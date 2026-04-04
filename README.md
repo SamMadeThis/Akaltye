@@ -13,6 +13,8 @@
 
 ## 🎯 About
 
+https://app.netlify.com/projects/akaltye/ 
+
 Akaltye is a web application dedicated to the preservation and revitalisation of the Eastern and Central Arrernte language, spoken by fewer than 4,000 people. The goal of this project is to provide accessible tools for learning Arrernte and to build a growing database of language resources.
 
 Arrernte is a language with deep cultural significance to Aboriginal peoples of Central Australia. Akaltye aims to support:
