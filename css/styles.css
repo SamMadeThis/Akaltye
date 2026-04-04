@@ -1,0 +1,2317 @@
+/* =============================================================
+   styles.css — Global styles for ALKATYE
+   Mobile-first · Dark mode · Organic / hand-made aesthetic
+
+   HOW THIS FILE IS ORGANISED:
+     1. Design tokens  (:root)
+        — Fonts (placeholders — fill in when decided)
+        — Colour palette
+        — Spacing & radius scale
+        — Transition speeds
+     2. Reset
+     3. Base (body, typography defaults)
+     4. Layout  (.page-content, .app)
+     5. Navigation (header, nav-bar, hamburger, nav drawer)
+     6. Word cards  (.card, .word, .definition …)
+     7. Shared UI   (.btn, .badge, .tag, .toast)
+     8. Log shared  (.log-list, .log-item, .log-word …)
+     9. Explore page (.explore, .explore-Groups …)
+    10. Animations   (@keyframes)
+
+   Page-specific styles live in their own CSS files:
+     practice.css  — Practice & Quiz page
+     history.css   — History page
+   ============================================================= */
+
+
+
+
+
+/* =============================================================
+   1. DESIGN TOKENS
+   ============================================================= */
+
+
+
+
+
+
+:root {
+
+  /* -----------------------------------------------------------
+     TYPOGRAPHY — placeholders
+     Replace the font-family values once fonts are decided.
+     The role comments explain where each is used so the swap
+     is mechanical — no hunting through every file.
+
+     ROLE: --font-display   → headings, logo, word cards
+     ROLE: --font-body      → body copy, definitions, examples
+     ROLE: --font-mono      → badges, labels, metadata, code
+     ----------------------------------------------------------- */
+  --font-display: 'Lora', serif;
+  --font-body: 'Vollkorn', serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Font sizes — mobile-first scale */
+  --text-xs: 0.625rem;
+  /*  10px — labels, fine print          */
+  --text-sm: 0.75rem;
+  /*  12px — badges, timestamps          */
+  --text-base: 0.9rem;
+  /*  14px — body copy, buttons          */
+  --text-md: 1rem;
+  /*  16px — definitions                 */
+  --text-lg: 1.4rem;
+  /*  22px — sub-headings                */
+  --text-xl: 2rem;
+  /*  32px — page headings               */
+  --text-2xl: 2.8rem;
+  /*  45px — word display on card        */
+  --text-3xl: 4rem;
+  /*  64px — score screen numeral        */
+
+  /* -----------------------------------------------------------
+     COLOUR PALETTE
+
+     Primary — dusty mauve/pink; used for accents, highlights,
+     interactive borders, the logo ATYE, hamburger lines.
+     Scale goes 0 (darkest/most saturated) → 90 (near white).
+     ----------------------------------------------------------- */
+  --clr-primary-a0: #c9afc2;
+  --clr-primary-a10: #cfb8c9;
+  --clr-primary-a20: #d5c0cf;
+  --clr-primary-a30: #dbc9d6;
+  --clr-primary-a40: #e1d2dd;
+  --clr-primary-a50: #e7dbe4;
+  --clr-primary-a60: #ede4ea;
+  --clr-primary-a70: #f3edf1;
+  --clr-primary-a80: #f9f6f8;
+  --clr-primary-a90: #ffffff;
+
+  /* Surface — warm dark greys for backgrounds and cards */
+  --clr-surface-a0: #1c1919;
+  /* page content background         */
+  --clr-surface-a10: #312e2e;
+  --clr-surface-a20: #474444;
+  --clr-surface-a30: #5f5c5c;
+  --clr-surface-a40: #777575;
+  --clr-surface-a50: #918f8f;
+  --clr-surface-a60: #abaaaa;
+  --clr-surface-a70: #c7c6c6;
+
+  /* Tonal surface — slightly warmer/pinker dark greys for cards */
+  --clr-surface-tonal-a0: #2b2627;
+  --clr-surface-tonal-a10: #3f3a3b;
+  --clr-surface-tonal-a20: #545051;
+  --clr-surface-tonal-a30: #6b6767;
+  --clr-surface-tonal-a40: #827e7f;
+  --clr-surface-tonal-a50: #999797;
+  --clr-surface-tonal-a60: #b2b0b0;
+  --clr-surface-tonal-a70: #cbcaca;
+
+  /* Base */
+  --clr-dark: #121010;
+  /* true page background (body)          */
+  --clr-light: #ffffff;
+
+  /* Semantic — feedback colours */
+  --clr-success-a0: #22946e;
+  --clr-success-a10: #47d5a6;
+  --clr-success-a20: #9ae8ce;
+
+  --clr-warning-a0: #a87a2a;
+  --clr-warning-a10: #d7ac61;
+  --clr-warning-a20: #ecd7b2;
+
+  --clr-danger-a0: #9c2121;
+  --clr-danger-a10: #d94a4a;
+  --clr-danger-a20: #eb9e9e;
+
+  --clr-info-a0: #515357;
+  --clr-info-a10: #83868b;
+  --clr-info-a20: #b8b9bc;
+
+  /* -----------------------------------------------------------
+     SPACING — consistent scale used across padding/gap/margin
+     ----------------------------------------------------------- */
+  --space-1: 0.25rem;
+  /*  4px */
+  --space-2: 0.5rem;
+  /*  8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+
+  /* -----------------------------------------------------------
+     BORDER RADIUS
+     Using slightly uneven values to hint at hand-made organics.
+     Swap for perfectly round values if preference changes.
+     ----------------------------------------------------------- */
+  --radius-sm: 8px;
+  /* tags, small badges                    */
+  --radius-md: 14px;
+  /* cards, mode cards                     */
+  --radius-lg: 18px;
+  /* word card, large panels               */
+  --radius-pill: 99px;
+  /* chips, pills, toast                   */
+
+  /* -----------------------------------------------------------
+     TRANSITIONS
+     ----------------------------------------------------------- */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* =============================================================
+   2. RESET
+   ============================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* =============================================================
+   3. BASE
+   ============================================================= */
+
+/* Body — dark background, primary text colour, mobile-first flex column */
+body {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--clr-primary-a50);
+  background-color: var(--clr-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Headings default to display font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--clr-light);
+}
+
+h1 {
+  font-size: var(--text-xl);
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: var(--text-lg);
+}
+
+/* Links — unstyled by default; individual components style as needed */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* =============================================================
+   4. LAYOUT
+   ============================================================= */
+
+/*
+ * .page-content
+ * WHAT: Main content wrapper used on every page
+ * HOW:  Centres content, constrains max-width, pads edges;
+ *       flex column so children stack naturally
+ * WHY:  Single token for consistent page margins across all pages
+ */
+.page-content {
+  width: 100%;
+  max-width: 640px;
+  /* comfortable reading width on desktop */
+  margin: var(--space-6) auto 0;
+  padding: var(--space-8) var(--space-4);
+  min-height: 100%;
+  background-color: var(--clr-surface-a0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+/*
+ * .app
+ * WHAT: Secondary inner wrapper used on word-card pages
+ * HOW:  Full width within .page-content, slight padding
+ * WHY:  Keeps the word card and controls grouped together
+ */
+.app {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--clr-surface-tonal-a0);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+
+/* =============================================================
+   5. NAVIGATION
+   ============================================================= */
+
+/*
+ * header
+ * WHAT: Top bar containing logo + hamburger + slide-out nav
+ * HOW:  Flex row, sticky at top; primary-tinted bottom border
+ * WHY:  Consistent header across all pages; border echoes the
+ *       primary accent colour
+ */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--clr-surface-tonal-a0);
+  border-bottom: 1px solid var(--clr-primary-a0);
+}
+
+.nav-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+}
+
+/* Logo — display font, two-tone: ALK white, ATYE primary */
+.logo {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.6rem;
+  letter-spacing: -0.5px;
+  color: var(--clr-light);
+  margin-right: auto;
+}
+
+.logo span {
+  color: var(--clr-primary-a0);
+}
+
+/* -----------------------------------------------------------
+   Hamburger menu — CSS-only checkbox toggle
+   HOW: Hidden checkbox; label acts as the button;
+        :checked sibling selectors drive open/close states
+   ----------------------------------------------------------- */
+
+/* Hidden checkbox — positioned off-screen, not display:none
+   so it still receives focus for accessibility */
+.menu-toggler {
+  position: absolute;
+  opacity: 0;
+  left: 10px;
+  top: 10px;
+}
+
+/* The three-line icon */
+.show-menu {
+  width: 32px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  z-index: 100;
+  background-color: transparent;
+}
+
+.show-menu span,
+.show-menu::before,
+.show-menu::after {
+  width: 100%;
+  height: 4px;
+  background: var(--clr-primary-a0);
+  border-radius: 3px;
+}
+
+.show-menu::before,
+.show-menu::after {
+  content: '';
+  left: 0;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.show-menu::before {
+  top: 0;
+}
+
+.show-menu::after {
+  top: 18px;
+}
+
+/* Open state — middle bar hidden, top & bottom rotate to × */
+.menu-toggler:checked+.show-menu span {
+  background-color: transparent;
+}
+
+.menu-toggler:checked+.show-menu::after {
+  top: 9px;
+  transform: rotate(45deg);
+}
+
+.menu-toggler:checked+.show-menu::before {
+  top: 9px;
+  transform: rotate(-45deg);
+}
+
+.menu-toggler:checked~.nav {
+  transform: translateX(0);
+}
+
+/* Slide-out nav drawer */
+.nav {
+  position: fixed;
+  right: 0;
+  top: 60px;
+  bottom: 0;
+  width: 100%;
+  background: var(--clr-primary-a0);
+  transform: translateX(100%);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.nav__menu {
+  list-style: none;
+}
+
+.nav__link {
+  display: block;
+  color: var(--clr-dark);
+  font-family: var(--font-body);
+  padding: var(--space-6) var(--space-6);
+  border-bottom: 1px solid var(--clr-surface-tonal-a40);
+  transition: background var(--transition-fast);
+}
+
+.nav__link:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+
+/* =============================================================
+   6. WORD CARDS  (words.html)
+   ============================================================= */
+
+/*
+ * .card
+ * WHAT: The main word display card
+ * HOW:  Dark tonal bg, accent border, flex column with gap;
+ *       fade-out class used during card transitions
+ */
+.card {
+  background: var(--clr-surface-tonal-a10);
+  border: 1px solid var(--clr-primary-a50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-8) var(--space-6);
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  margin-bottom: var(--space-4);
+}
+
+.card.fade-out {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* Large Arrernte word */
+.word {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: var(--clr-light);
+}
+
+/* Phonetic transcription below the word */
+.phonetic {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a60);
+  margin-top: -0.25rem;
+}
+
+/* Definition block — light bg with left accent border */
+.definition {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--clr-dark);
+  background-color: var(--clr-primary-a60);
+  border-left: 2px solid var(--clr-primary-a10);
+  padding-left: var(--space-4);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.def-line {
+  display: block;
+  margin-bottom: 0.3em;
+}
+
+.def-num {
+  font-weight: 600;
+  margin-right: 0.3em;
+}
+
+/* Example sentences — quoted with CSS */
+.example1,
+.example2 {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--clr-primary-a10);
+  line-height: 1.6;
+}
+
+.example1::before,
+.example2::before {
+  content: '\201C';
+}
+
+.example1::after,
+.example2::after {
+  content: '\201D';
+}
+
+/* Tags row at the bottom of the card */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+/* Progress bar row above word cards */
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.progress-track {
+  flex: 1;
+  height: 2px;
+  background: var(--clr-surface-a20);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--clr-primary-a0);
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+.progress-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a50);
+  white-space: nowrap;
+}
+
+/* Word card navigation controls */
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-8);
+}
+
+
+/* =============================================================
+   7. SHARED UI — buttons, badges, tags, toast
+   ============================================================= */
+
+/*
+ * .btn — base button used on word cards (prev / next / seen)
+ */
+.btn {
+  background: transparent;
+  border: 1px solid var(--clr-primary-a50);
+  border-radius: var(--radius-sm);
+  color: var(--clr-light);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 400;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform 0.1s ease;
+}
+
+.btn:hover {
+  background: var(--clr-surface-tonal-a10);
+  border-color: var(--clr-primary-a30);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* "Mark as seen" variant */
+.btn-seen {
+  flex: 1;
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+  font-weight: 500;
+}
+
+.btn-seen:hover {
+  background: rgba(201, 175, 194, 0.12);
+}
+
+/* After marking seen */
+.btn-seen.already {
+  background: var(--clr-surface-a60);
+  border-color: var(--clr-surface-a20);
+  color: var(--clr-dark);
+}
+
+/*
+ * Badges — pill labels on word cards
+ */
+.pos-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-light);
+  background: var(--clr-surface-a0);
+  border: 1px solid var(--clr-info-a10);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.seen-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-light);
+  background: var(--clr-surface-a20);
+  border: 1px solid var(--clr-surface-a40);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+/*
+ * .tag — small category label inside word cards
+ */
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-info-a20);
+  border: 1px solid var(--clr-info-a0);
+  border-radius: var(--radius-pill);
+  padding: 2px 9px;
+  letter-spacing: 0.03em;
+}
+
+/*
+ * .header-meta — small text showing "N words studied"
+ */
+.header-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a50);
+  letter-spacing: 0.05em;
+}
+
+/*
+ * .toast — brief confirmation message fixed at screen bottom
+ * WHAT: Non-blocking feedback e.g. "logged ✓"
+ * HOW:  Fixed position, opacity animated via .show class
+ * WHY:  Doesn't interrupt the user's flow with a modal
+ */
+.toast {
+  position: fixed;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--clr-surface-tonal-a10);
+  border: 1px solid var(--clr-primary-a0);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-primary-a0);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+/* =============================================================
+   8. LOG SHARED STYLES  (used by history.html and words.html)
+   ============================================================= */
+
+/* Section header row — title left, clear button right */
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.log-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a60);
+}
+
+.log-clear {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.log-clear:hover {
+  color: var(--clr-danger-a10);
+}
+
+/* Scrollable list container */
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-primary-a30) transparent;
+}
+
+/* Individual log row */
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--clr-surface-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-sm);
+  animation: slideIn 0.2s ease;
+}
+
+.log-word {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a70);
+  flex: 1;
+}
+
+.log-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--clr-surface-a0);
+  color: var(--clr-primary-a0);
+  border: 1px solid var(--clr-primary-a50);
+}
+
+.log-time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+}
+
+/* Empty state placeholder */
+.log-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+  text-align: center;
+  padding: var(--space-6);
+  border: 1px dashed var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+}
+
+
+/* =============================================================
+   9. EXPLORE PAGE  (explore.html / index.html)
+   ============================================================= */
+
+.explore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Topic group rows — flex-wrap, full width, mobile-friendly */
+.explore-Topbar,
+.explore-Groups {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: var(--space-4) 0;
+  gap: var(--space-4);
+}
+
+/* Individual group tiles */
+.explore-UserTopics,
+.explore-GroupList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--clr-surface-tonal-a0);
+  /* Grow to fill space; min ensures they don't get too small */
+  flex: 1 1 calc(50% - var(--space-4));
+  min-width: 130px;
+  height: 110px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-surface-a20);
+  transition: border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform 0.1s ease;
+}
+
+.explore-UserTopics:hover,
+.explore-GroupList:hover {
+  border-color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.05);
+  transform: translateY(-1px);
+}
+
+.explore a {
+  text-decoration: none;
+  width: 100%;
+}
+
+/* Clickable filter tiles */
+.explore-GroupList.filter-btn {
+  cursor: pointer;
+}
+
+.explore-GroupList.filter-btn.active {
+  border: 2px solid var(--clr-primary-a0);
+  background: var(--clr-surface-a0);
+}
+
+/* Inner content wrapper — centres icon above label */
+.explore-UserTopics>div,
+.explore-GroupList>div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+/* Tile icons — sized relative to viewport, never hardcoded px */
+.explore-UserTopics i,
+.explore-GroupList i {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  color: var(--clr-surface-a60);
+  line-height: 1;
+}
+
+/* Tile label — presentational text inside each tile button */
+.tile-label {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--clr-surface-a60);
+}
+
+/* Section headings — Groups, Parts of Speech, Levels, Lexicon */
+.explore h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--clr-surface-a40);
+  letter-spacing: 0.03em;
+  align-self: flex-start;
+}
+
+
+/* =============================================================
+   10. ANIMATIONS
+   ============================================================= */
+
+/*
+ * slideIn — used by log items when they are injected into the DOM
+ */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * fadeUp — used by quiz/practice screens when switching
+ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =============================================================
+   11. PRACTICE & QUIZ PAGE  (practice.html)
+   ============================================================= */
+
+/*
+ * .practice-wrap
+ * WHAT: Outermost column for all three quiz screens
+ * HOW:  Flex column, full width up to 580px
+ * WHY:  Centres and constrains content on all devices
+ */
+.practice-wrap {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * .screen — screen visibility & entrance animation
+ * WHAT: Controls which screen is visible (mode / quiz / score)
+ * HOW:  Hidden by default; practice.js adds .active to show one
+ * WHY:  Single-page feel without a reload between steps
+ */
+.screen {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  animation: fadeUp 0.22s ease;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* --- Mode screen heading --- */
+.practice-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -0.5px;
+}
+
+.practice-heading span {
+  color: var(--clr-primary-a0);
+}
+
+.practice-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--clr-surface-a50);
+  margin-top: var(--space-1);
+}
+
+/* --- Filter chips --- */
+/*
+ * WHAT: Pill buttons to filter words by tag, POS, or seen status
+ * HOW:  Flex-wrap row; .on state uses primary accent border
+ * WHY:  Lets users narrow the word pool without navigating away
+ */
+.filter-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-bottom: var(--space-2);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--clr-surface-a20);
+  color: var(--clr-surface-a50);
+  background: var(--clr-surface-tonal-a0);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.03em;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+}
+
+.chip.on {
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+  background: rgba(201, 175, 194, 0.09);
+}
+
+.chip.seen-chip.on {
+  border-color: var(--clr-success-a0);
+  color: var(--clr-success-a10);
+  background: rgba(34, 148, 110, 0.09);
+}
+
+/* --- Mode cards --- */
+/*
+ * WHAT: Five clickable cards for each quiz type + shuffle
+ * HOW:  CSS grid 2-col; shuffle spans full width
+ * WHY:  All options visible at once; grid keeps them aligned
+ */
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.mode-card {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-4);
+  cursor: pointer;
+  transition: border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.mode-card:hover {
+  border-color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.05);
+  transform: translateY(-1px);
+}
+
+.mode-card:active {
+  transform: scale(0.98);
+}
+
+.mode-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.mode-name {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -0.2px;
+}
+
+.mode-desc {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--clr-surface-a50);
+  line-height: 1.5;
+}
+
+/* Shuffle card — full width, row layout */
+.shuffle-card {
+  grid-column: 1 / -1;
+  background: rgba(201, 175, 194, 0.06);
+  border-color: var(--clr-primary-a30);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.shuffle-card .mode-icon {
+  font-size: 1.7rem;
+}
+
+.shuffle-card .mode-name {
+  font-size: 1.05rem;
+}
+
+.shuffle-card:hover {
+  background: rgba(201, 175, 194, 0.12);
+  border-color: var(--clr-primary-a0);
+}
+
+/* --- Also row (Word Cards / History links) --- */
+.also-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.also-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a50);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  transition: all var(--transition-fast);
+}
+
+.also-link:hover {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+}
+
+.also-icon {
+  font-size: 0.9rem;
+}
+
+/* --- Quiz screen top bar --- */
+.quiz-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quiz-mode-lbl {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+}
+
+.quiz-exit {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.quiz-exit:hover {
+  color: var(--clr-primary-a0);
+}
+
+/* --- Quiz progress bar --- */
+.q-prog-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-prog-track {
+  flex: 1;
+  height: 2px;
+  background: var(--clr-surface-a20);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.q-prog-fill {
+  height: 100%;
+  background: var(--clr-primary-a0);
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+  width: 0;
+}
+
+.q-prog-lbl {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  white-space: nowrap;
+}
+
+/* --- Question card --- */
+.q-card {
+  background: var(--clr-surface-tonal-a10);
+  border: 1px solid var(--clr-primary-a50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 120px;
+}
+
+.q-type-pill {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--clr-surface-a20);
+  color: var(--clr-surface-a40);
+  align-self: flex-start;
+}
+
+.q-instruction {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  color: var(--clr-surface-a50);
+}
+
+.q-main {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+}
+
+.q-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a50);
+}
+
+/* --- Multiple choice answer grid --- */
+/*
+ * WHAT: 2×2 grid of answer buttons for Guess + Meaning Match
+ * HOW:  CSS grid; correct/incorrect classes added by JS after pick
+ * WHY:  Large tap targets; instant colour feedback
+ */
+.ans-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.ans-btn {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-sm);
+  color: var(--clr-surface-a60);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  padding: 13px 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.ans-btn:hover:not(:disabled) {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a50);
+  background: rgba(201, 175, 194, 0.06);
+}
+
+.ans-btn.correct {
+  border-color: var(--clr-success-a0) !important;
+  background: rgba(34, 148, 110, 0.15) !important;
+  color: var(--clr-success-a10) !important;
+}
+
+.ans-btn.incorrect {
+  border-color: var(--clr-danger-a0) !important;
+  background: rgba(156, 33, 33, 0.15) !important;
+  color: var(--clr-danger-a10) !important;
+}
+
+.ans-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* --- Fill the Gap input --- */
+.gap-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gap-input {
+  width: 100%;
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a30);
+  border-radius: var(--radius-sm);
+  color: var(--clr-light);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.gap-input:focus {
+  border-color: var(--clr-primary-a0);
+}
+
+.gap-input.correct {
+  border-color: var(--clr-success-a0);
+  background: rgba(34, 148, 110, 0.1);
+}
+
+.gap-input.incorrect {
+  border-color: var(--clr-danger-a0);
+  background: rgba(156, 33, 33, 0.1);
+}
+
+.gap-submit {
+  padding: 11px;
+  background: none;
+  border: 1px solid var(--clr-primary-a30);
+  border-radius: var(--radius-sm);
+  color: var(--clr-primary-a40);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.gap-submit:hover {
+  background: rgba(201, 175, 194, 0.08);
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+}
+
+.gap-submit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* --- Match synonym columns --- */
+/*
+ * WHAT: Two-column tap-to-pair interface
+ * HOW:  Grid 1fr 1fr; columns shuffled independently by JS
+ * WHY:  Pairing trains associative memory differently to MC
+ */
+.match-instructions {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  text-align: center;
+  padding-bottom: var(--space-1);
+}
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.match-col-lbl {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-bottom: var(--space-2);
+}
+
+.match-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.match-item {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-sm);
+  padding: 11px 10px;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a60);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+  line-height: 1.3;
+  user-select: none;
+}
+
+.match-item:hover:not(.matched):not(.disabled) {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a50);
+}
+
+.match-item.selected {
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+  background: rgba(201, 175, 194, 0.1);
+}
+
+.match-item.matched {
+  border-color: var(--clr-success-a0);
+  background: rgba(34, 148, 110, 0.13);
+  color: var(--clr-success-a10);
+  cursor: default;
+}
+
+.match-item.wrong-flash {
+  border-color: var(--clr-danger-a0);
+  background: rgba(156, 33, 33, 0.13);
+}
+
+.match-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Feedback line --- */
+.feedback {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-align: center;
+  min-height: 1.2em;
+  color: var(--clr-surface-a40);
+  transition: color 0.2s ease;
+}
+
+.feedback.ok {
+  color: var(--clr-success-a10);
+}
+
+.feedback.bad {
+  color: var(--clr-danger-a10);
+}
+
+/* --- Next button --- */
+.btn-next {
+  width: 100%;
+  padding: 13px;
+  background: none;
+  border: 1px solid var(--clr-primary-a0);
+  border-radius: var(--radius-md);
+  color: var(--clr-primary-a0);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: background var(--transition-fast), transform 0.1s ease;
+  display: none;
+}
+
+.btn-next.show {
+  display: block;
+}
+
+.btn-next:hover {
+  background: rgba(201, 175, 194, 0.08);
+}
+
+.btn-next:active {
+  transform: scale(0.98);
+}
+
+/* --- Score screen --- */
+.score-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+.score-big {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -3px;
+  line-height: 1;
+}
+
+.score-big span {
+  color: var(--clr-primary-a0);
+}
+
+.score-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-top: calc(-1 * var(--space-3));
+}
+
+.score-bar-track {
+  width: 100%;
+  height: 3px;
+  background: var(--clr-surface-a20);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  background: var(--clr-primary-a0);
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-quip {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-base);
+  color: var(--clr-primary-a40);
+}
+
+.score-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--clr-primary-a0);
+  color: var(--clr-dark);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background: var(--clr-primary-a10);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  color: var(--clr-surface-a50);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+}
+
+/* --- Recent quiz log strip on mode screen --- */
+.quiz-log-header {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-bottom: var(--space-2);
+}
+
+.quiz-log-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-1);
+  background: var(--clr-surface-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-sm);
+  animation: slideIn 0.2s ease;
+}
+
+.qli-mode {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  flex: 1;
+}
+
+.qli-score {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(201, 175, 194, 0.08);
+  border: 1px solid var(--clr-primary-a50);
+  flex: 0 0 auto;
+}
+
+.qli-time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a30);
+  flex: 0 0 auto;
+}
+
+.quiz-log-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a30);
+  text-align: center;
+  padding: var(--space-5);
+  border: 1px dashed var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+}
+
+
+/* =============================================================
+   12. HISTORY PAGE  (history.html)
+   ============================================================= */
+
+/*
+ * .history-wrap
+ * WHAT: Outer column holding both log sections
+ * HOW:  Flex column, full width, consistent gap
+ */
+.history-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 560px;
+}
+
+/* Section header row */
+.history-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.history-section-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a50);
+}
+
+.history-clear-btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.history-clear-btn:hover {
+  color: var(--clr-danger-a10);
+}
+
+/* Quiz log rows (word log rows reuse .log-item from section 8) */
+.quiz-log-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3);
+  background: var(--clr-surface-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-sm);
+  animation: slideIn 0.2s ease;
+}
+
+.quiz-log-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.quiz-log-mode {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a60);
+}
+
+.quiz-log-date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a30);
+}
+
+.quiz-log-bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.quiz-log-bar-track {
+  flex: 1;
+  height: 2px;
+  background: var(--clr-surface-a20);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Bar fill width + colour set inline by history.js */
+.quiz-log-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.quiz-log-score {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(201, 175, 194, 0.08);
+  border: 1px solid var(--clr-primary-a50);
+  flex: 0 0 auto;
+}
+
+/* =============================================================
+   FAVOURITE BUTTON  (words.html)
+   ============================================================= */
+
+/*
+ * .btn-fav — favourite toggle on the word card
+ * WHAT: Sits next to the "seen" button; toggles a word in/out
+ *       of the user's favourites list
+ * HOW:  Inherits base .btn styles; primary-coloured border at
+ *       rest; fills solid when .active (word is favourited)
+ * WHY:  Visually distinct from "seen" so users understand the
+ *       two actions serve different purposes
+ */
+.btn-fav {
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+}
+
+.btn-fav:hover {
+  background: rgba(201, 175, 194, 0.12);
+}
+
+/* Word is currently favourited */
+.btn-fav.active {
+  background: var(--clr-primary-a0);
+  color: var(--clr-dark);
+  border-color: var(--clr-primary-a0);
+}
+
+
+/* Clickable log row — used on saved.html */
+.log-item--link {
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.log-item--link:hover {
+  border-color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.05);
+  transform: translateY(-1px);
+}
+
+.log-item--link:active {
+  transform: scale(0.99);
+}
+
+/*Sits below the seen/favourite row; independent from favourite.=============================================================*/
+
+.btn-bookmark {
+  width: 100%;
+  border-color: var(--clr-surface-a30);
+  color: var(--clr-surface-a50);
+}
+
+.btn-bookmark:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--clr-surface-a50);
+  color: var(--clr-surface-a60);
+}
+
+.btn-bookmark.active {
+  background: rgba(201, 175, 194, 0.1);
+  color: var(--clr-primary-a20);
+  border-color: var(--clr-primary-a30);
+}
+
+
+/* =============================================================
+   PROFILE PAGE  (profile.html)
+   ============================================================= */
+
+/* Outer column */
+.profile-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 480px;
+}
+
+.profile-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -0.5px;
+}
+
+/*
+ * .profile-stats — two-column grid of stat tiles
+ * WHAT: Shows words studied, favourited, bookmarked and practices
+ *       completed as large tappable tiles; each is an <a> link.
+ * WHY:  At-a-glance progress; tapping acts on the stat directly
+ */
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* ── Last practice result card ── */
+.profile-last-test {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.last-test-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+}
+
+.last-test-mode {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--clr-surface-a60);
+}
+
+.last-test-date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a30);
+  letter-spacing: 0.05em;
+}
+
+.last-test-bar-track {
+  width: 100%;
+  height: 3px;
+  background: var(--clr-surface-a20);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: var(--space-1);
+}
+
+.last-test-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.7s ease;
+}
+
+.last-test-score {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--clr-light);
+  margin-top: var(--space-1);
+}
+
+.last-test-pct {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a50);
+  letter-spacing: 0.05em;
+}
+
+.stat-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-6) var(--space-4);
+  text-decoration: none;
+  transition: border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform 0.1s ease;
+}
+
+.stat-btn:hover {
+  border-color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.05);
+  transform: translateY(-1px);
+}
+
+.stat-btn:active {
+  transform: scale(0.98);
+}
+
+/* Favourites tile — warmer border accent */
+.stat-btn--fav {
+  border-color: rgba(201, 175, 194, 0.3);
+}
+
+.stat-btn--fav:hover {
+  border-color: var(--clr-primary-a0);
+}
+
+/* Bookmarks tile */
+.stat-btn--bookmark {
+  border-color: rgba(201, 175, 194, 0.15);
+}
+
+.stat-btn--bookmark:hover {
+  border-color: var(--clr-primary-a30);
+}
+
+/* Practices tile */
+.stat-btn--practice {
+  border-color: rgba(34, 148, 110, 0.2);
+}
+
+.stat-btn--practice:hover {
+  border-color: var(--clr-success-a0);
+}
+
+/* Large number */
+.stat-num {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--clr-light);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+/* Label below the number */
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a50);
+}
+
+/* Section divider label */
+.profile-section-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-bottom: calc(-1 * var(--space-3));
+}
+
+/* Quick-link pills */
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.profile-link-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a50);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.profile-link-btn:hover {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+}
+
+
+/* =============================================================
+   NAV AUTH BUTTON  (index.html + all pages eventually)
+   ============================================================= */
+
+/* Wrapper sits at the right of the nav bar */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Sign in button — shown when logged out */
+.nav-auth-btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--clr-dark);
+  background: var(--clr-primary-a0);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-auth-btn:hover {
+  background: var(--clr-primary-a10);
+}
+
+/* Avatar + first name — shown when logged in */
+.nav-auth-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  transition: background var(--transition-fast);
+}
+
+.nav-auth-user:hover {
+  background: rgba(201, 175, 194, 0.08);
+}
+
+.nav-auth-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--clr-surface-a20);
+}
+
+.nav-auth-initial {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--clr-primary-a0);
+  color: var(--clr-dark);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-auth-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a50);
+  letter-spacing: 0.05em;
+}
+
+/* =============================================================
+   HOME — SIGN-IN PROMPT SECTION
+   ============================================================= */
+
+/*
+ * Shown only when the user is not signed in.
+ * Sits between the CTAs and the footer note.
+ * Uses a dashed border to feel like an invitation, not a demand.
+ */
+.home-signin-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border: 1px dashed var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  animation: fadeUp 0.55s ease 0.28s both;
+}
+
+.home-signin-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.home-signin-prompt-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a60);
+}
+
+.home-signin-prompt-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a30);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+
+.home-signin-prompt-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--clr-primary-a0);
+  border: 1px solid var(--clr-primary-a30);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.home-signin-prompt-btn:hover {
+  background: rgba(201, 175, 194, 0.08);
+  border-color: var(--clr-primary-a0);
+}
+
+.profile-account-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  min-height: 64px;
+}
+
+.account-avatar {
+  flex-shrink: 0;
+}
+
+.account-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--clr-surface-a20);
+}
+
+.account-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--clr-primary-a0);
+  color: var(--clr-dark);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.account-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-name {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--clr-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-email {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-signout-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  background: none;
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.account-signout-btn:hover {
+  color: var(--clr-danger-a10);
+  border-color: var(--clr-danger-a0);
+}
+
+.account-signin-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-dark);
+  background: var(--clr-primary-a0);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.account-signin-btn:hover {
+  background: var(--clr-primary-a10);
+}
+
+/* =============================================================
+   PROFILE — ABOUT YOU CARD
+   ============================================================= */
+.profile-about-card {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.about-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+}
+
+.about-edit-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.about-edit-link:hover {
+  color: var(--clr-primary-a20);
+}
+
+.about-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.about-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.about-row-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+}
+
+.about-row-value {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a60);
+  line-height: 1.5;
+}
+
+/* Small count shown on the tile when > 0 */
+.explore-tile-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  margin-top: var(--space-1);
+}
+
+/* Heart icon above the tile label */
+.explore-tile-icon {
+  font-size: 1.1rem;
+  color: var(--clr-primary-a0);
+  margin-bottom: var(--space-1);
+}
