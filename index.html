@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>ALKATYE — Arrernte Language</title>
+
+  <style>
+    /* ── Index-page-only styles ── */
+
+    /* Full-height hero that fills the screen below the nav */
+    .home-hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100vh - 64px);
+      padding: var(--space-8) var(--space-4);
+      gap: var(--space-8);
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Top: country marker ── */
+    .home-country {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .home-country-line {
+      width: 28px;
+      height: 1px;
+      background: var(--clr-primary-a0);
+      opacity: 0.5;
+    }
+
+    .home-country-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--clr-primary-a0);
+      opacity: 0.7;
+    }
+
+    /* ── Headline block ── */
+    .home-headline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      animation: fadeUp 0.55s ease 0.08s both;
+    }
+
+    .home-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 8vw, 3.6rem);
+      font-weight: 500;
+      line-height: 1.15;
+      color: var(--clr-light);
+      letter-spacing: -0.5px;
+    }
+
+    .home-title em {
+      font-style: italic;
+      color: var(--clr-primary-a0);
+    }
+
+    .home-subtitle {
+      font-family: var(--font-body);
+      font-size: var(--text-md);
+      line-height: 1.7;
+      color: var(--clr-surface-a50);
+      max-width: 380px;
+    }
+
+    /* ── Daily word card ── */
+    .home-word-card {
+      background: var(--clr-surface-tonal-a0);
+      border: 1px solid var(--clr-surface-a20);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      animation: fadeUp 0.55s ease 0.16s both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative corner accent */
+    .home-word-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at top right, rgba(201, 175, 194, 0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .home-word-card-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--clr-surface-a40);
+    }
+
+    .home-word-card-word {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      color: var(--clr-light);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .home-word-card-phonetic {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--clr-primary-a0);
+      opacity: 0.7;
+      font-weight: 300;
+    }
+
+    .home-word-card-def {
+      font-family: var(--font-body);
+      font-size: var(--text-md);
+      color: var(--clr-surface-a60);
+      margin-top: var(--space-1);
+      line-height: 1.5;
+    }
+
+    .home-word-card-example {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: var(--text-base);
+      color: var(--clr-surface-a40);
+      margin-top: var(--space-1);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--clr-surface-a20);
+    }
+
+    /* ── CTA buttons ── */
+    .home-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      animation: fadeUp 0.55s ease 0.24s both;
+    }
+
+    .home-btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      background: var(--clr-primary-a0);
+      color: var(--clr-dark);
+      font-family: var(--font-body);
+      font-size: var(--text-md);
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 16px var(--space-6);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform 0.1s ease;
+    }
+
+    .home-btn-primary:hover {
+      background: var(--clr-primary-a10);
+    }
+
+    .home-btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .home-btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      background: none;
+      color: var(--clr-surface-a50);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      border: 1px solid var(--clr-surface-a20);
+      border-radius: var(--radius-md);
+      padding: 14px var(--space-6);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .home-btn-secondary:hover {
+      border-color: var(--clr-primary-a30);
+      color: var(--clr-primary-a40);
+    }
+
+    /* ── Returning user progress strip ── */
+    .home-progress {
+      display: none;
+      /* shown by JS if they have data */
+      flex-direction: column;
+      gap: var(--space-3);
+      animation: fadeUp 0.55s ease 0.3s both;
+    }
+
+    .home-progress.visible {
+      display: flex;
+    }
+
+    .home-progress-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--clr-surface-a40);
+    }
+
+    .home-progress-stats {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .home-progress-stat {
+      flex: 1;
+      background: var(--clr-surface-tonal-a0);
+      border: 1px solid var(--clr-surface-a20);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      transition: border-color var(--transition-fast);
+    }
+
+    .home-progress-stat:hover {
+      border-color: var(--clr-primary-a30);
+    }
+
+    .home-progress-stat-num {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--clr-light);
+      line-height: 1;
+    }
+
+    .home-progress-stat-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.08em;
+      color: var(--clr-surface-a40);
+      text-transform: uppercase;
+    }
+
+    /* ── Footer note ── */
+    .home-footer-note {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--clr-surface-a30);
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+      animation: fadeUp 0.55s ease 0.32s both;
+      padding-bottom: var(--space-8);
+    }
+
+    /* ── Animation ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-bar">
+      <a href="index.html" class="logo">ALK<span>ATYE</span></a>
+
+      <input id="menu-toggler" type="checkbox" class="menu-toggler">
+      <label for="menu-toggler" class="show-menu"><span></span></label>
+
+      <nav class="nav">
+        <ul class="nav__menu">
+          <li class="nav__item"><a href="pages/explore.html" class="nav__link">Explore</a></li>
+          <li class="nav__item"><a href="pages/practice.html" class="nav__link">Practice</a></li>
+          <li class="nav__item"><a href="pages/profile.html" class="nav__link">Profile</a></li>
+          <li class="nav__item"><a href="pages/resources.html" class="nav__link">Resources</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth button — swaps between Sign in / avatar based on auth state -->
+      <div id="navAuth" class="nav-auth"></div>
+    </div>
+  </header>
+
+  <div class="home-hero">
+
+    <!-- Country marker -->
+    <div class="home-country">
+      <div class="home-country-line"></div>
+      <span class="home-country-label">Arrernte Country · Mparntwe</span>
+    </div>
+
+    <!-- Headline -->
+    <div class="home-headline">
+      <h1 class="home-title">
+        Learn the language<br>of <em>this Country.</em>
+      </h1>
+      <p class="home-subtitle">
+        Arrernte is a living language of the Alice Springs region.
+        This is a place to learn at your own pace, word by word.
+      </p>
+    </div>
+
+    <!-- Word of the day card -->
+    <div class="home-word-card">
+      <div class="home-word-card-label">Word of the day</div>
+      <div class="home-word-card-word" id="wotdWord">—</div>
+      <div class="home-word-card-phonetic" id="wotdPhonetic"></div>
+      <div class="home-word-card-def" id="wotdDef">—</div>
+      <div class="home-word-card-example" id="wotdExample"></div>
+    </div>
+
+    <!-- Returning user progress (only shown if they have data) -->
+    <div class="home-progress" id="homeProgress">
+      <div class="home-progress-label">Your progress</div>
+      <div class="home-progress-stats">
+        <a href="pages/words.html?tag=all" class="home-progress-stat">
+          <span class="home-progress-stat-num" id="progressSeen">0</span>
+          <span class="home-progress-stat-label">words studied</span>
+        </a>
+        <a href="pages/practice.html" class="home-progress-stat">
+          <span class="home-progress-stat-num" id="progressQuizzes">0</span>
+          <span class="home-progress-stat-label">practices done</span>
+        </a>
+        <a href="pages/saved.html" class="home-progress-stat">
+          <span class="home-progress-stat-num" id="progressFavs">0</span>
+          <span class="home-progress-stat-label">favourited</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="home-actions">
+      <a href="pages/words.html?tag=beginner" class="home-btn-primary">
+        Start with beginner words →
+      </a>
+      <a href="pages/explore.html" class="home-btn-secondary">
+        Explore all words
+      </a>
+    </div>
+
+    <!-- ── Sign-in prompt — only shown when not signed in ── -->
+    <div class="home-signin-prompt" id="homeSigninPrompt" style="display:none;">
+      <div class="home-signin-prompt-text">
+        <span class="home-signin-prompt-title">Save your progress</span>
+        <span class="home-signin-prompt-sub">Sign in to keep your words and history across all your devices.</span>
+      </div>
+      <a href="pages/login.html" class="home-signin-prompt-btn">Sign in →</a>
+    </div>
+
+    <!-- Footer note -->
+    <p class="home-footer-note">
+      Arrernte is spoken by the Arrernte people of Central Australia.<br>
+      This app is a learning tool. Always seek out speakers and elders<br>
+      to deepen your understanding.
+    </p>
+
+  </div>
+
+  <script type="module">
+    import { auth } from './js/firebase-config.js';
+    import { signOut } from './js/auth.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+    /* ── Word of the day ── */
+    const WORDS = [
+      { word: "Werte", phonetic: "wer-da", definition: "Greeting — Hello, what's up?", example: "Werte? Inwenheke-ame unte atyenge antangkelhene." },
+      { word: "Mwerre", phonetic: "mwa-rra", definition: "Good, right, proper. Healthy, well.", example: "Unte mwerre? — Are you good?" },
+      { word: "Kwatye", phonetic: "kwa-dja", definition: "Water, rain.", example: "Kwatye arrangkwe — there is no water." },
+      { word: "Apmere", phonetic: "ap-mara", definition: "Country, land, home, place.", example: "Apmere — the land that holds everything." },
+      { word: "Mparntwe", phonetic: "m'barn-twa", definition: "Alice Springs — the town area.", example: "Mparntwe is Arrernte Country." },
+      { word: "Urreke", phonetic: "oo-ree-ga", definition: "Goodbye, farewell.", example: "Urreke! Nhenhe apetyeke — Goodbye! See you later." },
+      { word: "Inwenhe", phonetic: "in-wan-ya", definition: "What — used to ask about something.", example: "Inwenhe nhenhe? — What is this?" },
+      { word: "Ye", phonetic: "ya", definition: "Yes, yeah.", example: "Ye, ayenge mwerre — Yes, I am good." },
+    ];
+
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    const wotd = WORDS[dayOfYear % WORDS.length];
+    document.getElementById('wotdWord').textContent = wotd.word;
+    document.getElementById('wotdPhonetic').textContent = wotd.phonetic ? `/${wotd.phonetic}/` : '';
+    document.getElementById('wotdDef').textContent = wotd.definition;
+    document.getElementById('wotdExample').textContent = wotd.example || '';
+    if (!wotd.example) document.getElementById('wotdExample').style.display = 'none';
+
+    /* ── Returning user progress ── */
+    const seen = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
+    const quizzes = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
+    const favs = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
+    const seenCount = Object.keys(seen).length;
+    if (seenCount > 0) {
+      document.getElementById('progressSeen').textContent = seenCount;
+      document.getElementById('progressQuizzes').textContent = quizzes.length;
+      document.getElementById('progressFavs').textContent = favs.length;
+      document.getElementById('homeProgress').classList.add('visible');
+    }
+
+    /* ── Auth state → nav button + sign-in prompt ── */
+    const navAuth = document.getElementById('navAuth');
+    const signinPrompt = document.getElementById('homeSigninPrompt');
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        // Signed in — show avatar/name in nav, hide prompt
+        navAuth.innerHTML = `
+          <a href="pages/profile.html" class="nav-auth-user">
+            ${user.photoURL
+            ? `<img src="${user.photoURL}" alt="${user.displayName}" class="nav-auth-avatar">`
+            : `<div class="nav-auth-initial">${(user.displayName || user.email || '?')[0].toUpperCase()}</div>`
+          }
+            <span class="nav-auth-name">${(user.displayName || '').split(' ')[0]}</span>
+          </a>
+        `;
+        signinPrompt.style.display = 'none';
+      } else {
+        // Not signed in — show sign-in button in nav + prompt section
+        navAuth.innerHTML = `<a href="pages/login.html" class="nav-auth-btn">Sign in</a>`;
+        signinPrompt.style.display = 'flex';
+      }
+    });
+  </script>
+
+</body>
+
+</html>
