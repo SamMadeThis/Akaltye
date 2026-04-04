@@ -305,21 +305,18 @@ const WORDS = [
 // ═══════════════════════════════════════════════════
 //  Firebase
 // ═══════════════════════════════════════════════════
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { auth }                        from './firebase-config.js';
+import { onAuthStateChanged }           from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+import { pullFromFirestore, syncSeen, syncFavourites, syncBookmarks } from './sync.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCvEdCqAuwgtJ-02R9xs7nbeBlfn55lYUk",
-  authDomain: "lexicon-69642.firebaseapp.com",
-  projectId: "lexicon-69642",
-  storageBucket: "lexicon-69642.firebasestorage.app",
-  messagingSenderId: "40542416693",
-  appId: "1:40542416693:web:ce930dbe96c7d5b3ebe67c",
-  measurementId: "G-17ZB632V40"
-};
+// Track the signed-in uid — null if not signed in
+let currentUid = null;
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+// Listen for auth state once; pull Firestore data if new device
+onAuthStateChanged(auth, user => {
+  currentUid = user ? user.uid : null;
+  if (currentUid) pullFromFirestore(currentUid);
+});
 
 
 // ═══════════════════════════════════════════════════
@@ -472,22 +469,10 @@ async function markSeen() {
   seenCounts[w.word].lastSeen = isoNow;
   viewLog.unshift({ word: w.word, time: timeStr, iso: isoNow });
 
-  localStorage.setItem('lexicon_seen', JSON.stringify(seenCounts));
-  localStorage.setItem('lexicon_log',  JSON.stringify(viewLog));
+  syncSeen(currentUid, seenCounts, viewLog);
 
   renderCard();
   showToast('logged ✓');
-
-  try {
-    await addDoc(collection(db, 'viewLog'), {
-      word:   w.word,
-      pos:    w.pos || '',
-      seenAt: serverTimestamp(),
-      count:  seenCounts[w.word].count
-    });
-  } catch (e) {
-    console.warn('Firebase write failed — entry saved locally:', e);
-  }
 }
 
 /*
@@ -504,22 +489,19 @@ function toggleFavourite() {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateStr = now.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
 
+  let favLog = JSON.parse(localStorage.getItem('lexicon_favourite_log') || '[]');
+
   if (favourites.has(w.word)) {
     favourites.delete(w.word);
-    // Remove from favourite log
-    let favLog = JSON.parse(localStorage.getItem('lexicon_favourite_log') || '[]');
     favLog = favLog.filter(e => e.word !== w.word);
-    localStorage.setItem('lexicon_favourite_log', JSON.stringify(favLog));
     showToast('removed from favourites');
   } else {
     favourites.add(w.word);
-    // Append timestamped log entry
-    const favLog = JSON.parse(localStorage.getItem('lexicon_favourite_log') || '[]');
     favLog.unshift({ word: w.word, time: timeStr, date: dateStr, iso: now.toISOString() });
-    localStorage.setItem('lexicon_favourite_log', JSON.stringify(favLog));
     showToast('♥ added to favourites');
   }
-  localStorage.setItem('lexicon_favourites', JSON.stringify(Array.from(favourites)));
+
+  syncFavourites(currentUid, Array.from(favourites), favLog);
   renderCard();
 }
 
@@ -540,22 +522,19 @@ function toggleBookmark() {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateStr = now.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
 
+  let bmLog = JSON.parse(localStorage.getItem('lexicon_bookmark_log') || '[]');
+
   if (bookmarks.has(w.word)) {
     bookmarks.delete(w.word);
-    // Remove from log too
-    let bmLog = JSON.parse(localStorage.getItem('lexicon_bookmark_log') || '[]');
     bmLog = bmLog.filter(e => e.word !== w.word);
-    localStorage.setItem('lexicon_bookmark_log', JSON.stringify(bmLog));
     showToast('bookmark removed');
   } else {
     bookmarks.add(w.word);
-    // Append timestamped log entry
-    const bmLog = JSON.parse(localStorage.getItem('lexicon_bookmark_log') || '[]');
     bmLog.unshift({ word: w.word, time: timeStr, date: dateStr, iso: now.toISOString() });
-    localStorage.setItem('lexicon_bookmark_log', JSON.stringify(bmLog));
     showToast('🔖 bookmarked');
   }
-  localStorage.setItem('lexicon_bookmarks', JSON.stringify(Array.from(bookmarks)));
+
+  syncBookmarks(currentUid, Array.from(bookmarks), bmLog);
   renderCard();
 }
 //  Reads ?tag= and ?pos= from the URL.

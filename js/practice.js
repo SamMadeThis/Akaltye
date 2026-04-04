@@ -11,6 +11,18 @@
          score tracking and localStorage persistence.
    ============================================================= */
 
+import { auth }                                  from './firebase-config.js';
+import { onAuthStateChanged }                    from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+import { pullFromFirestore, syncQuizLog }         from './sync.js';
+
+// Track signed-in uid — null if not signed in
+let currentUid = null;
+
+onAuthStateChanged(auth, user => {
+  currentUid = user ? user.uid : null;
+  if (currentUid) pullFromFirestore(currentUid);
+});
+
 
 /* =============================================================
    WORD DATA
@@ -240,7 +252,7 @@ function saveQuizResult(mode, score, total) {
     date: now.toLocaleDateString([], { day: 'numeric', month: 'short' }),
     iso: now.toISOString()
   });
-  localStorage.setItem('lexicon_quiz_log', JSON.stringify(log.slice(0, 50)));
+  syncQuizLog(currentUid, log.slice(0, 50));
 }
 
 
