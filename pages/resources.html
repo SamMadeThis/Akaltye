@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>ALKATYE — Resources</title>
+
+    <style>
+        .resources-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 64px);
+            gap: var(--space-6);
+            max-width: 480px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-4);
+            text-align: center;
+        }
+
+        .resources-icon {
+            font-size: 3rem;
+            opacity: 0.4;
+        }
+
+        .resources-title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 500;
+            color: var(--clr-light);
+        }
+
+        .resources-sub {
+            font-family: var(--font-body);
+            font-size: var(--text-md);
+            color: var(--clr-surface-a50);
+            line-height: 1.7;
+            max-width: 340px;
+        }
+
+        .resources-badge {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--clr-surface-a30);
+            border: 1px dashed var(--clr-surface-a20);
+            border-radius: var(--radius-pill);
+            padding: var(--space-2) var(--space-4);
+        }
+
+        .resources-links-preview {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            width: 100%;
+            opacity: 0.4;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .resources-link-placeholder {
+            background: var(--clr-surface-tonal-a0);
+            border: 1px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .resources-link-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--clr-surface-a30);
+            flex-shrink: 0;
+        }
+
+        .resources-link-line {
+            height: 10px;
+            border-radius: 4px;
+            background: var(--clr-surface-a20);
+            flex: 1;
+        }
+
+        .resources-link-line--short {
+            flex: 0 0 40%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+
+            <input id="menu-toggler" type="checkbox" class="menu-toggler">
+            <label for="menu-toggler" class="show-menu"><span></span></label>
+
+            <nav class="nav">
+                <ul class="nav__menu">
+                    <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
+                    <li class="nav__item"><a href="practice.html" class="nav__link">Practice</a></li>
+                    <li class="nav__item"><a href="profile.html" class="nav__link">Profile</a></li>
+                    <li class="nav__item"><a href="resources.html" class="nav__link">Resources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="resources-wrap">
+
+            <div class="resources-icon">📚</div>
+
+            <div>
+                <span class="resources-badge">Under construction</span>
+            </div>
+
+            <h1 class="resources-title">Resources coming soon</h1>
+
+            <p class="resources-sub">
+                We're gathering links to Arrernte dictionaries, pronunciation guides,
+                community resources and more. Check back soon.
+            </p>
+
+            <!-- Ghost preview of what's coming -->
+            <div class="resources-links-preview" aria-hidden="true">
+                <div class="resources-link-placeholder">
+                    <div class="resources-link-dot"></div>
+                    <div class="resources-link-line"></div>
+                </div>
+                <div class="resources-link-placeholder">
+                    <div class="resources-link-dot"></div>
+                    <div class="resources-link-line resources-link-line--short"></div>
+                </div>
+                <div class="resources-link-placeholder">
+                    <div class="resources-link-dot"></div>
+                    <div class="resources-link-line"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

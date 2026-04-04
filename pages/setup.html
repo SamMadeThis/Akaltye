@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<!--
+  setup.html — One-time onboarding for ALKATYE
+
+  WHAT: Three optional question sections shown once after
+        first sign-in. User ticks what applies, skips anything
+        they prefer not to answer, then hits "Start learning."
+  HOW:  Answers saved to Firestore under users/{uid}/profile
+        and cached in localStorage. Redirects to index.html.
+        If user returns here later (via profile.html edit link)
+        their previous answers are pre-filled.
+  WHY:  Collecting goals, level and background now means the
+        app can tailor content later without asking again.
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>ALKATYE — About you</title>
+
+    <style>
+        .setup-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+            width: 100%;
+            max-width: 480px;
+            padding: var(--space-8) var(--space-4);
+            margin: 0 auto;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        /* ── Header ── */
+        .setup-header {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .setup-title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 500;
+            color: var(--clr-light);
+            line-height: 1.2;
+        }
+
+        .setup-subtitle {
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            color: var(--clr-surface-a50);
+            line-height: 1.7;
+        }
+
+        .setup-optional-note {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.08em;
+            color: var(--clr-surface-a30);
+        }
+
+        /* ── Question section ── */
+        .setup-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .setup-section-label {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--clr-surface-a40);
+        }
+
+        .setup-section-question {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 400;
+            color: var(--clr-light);
+            line-height: 1.3;
+        }
+
+        /* ── Option cards ── */
+        .setup-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        /*
+     * Each option is a <label> wrapping a hidden checkbox.
+     * Clicking anywhere on the label toggles the checkbox.
+     * WHY: Larger touch target than a small checkbox alone;
+     *      the whole card is tappable.
+     */
+        .setup-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            background: var(--clr-surface-tonal-a0);
+            border: 1px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            cursor: pointer;
+            transition: border-color var(--transition-fast),
+                background var(--transition-fast);
+            min-height: 52px;
+            /* comfortable touch target */
+        }
+
+        .setup-option:hover {
+            border-color: var(--clr-primary-a30);
+            background: rgba(201, 175, 194, 0.04);
+        }
+
+        /* Hidden native checkbox */
+        .setup-option input[type="checkbox"],
+        .setup-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Custom tick box */
+        .setup-option-tick {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid var(--clr-surface-a30);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        /* Radio pill shape */
+        .setup-option--radio .setup-option-tick {
+            border-radius: 50%;
+        }
+
+        .setup-option-tick::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: var(--clr-dark);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .setup-option--radio .setup-option-tick::after {
+            border-radius: 50%;
+        }
+
+        /* Selected state — driven by JS adding .selected to label */
+        .setup-option.selected {
+            border-color: var(--clr-primary-a0);
+            background: rgba(201, 175, 194, 0.08);
+        }
+
+        .setup-option.selected .setup-option-tick {
+            background: var(--clr-primary-a0);
+            border-color: var(--clr-primary-a0);
+        }
+
+        .setup-option.selected .setup-option-tick::after {
+            opacity: 1;
+        }
+
+        .setup-option-text {
+            font-family: var(--font-body);
+            font-size: var(--text-md);
+            color: var(--clr-surface-a60);
+            line-height: 1.4;
+        }
+
+        .setup-option.selected .setup-option-text {
+            color: var(--clr-light);
+        }
+
+        /* ── Privacy note for identity question ── */
+        .setup-privacy-note {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a30);
+            line-height: 1.7;
+            padding: var(--space-3) var(--space-4);
+            border-left: 2px solid var(--clr-surface-a20);
+        }
+
+        /* ── Divider ── */
+        .setup-divider {
+            height: 1px;
+            background: var(--clr-surface-a20);
+        }
+
+        /* ── CTA ── */
+        .setup-cta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            padding-bottom: var(--space-8);
+        }
+
+        .setup-btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--clr-primary-a0);
+            color: var(--clr-dark);
+            font-family: var(--font-body);
+            font-size: var(--text-md);
+            font-weight: 500;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            cursor: pointer;
+            transition: background var(--transition-fast), transform 0.1s ease;
+            width: 100%;
+        }
+
+        .setup-btn-primary:hover {
+            background: var(--clr-primary-a10);
+        }
+
+        .setup-btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .setup-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .setup-skip {
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a30);
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: var(--space-2);
+            transition: color var(--transition-fast);
+        }
+
+        .setup-skip:hover {
+            color: var(--clr-surface-a50);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="setup-wrap">
+
+            <!-- Header -->
+            <div class="setup-header">
+                <h1 class="setup-title">Tell us a little about yourself</h1>
+                <p class="setup-subtitle">
+                    These questions help us show you the most relevant content.
+                    All are optional — tick whatever applies to you.
+                </p>
+                <span class="setup-optional-note">All questions are optional and can be changed later in your
+                    profile.</span>
+            </div>
+
+            <div class="setup-divider"></div>
+
+            <!-- Question 1 — Goals -->
+            <div class="setup-section">
+                <span class="setup-section-label">Question 1 of 3</span>
+                <h2 class="setup-section-question">Why are you learning Arrernte?</h2>
+                <p class="setup-subtitle" style="margin-top: -8px; font-size: 0.8rem;">Pick any that apply</p>
+
+                <div class="setup-options" id="goalsOptions">
+                    <label class="setup-option">
+                        <input type="checkbox" name="goals" value="culture_family">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Connect with my culture and family</span>
+                    </label>
+                    <label class="setup-option">
+                        <input type="checkbox" name="goals" value="elders">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Learn to speak with Elders</span>
+                    </label>
+                    <label class="setup-option">
+                        <input type="checkbox" name="goals" value="country">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Understand my Country</span>
+                    </label>
+                    <label class="setup-option">
+                        <input type="checkbox" name="goals" value="children">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Teach my children</span>
+                    </label>
+                    <label class="setup-option">
+                        <input type="checkbox" name="goals" value="curiosity">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">General interest / curiosity</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setup-divider"></div>
+
+            <!-- Question 2 — Level -->
+            <div class="setup-section">
+                <span class="setup-section-label">Question 2 of 3</span>
+                <h2 class="setup-section-question">How much Arrernte do you know?</h2>
+                <p class="setup-subtitle" style="margin-top: -8px; font-size: 0.8rem;">Pick one</p>
+
+                <div class="setup-options" id="levelOptions">
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="level" value="starting">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">I'm just starting — I know a few words</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="level" value="grew_up_hearing">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">I grew up hearing it but can't speak it</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="level" value="basic_conversations">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">I can have basic conversations</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="level" value="speaker">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">I'm a speaker looking to strengthen my language</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setup-divider"></div>
+
+            <!-- Question 3 — Identity -->
+            <div class="setup-section">
+                <span class="setup-section-label">Question 3 of 3</span>
+                <h2 class="setup-section-question">About you</h2>
+                <p class="setup-subtitle" style="margin-top: -8px; font-size: 0.8rem;">Pick one</p>
+
+                <div class="setup-privacy-note">
+                    We ask this so we can eventually tailor content and resources
+                    to be most relevant for you. This information is private and
+                    will never be shared.
+                </div>
+
+                <div class="setup-options" id="identityOptions">
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="identity" value="arrernte">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Arrernte person</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="identity" value="atsi_other">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Aboriginal / Torres Strait Islander (other)</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="identity" value="non_indigenous">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Non-Indigenous</span>
+                    </label>
+                    <label class="setup-option setup-option--radio">
+                        <input type="radio" name="identity" value="prefer_not">
+                        <span class="setup-option-tick"></span>
+                        <span class="setup-option-text">Prefer not to say</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="setup-cta">
+                <button class="setup-btn-primary" id="saveBtn">Start learning →</button>
+                <button class="setup-skip" id="skipBtn">Skip all and start learning</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="../js/setup.js"></script>
+
+</body>
+
+</html>

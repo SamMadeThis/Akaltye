@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts — shared across the app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>AKALTYE</title>
+</head>
+
+<body>
+
+    <!--Navigation BAR-->
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+
+            <input id="menu-toggler" type="checkbox" class="menu-toggler">
+            <label for="menu-toggler" class="show-menu">
+                <span></span>
+            </label>
+
+            <nav class="nav">
+                <ul class="nav__menu">
+                    <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
+                    <li class="nav__item"><a href="practice.html" class="nav__link">Practice</a></li>
+                    <li class="nav__item"><a href="profile.html" class="nav__link">Profile</a></li>
+                    <li class="nav__item"><a href="resources.html" class="nav__link">Resources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="app">
+
+            <h2>Lexicon</h2>
+            <span id="headerMeta"></span>
+
+            <div class="progress-row">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">— / —</div>
+            </div>
+
+            <div class="card" id="wordCard">
+                <div class="card-top">
+                    <span class="pos-badge" id="posbadge">—</span>
+                    <span class="seen-badge" id="seenBadge" style="display:none"></span>
+                </div>
+                <div>
+                    <div class="word" id="wordText">—</div>
+                    <div class="phonetic" id="phonetic"></div>
+                </div>
+                <div class="definition" id="definition">—</div>
+                <div class="example1" id="example1"></div>
+                <div class="example2" id="example2"></div>
+                <div class="tags" id="tagsContainer"></div>
+            </div>
+
+            <!-- Navigation: prev / next -->
+            <div class="controls">
+                <button class="btn" id="prevBtn">← prev</button>
+                <button class="btn" id="nextBtn">next →</button>
+            </div>
+
+            <!-- Actions: seen + favourite on same row -->
+            <div class="controls">
+                <button class="btn btn-seen" id="seenBtn">mark as seen</button>
+                <!-- Favourite button — words.js toggles .active and text -->
+                <button class="btn btn-fav" id="favBtn">♡ favourite</button>
+            </div>
+
+            <!-- Bookmark button — separate from favourite; words.js toggles .active -->
+            <div class="controls">
+                <button class="btn btn-bookmark" id="bookmarkBtn">🔖 bookmark</button>
+            </div>
+
+        </div>
+
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script type="module" src="../js/words.js"></script>
+
+</body>
+
+</html>

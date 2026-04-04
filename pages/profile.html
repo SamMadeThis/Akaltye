@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts — shared across the app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>AKALTYE — Profile</title>
+</head>
+
+<body>
+
+    <!--Navigation BAR-->
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+
+            <input id="menu-toggler" type="checkbox" class="menu-toggler">
+            <label for="menu-toggler" class="show-menu">
+                <span></span>
+            </label>
+
+            <nav class="nav">
+                <ul class="nav__menu">
+                    <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
+                    <li class="nav__item"><a href="practice.html" class="nav__link">Practice</a></li>
+                    <li class="nav__item"><a href="profile.html" class="nav__link">Profile</a></li>
+                    <li class="nav__item"><a href="resources.html" class="nav__link">Resources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="profile-wrap">
+
+            <h1 class="profile-heading">Profile</h1>
+
+            <!-- ── Account card ── -->
+            <div class="profile-account-card" id="accountCard">
+                <!-- Populated by inline script below -->
+            </div>
+
+            <!-- ── Stat buttons ── -->
+            <div class="profile-stats">
+                <a href="words.html?tag=all" class="stat-btn" id="statSeen">
+                    <span class="stat-num" id="seenCount">—</span>
+                    <span class="stat-label">words studied</span>
+                </a>
+                <a href="saved.html" class="stat-btn stat-btn--fav" id="statFav">
+                    <span class="stat-num" id="favCount">—</span>
+                    <span class="stat-label">favourited</span>
+                </a>
+                <a href="saved.html" class="stat-btn stat-btn--bookmark" id="statBookmark">
+                    <span class="stat-num" id="bookmarkCount">—</span>
+                    <span class="stat-label">bookmarked</span>
+                </a>
+                <a href="history.html" class="stat-btn stat-btn--practice" id="statPractice">
+                    <span class="stat-num" id="practiceCount">—</span>
+                    <span class="stat-label">practices done</span>
+                </a>
+            </div>
+
+            <!-- ── Last test result card ── -->
+            <div class="profile-section-label">Last practice</div>
+            <div class="profile-last-test" id="lastTestCard">
+                <span class="last-test-empty">no quizzes yet — go to Practice to start one!</span>
+            </div>
+
+            <!-- ── About you ── -->
+            <div class="profile-section-label">About you</div>
+            <div class="profile-about-card" id="aboutCard">
+                <span class="about-empty">
+                    No answers saved yet —
+                    <a href="setup.html" class="about-edit-link">answer a few questions</a>
+                </span>
+            </div>
+
+            <!-- ── Quick links ── -->
+            <div class="profile-section-label">Go to</div>
+            <div class="profile-links">
+                <a href="saved.html" class="profile-link-btn">♥ Favourites</a>
+                <a href="saved.html" class="profile-link-btn">🔖 Bookmarks</a>
+                <a href="history.html" class="profile-link-btn">🕓 History</a>
+                <a href="practice.html" class="profile-link-btn">🎯 Practice</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth } from '../js/firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { signOut } from '../js/auth.js';
+
+        /* ── Stats from localStorage (instant, no network) ── */
+        const seenCounts = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
+        document.getElementById('seenCount').textContent = Object.keys(seenCounts).length;
+
+        const favourites = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
+        document.getElementById('favCount').textContent = favourites.length;
+
+        const bookmarks = JSON.parse(localStorage.getItem('lexicon_bookmarks') || '[]');
+        document.getElementById('bookmarkCount').textContent = bookmarks.length;
+
+        const quizLog = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
+        document.getElementById('practiceCount').textContent = quizLog.length;
+
+        /* ── Last test card ── */
+        const lastTestCard = document.getElementById('lastTestCard');
+        if (quizLog.length > 0) {
+            const last = quizLog[0];
+            const pct = last.pct ?? Math.round(last.score / last.total * 100);
+            const barColour = pct >= 80 ? '#22946e' : pct >= 50 ? '#c49a2b' : '#b84040';
+            lastTestCard.innerHTML = `
+          <div class="last-test-mode">${last.mode}</div>
+          <div class="last-test-date">${last.date} · ${last.time}</div>
+          <div class="last-test-bar-track">
+            <div class="last-test-bar-fill" style="width:${pct}%; background:${barColour};"></div>
+          </div>
+          <div class="last-test-score">${last.score} / ${last.total} &nbsp;<span class="last-test-pct">${pct}%</span></div>
+        `;
+        }
+
+        /* ── Account card ── */
+        const accountCard = document.getElementById('accountCard');
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                accountCard.innerHTML = `
+            <div class="account-avatar">
+              ${user.photoURL
+                        ? `<img src="${user.photoURL}" alt="${user.displayName}" class="account-avatar-img">`
+                        : `<div class="account-avatar-placeholder">${(user.displayName || user.email || '?')[0].toUpperCase()}</div>`
+                    }
+            </div>
+            <div class="account-info">
+              <div class="account-name">${user.displayName || 'Learner'}</div>
+              <div class="account-email">${user.email || ''}</div>
+            </div>
+            <button class="account-signout-btn" id="signOutBtn">Sign out</button>
+          `;
+                document.getElementById('signOutBtn').addEventListener('click', signOut);
+            } else {
+                accountCard.innerHTML = `
+            <div class="account-info">
+              <div class="account-name">Not signed in</div>
+              <div class="account-email">Your progress is saved on this device only.</div>
+            </div>
+            <a href="login.html" class="account-signin-btn">Sign in</a>
+          `;
+            }
+        });
+
+        /* ── About you card ── */
+        const GOAL_LABELS = {
+            culture_family: 'Connect with culture and family',
+            elders: 'Learn to speak with Elders',
+            country: 'Understand my Country',
+            children: 'Teach my children',
+            curiosity: 'General interest / curiosity'
+        };
+        const LEVEL_LABELS = {
+            starting: 'Just starting out',
+            grew_up_hearing: 'Grew up hearing it',
+            basic_conversations: 'Basic conversations',
+            speaker: 'Speaker strengthening language'
+        };
+        const IDENTITY_LABELS = {
+            arrernte: 'Arrernte person',
+            atsi_other: 'Aboriginal / Torres Strait Islander (other)',
+            non_indigenous: 'Non-Indigenous',
+            prefer_not: 'Prefer not to say'
+        };
+
+        const cached = localStorage.getItem('alkatye_profile');
+        if (cached) {
+            const p = JSON.parse(cached);
+            const hasAny = (p.goals && p.goals.length) || p.level || p.identity;
+            if (hasAny) {
+                const aboutCard = document.getElementById('aboutCard');
+                let html = '<div class="about-rows">';
+
+                if (p.goals && p.goals.length) {
+                    html += `<div class="about-row">
+              <span class="about-row-label">Why learning</span>
+              <span class="about-row-value">${p.goals.map(g => GOAL_LABELS[g] || g).join(', ')}</span>
+            </div>`;
+                }
+                if (p.level) {
+                    html += `<div class="about-row">
+              <span class="about-row-label">Level</span>
+              <span class="about-row-value">${LEVEL_LABELS[p.level] || p.level}</span>
+            </div>`;
+                }
+                if (p.identity) {
+                    html += `<div class="about-row">
+              <span class="about-row-label">Background</span>
+              <span class="about-row-value">${IDENTITY_LABELS[p.identity] || p.identity}</span>
+            </div>`;
+                }
+
+                html += `</div>
+            <a href="setup.html" class="about-edit-link" style="margin-top: var(--space-4); display:inline-block;">Edit answers →</a>`;
+                aboutCard.innerHTML = html;
+            }
+        }
+    </script>
+
+</body>
+
+</html>

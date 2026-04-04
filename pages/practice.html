@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!--
+  practice.html — Practice & Quiz page for ALKATYE
+
+  WHAT: Single page combining the practice hub and all quiz modes.
+        No separate quiz.html needed — everything lives here.
+
+  HOW:  Three screens toggled by JS (.active class):
+          #modeScreen  — mode picker with filters + recent log
+          #quizScreen  — active question with progress bar
+          #scoreScreen — final result with replay actions
+        Styles in practice.css. Logic in practice.js.
+
+  WHY:  The old practice.html was just a list of links and
+        quiz.html was just the destination — merging removes
+        a navigation step and keeps the experience faster.
+
+  FILES NEEDED:
+    styles.css    — global tokens, nav, layout
+    practice.css  — all styles for this page
+    practice.js   — all quiz logic
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts — shared across the app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+
+    <!-- Global app styles: colour tokens, nav, layout -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <!-- Practice + quiz styles -->
+
+    <title>AKALTYE — Practice</title>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION BAR
+         - CSS-only hamburger (checkbox hack in styles.css)
+         - Same markup pattern used on every page
+         ═══════════════════════════════════════════ -->
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+
+            <input id="menu-toggler" type="checkbox" class="menu-toggler">
+            <label for="menu-toggler" class="show-menu"><span></span></label>
+
+            <nav class="nav">
+                <ul class="nav__menu">
+                    <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
+                    <li class="nav__item"><a href="practice.html" class="nav__link">Practice</a></li>
+                    <li class="nav__item"><a href="profile.html" class="nav__link">Profile</a></li>
+                    <li class="nav__item"><a href="resources.html" class="nav__link">Resources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- ═══════════════════════════════════════════
+         PAGE CONTENT
+         - .page-content centres and constrains width
+           (defined in global styles.css)
+         ═══════════════════════════════════════════ -->
+    <div class="page-content">
+        <div class="practice-wrap">
+
+
+            <!-- ═══════════════════════════════════════════
+                 SCREEN 1 — MODE PICKER
+                 Shown on load. JS hides it when a mode card
+                 is tapped and shows #quizScreen instead.
+                 ═══════════════════════════════════════════ -->
+            <div class="screen active" id="modeScreen">
+
+                <!-- Page heading -->
+                <div>
+                    <div class="practice-heading">Practice.<span> ✦</span></div>
+                    <div class="practice-sub">choose a quiz mode to begin</div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     FILTER — Topic tags
+                     data-tag read by practice.js to narrow
+                     the word pool before a quiz starts
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="filter-label">Topic</div>
+                    <div class="chip-row" id="tagChips">
+                        <div class="chip on" data-tag="all">All words</div>
+                        <div class="chip" data-tag="beginner">Beginner</div>
+                        <div class="chip" data-tag="interaction">Interactions</div>
+                        <div class="chip" data-tag="country">Country</div>
+                        <div class="chip" data-tag="weather">Weather</div>
+                    </div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     FILTER — Part of speech
+                     data-pos read by practice.js
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="filter-label">Part of speech</div>
+                    <div class="chip-row" id="posChips">
+                        <div class="chip on" data-pos="all">All</div>
+                        <div class="chip" data-pos="noun">Noun</div>
+                        <div class="chip" data-pos="verb">Verb</div>
+                        <div class="chip" data-pos="adjective">Adjective</div>
+                        <div class="chip" data-pos="interjection">Interjection</div>
+                    </div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     FILTER — Seen / unseen words
+                     Reads lexicon_seen from localStorage
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="filter-label">Study set</div>
+                    <div class="chip-row">
+                        <div class="chip seen-chip" id="seenOnlyChip">Seen words only</div>
+                        <div class="chip" id="unseenOnlyChip">Unseen words only</div>
+                    </div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     QUIZ MODE CARDS
+                     data-mode on each card is read by
+                     practice.js startQuiz() to know which
+                     question type(s) to build
+                     ───────────────────────────────────────── -->
+                <div class="mode-grid">
+
+                    <div class="mode-card" data-mode="guess">
+                        <i class="fa-solid fa-question"></i>
+                        <div class="mode-name">Guess the Word</div>
+                        <div class="mode-desc">See the English meaning — pick the Arrernte word</div>
+                    </div>
+
+                    <div class="mode-card" data-mode="meaning">
+                        <i class="fa-solid fa-book-open"></i>
+                        <div class="mode-name">Meaning Match</div>
+                        <div class="mode-desc">See the Arrernte word — pick the correct meaning</div>
+                    </div>
+
+                    <div class="mode-card" data-mode="gap">
+                        <i class="fa-solid fa-pencil"></i>
+
+                        <div class="mode-name">Fill the Gap</div>
+                        <div class="mode-desc">Complete the sentence with the missing word</div>
+                    </div>
+
+                    <div class="mode-card" data-mode="match">
+                        <i class="fa-solid fa-link"></i>
+                        <div class="mode-name">Match Synonym</div>
+                        <div class="mode-desc">Tap to pair Arrernte words with their meanings</div>
+                    </div>
+
+                    <!-- Shuffle spans full width — mixes all four types -->
+                    <div class="mode-card shuffle-card" data-mode="shuffle">
+                        <i class="fa-solid fa-dice"></i>
+                        <div>
+                            <div class="mode-name">Try Game Shuffle</div>
+                            <div class="mode-desc">A mix of all four quiz types in one session</div>
+                        </div>
+                    </div>
+
+                </div><!-- /mode-grid -->
+
+                <!-- ─────────────────────────────────────────
+                     OTHER ACTIVITIES
+                     Quick-access links so Word Cards and
+                     History are still one tap away
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="filter-label">Also</div>
+                    <div class="also-row">
+                        <a href="words.html" class="also-link">
+                            <i class="fa-regular fa-note-sticky"></i> Word Cards
+                        </a>
+                        <a href="history.html" class="also-link">
+                            <i class="fa-regular fa-clock"></i> History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     RECENT QUIZ LOG
+                     Last 6 results injected by practice.js
+                     on page load from lexicon_quiz_log
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="quiz-log-header">Recent quizzes</div>
+                    <div id="quizLogContainer"></div>
+                </div>
+
+            </div><!-- /modeScreen -->
+
+
+            <!-- ═══════════════════════════════════════════
+                 SCREEN 2 — ACTIVE QUIZ
+                 Hidden on load. Shown by practice.js when
+                 a mode card is tapped.
+                 ═══════════════════════════════════════════ -->
+            <div class="screen" id="quizScreen">
+
+                <!-- Top bar: mode label left, back button right
+                     Back button returns to #modeScreen without
+                     reloading the page -->
+                <div class="quiz-topbar">
+                    <div class="quiz-mode-lbl" id="quizModeLbl">—</div>
+                    <button class="quiz-exit" id="exitBtn">← back</button>
+                </div>
+
+                <!-- Progress bar + question counter
+                     #progFill width set by practice.js as
+                     each question is answered -->
+                <div class="q-prog-row">
+                    <div class="q-prog-track">
+                        <div class="q-prog-fill" id="progFill"></div>
+                    </div>
+                    <div class="q-prog-lbl" id="progLbl">1 / —</div>
+                </div>
+
+                <!-- Question card
+                     All inner text set by practice.js
+                     per question type -->
+                <div class="q-card">
+                    <span class="q-type-pill" id="qTypePill">—</span>
+                    <div class="q-instruction" id="qInstruction">—</div>
+                    <div class="q-main" id="qMain">—</div>
+                    <div class="q-sub" id="qSub"></div>
+                </div>
+
+                <!-- Answer area 1: Multiple choice
+                     Used by Guess the Word + Meaning Match.
+                     Hidden by default; shown by practice.js -->
+                <div class="ans-grid" id="ansGrid"></div>
+
+                <!-- Answer area 2: Fill the Gap text input
+                     Hidden by default; shown by practice.js -->
+                <div class="gap-wrap" id="gapWrap" style="display:none">
+                    <input class="gap-input" id="gapInput" type="text" placeholder="Type the Arrernte word…"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                    <button class="gap-submit" id="gapSubmit">Check answer</button>
+                </div>
+
+                <!-- Answer area 3: Match Synonym columns
+                     Hidden by default; shown by practice.js -->
+                <div id="matchWrap" style="display:none">
+                    <div class="match-instructions">
+                        Tap a word on the left, then its meaning on the right.
+                    </div>
+                    <div style="height:8px"></div>
+                    <div class="match-grid">
+                        <div>
+                            <div class="match-col-lbl">Arrernte</div>
+                            <div class="match-col" id="matchLeft"></div>
+                        </div>
+                        <div>
+                            <div class="match-col-lbl">Meaning</div>
+                            <div class="match-col" id="matchRight"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback line: correct / incorrect message
+                     Text + .ok / .bad class set by practice.js -->
+                <div class="feedback" id="feedback"></div>
+
+                <!-- Next button: hidden until answer submitted
+                     practice.js adds .show class to reveal -->
+                <button class="btn-next" id="nextBtn">Next →</button>
+
+            </div><!-- /quizScreen -->
+
+
+            <!-- ═══════════════════════════════════════════
+                 SCREEN 3 — SCORE
+                 Hidden until the last question is answered.
+                 ═══════════════════════════════════════════ -->
+            <div class="screen" id="scoreScreen">
+                <div class="score-wrap">
+
+                    <!-- Large score numeral e.g. "7 / 10"
+                         Set by finishQuiz() in practice.js -->
+                    <div class="score-big" id="scoreBig">0 <span>/ 0</span></div>
+                    <div class="score-tag">correct answers</div>
+
+                    <!-- Score bar animated to pct width by practice.js -->
+                    <div class="score-bar-track">
+                        <div class="score-bar-fill" id="scoreBarFill"></div>
+                    </div>
+
+                    <!-- Contextual message based on score percentage -->
+                    <div class="score-quip" id="scoreQuip">—</div>
+
+                    <!-- Action buttons -->
+                    <div class="score-actions">
+                        <button class="btn-primary" id="playAgainBtn">Play again</button>
+                        <button class="btn-ghost" id="backToModeBtn">Choose another mode</button>
+                    </div>
+
+                </div>
+            </div><!-- /scoreScreen -->
+
+
+        </div><!-- /practice-wrap -->
+    </div><!-- /page-content -->
+
+
+    <!-- Toast: brief confirmation messages e.g. "Need at least 2 words"
+         Shown by showToast() in practice.js -->
+    <div class="toast" id="toast"></div>
+    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
+    <!-- Quiz logic — type="module" needed for ES import syntax in practice.js -->
+    <script type="module" src="../js/practice.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--
+  history.html — Study history page for ALKATYE
+
+  WHAT: Displays two sections of activity history:
+        1. Word view log (words marked as "seen" in words.html)
+        2. Quiz results log (quizzes completed in quiz.html)
+
+  HOW:  No inline styles or scripts. Appearance lives in
+        history.css (+ global styles.css). Behaviour lives
+        in history.js which reads from localStorage only —
+        no Firebase needed on this page.
+
+  WHY:  Separating structure, style and behaviour means each
+        file can be edited independently. The page stays fast
+        because it makes no network requests.
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts — shared across the app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+
+    <!-- Global app styles (colour tokens, nav, layout) -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <!-- History page styles -->
+
+    <title>AKALTYE — History</title>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════
+       NAVIGATION BAR
+       - CSS-only hamburger (checkbox hack in styles.css)
+       - Identical markup used on every page
+       ═══════════════════════════════════════════ -->
+    <header>
+        <div class="nav-bar">
+            <a href="../index.html" class="logo">ALK<span>ATYE</span></a>
+
+            <input id="menu-toggler" type="checkbox" class="menu-toggler">
+            <label for="menu-toggler" class="show-menu"><span></span></label>
+
+            <nav class="nav">
+                <ul class="nav__menu">
+                    <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
+                    <li class="nav__item"><a href="practice.html" class="nav__link">Practice</a></li>
+                    <li class="nav__item"><a href="profile.html" class="nav__link">Profile</a></li>
+                    <li class="nav__item"><a href="resources.html" class="nav__link">Resources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- ═══════════════════════════════════════════
+       PAGE CONTENT
+       - .page-content centres + constrains width
+         (defined in styles.css)
+       ═══════════════════════════════════════════ -->
+    <div class="page-content">
+        <div class="history-wrap">
+
+
+            <!-- ─────────────────────────────────────────
+           SECTION 1 — Word View Log
+           Populated by renderWordLog() in history.js
+           Data source: localStorage key "lexicon_log"
+           ───────────────────────────────────────── -->
+            <div>
+
+                <!-- Section header: title + clear button -->
+                <div class="history-section-header">
+                    <div class="history-section-title">Word Log</div>
+                    <!-- clearWordBtn wired in history.js -->
+                    <button class="history-clear-btn" id="clearWordBtn">clear</button>
+                </div>
+
+                <!-- Log rows injected here by history.js
+             Shows: word name | seen count | last time -->
+                <div id="wordLogContainer"></div>
+
+            </div>
+
+
+            <!-- ─────────────────────────────────────────
+           SECTION 2 — Quiz Results Log
+           Populated by renderQuizLog() in history.js
+           Data source: localStorage key "lexicon_quiz_log"
+           ───────────────────────────────────────── -->
+            <div>
+
+                <!-- Section header: title + clear button -->
+                <div class="history-section-header">
+                    <div class="history-section-title">Quiz History</div>
+                    <!-- clearQuizBtn wired in history.js -->
+                    <button class="history-clear-btn" id="clearQuizBtn">clear</button>
+                </div>
+
+                <!-- Quiz log rows injected here by history.js
+             Shows: mode name | score bar | score/total -->
+                <div id="quizLogContainer"></div>
+
+            </div>
+
+
+        </div><!-- /history-wrap -->
+    </div><!-- /page-content -->
+
+
+    <!-- Toast notification (e.g. "word log cleared")
+       Shown temporarily by showToast() in history.js -->
+    <div class="toast" id="toast"></div>
+
+    <!-- History logic — plain script, no modules needed -->
+    <script src="../js/history.js"></script>
+
+</body>
+
+</html>
