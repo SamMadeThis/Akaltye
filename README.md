@@ -5,7 +5,7 @@
 
 *Preserving and revitalising language, one word at a time.*
 
-[![Live Site](https://img.shields.io/badge/🌏%20Live%20Site-akaltye.netlify.app-brightgreen?style=for-the-badge)](https://akaltye.netlify.app)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/516f50e0-419b-402d-bc6d-b9f880d73bef/deploy-status)](https://app.netlify.com/projects/akaltye/deploys)
 
 </div>
 
