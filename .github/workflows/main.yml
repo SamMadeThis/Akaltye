@@ -1,1 +1,8 @@
-${{ secrets.GOOGLE_API_KEY }}
+
+steps:
+  - name: Use My Secret
+    env:
+      MY_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    run: |
+      echo "The secret is masked in logs: $MY_API_KEY"
+```
