@@ -8,7 +8,6 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-17ZB632V40');
     </script>
     <meta charset="UTF-8">
@@ -87,25 +86,16 @@
                     <div class="phonetic" id="phonetic"></div>
                 </div>
                 <div class="definition" id="definition">—</div>
-                <div class="example1" id="example1"></div>
-                <div class="example2" id="example2"></div>
+
+                <!-- Examples — populated from words-data.js examples[] array -->
+                <div class="examples" id="examples"></div>
+
+                <!-- Notes — shown only when a word has a notes field -->
+                <div class="notes" id="notes" style="display:none"></div>
+
                 <div class="tags" id="tagsContainer"></div>
             </div>
 
-            <!--
-                Single controls row — prev / fav / bookmark / next.
-                Fav and bookmark are icon-only squares that sit centred
-                between the two flex:1 nav buttons.
-
-                FA icons match explore.html:
-                  Favourite  — fa-regular fa-heart (outline) at rest
-                               fa-solid fa-heart (filled) when .active
-                  Bookmark   — fa-solid fa-bookmark always;
-                               active state via CSS border/bg only
-
-                words.js swaps the <i> class on toggle instead of
-                setting textContent.
-            -->
             <div class="controls">
                 <button class="btn" id="prevBtn">← prev</button>
 
@@ -121,17 +111,6 @@
 
                 <button class="btn" id="nextBtn">next →</button>
             </div>
-
-            <!--
-                OLD controls rows — collapsed into the single row above:
-                <div class="controls">
-                    <button class="btn btn-seen" id="seenBtn">mark as seen</button>
-                    <button class="btn btn-fav" id="favBtn">♡ favourite</button>
-                </div>
-                <div class="controls">
-                    <button class="btn btn-bookmark" id="bookmarkBtn">🔖 bookmark</button>
-                </div>
-            -->
 
         </div>
 
