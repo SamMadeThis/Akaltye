@@ -1,8 +1,28 @@
 
-steps:
-  - name: Use My Secret
-    env:
-      MY_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-    run: |
-      echo "The secret is masked in logs: $MY_API_KEY"
-```
+name: Deploy to Firebase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_API_KEY }}
+
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.GOOGLE_CREDENTIALS }}
+          projectId: your-firebase-project-id
+          channelId: live
