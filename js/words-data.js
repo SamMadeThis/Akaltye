@@ -1,13 +1,64 @@
 /* =============================================================
    words-data.js — Single source of truth for the Akaltye lexicon
 
-   WHY:  Shared by both words.js (word list page) and
-         practice.js (quiz engine) so there is only one
-         place to add, edit or remove words.
+   WHY:  Shared by words.js (word list) and practice.js (quiz engine)
+         so there is only one place to add, edit or remove words.
    HOW:  ES module export — import with:
            import { WORDS } from './words-data.js';
-   WHAT: 325 Arrernte words with phonetic, part of speech,
-         definitions, example sentences and category tags.
+
+   ── LEXICON GROUP STRUCTURE ───────────────────────────────────
+   Each word has a `groups` array (derived from `tags`) used by
+   the Explore tab to organise words into the Lexicon groups.
+   Level (beginner/intermediate/advanced) is kept separate and
+   shown as a second filter row beneath the lexicon groups.
+
+   LEXICON GROUPS
+   ┌─────────────┬──────────────────────────────────────────────┐
+   │ Group       │ Sub-tags                                      │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ people      │ family, people, interaction, communication,   │
+   │             │ classroom, command                            │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ country     │ nature, animals, plants, weather, country,    │
+   │             │ place names, travel                           │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ emotions    │ emotion, states, thinking                     │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ body        │ body                                          │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ language    │ verb, grammar, pronoun, describing, quantity, │
+   │             │ location, movement, colour                    │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ daily life  │ food, objects, time                           │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ culture     │ culture, spiritual                            │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ cheeky      │ cheeky, fun  (playful / expressive words)     │
+   ├─────────────┼──────────────────────────────────────────────┤
+   │ rude        │ rude, curses  (add words manually in xlsx)    │
+   └─────────────┴──────────────────────────────────────────────┘
+
+   LEVEL (separate filter row, not a lexicon group)
+     beginner · intermediate · advanced
+
+   ── ADDING NEW WORDS ─────────────────────────────────────────
+   1. Add the row to updload_5APRIL_LEXICON.xlsx (main sheet)
+   2. Re-run the generator script to rebuild this file
+   3. To add a rude/cheeky word not in the xlsx, add its word
+      string to EXTRA_TAGS in the generator, or tag it in xlsx.
+
+   ── TAG → GROUP MAP (keep in sync with generator script) ─────
+   family/people/interaction/communication/classroom/command → people
+   nature/animals/plants/weather/country/place names/travel  → country
+   emotion/states/thinking                                    → emotions
+   body                                                       → body
+   verb/grammar/pronoun/describing/quantity/location/
+     movement/colour                                          → language
+   food/objects/time                                          → daily life
+   culture/spiritual                                          → culture
+   cheeky/fun                                                 → cheeky
+   rude/curses                                                → rude
+   beginner/intermediate/advanced                             → level
    ============================================================= */
 
 export const WORDS = [
@@ -17,6 +68,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["dingo"],
     tags:       ["advanced", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -25,6 +77,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Santa Teresa"],
     tags:       ["advanced", "country", "place names"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -33,6 +86,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["regarding the law/rules"],
     tags:       ["advanced", "culture"],
+    groups:     ["culture", "level"],
     examples:   [],
   },
   {
@@ -41,6 +95,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["boomerang (Central Arrernte)"],
     tags:       ["advanced", "culture", "objects"],
+    groups:     ["culture", "daily life", "level"],
     examples:   [],
     notes:      "Eastern Arrernte form: ilye",
   },
@@ -50,6 +105,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["boomerang (Eastern Arrernte)"],
     tags:       ["advanced", "culture", "objects"],
+    groups:     ["culture", "daily life", "level"],
     examples:   [],
     notes:      "Central Arrernte form: alye",
   },
@@ -59,6 +115,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["woomera, spear-thrower"],
     tags:       ["advanced", "culture", "objects"],
+    groups:     ["culture", "daily life", "level"],
     examples:   [],
   },
   {
@@ -67,6 +124,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["coolamon"],
     tags:       ["advanced", "culture", "objects"],
+    groups:     ["culture", "daily life", "level"],
     examples:   [],
   },
   {
@@ -75,6 +133,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["a dream; Dreaming"],
     tags:       ["advanced", "culture", "spiritual"],
+    groups:     ["culture", "level"],
     examples:   [],
   },
   {
@@ -83,6 +142,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["husband's mother"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -91,6 +151,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["male cross-cousin"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -99,6 +160,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["father's sister"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -107,6 +169,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mother's mother; woman's daughter's child"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -115,6 +178,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["father's mother, woman's son's child"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -123,6 +187,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["father's father, man's son's child"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -131,6 +196,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["female cross-cousin"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -139,6 +205,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mother's brother"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -147,6 +214,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mother's father, man's daughter's child"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -155,6 +223,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["husband or wife, spouse"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -163,6 +232,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["woman's child, sister's child"],
     tags:       ["advanced", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -171,6 +241,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["without being like this"],
     tags:       ["advanced", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -179,6 +250,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["husk, peel, skin of some animals"],
     tags:       ["advanced", "nature", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -187,6 +259,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["rockhole (where water collects)"],
     tags:       ["advanced", "nature", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -195,6 +268,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["red ochre"],
     tags:       ["advanced", "nature", "culture"],
+    groups:     ["country", "culture", "level"],
     examples:   [],
   },
   {
@@ -203,6 +277,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["spinifex resin"],
     tags:       ["advanced", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -211,6 +286,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Friend"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Angwenhe atyewe ngkwenhe? (Who is your friend?)"],
   },
   {
@@ -219,6 +295,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["Who, which person?"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Angwenhe unte? (Who are you?)", "Angwenhe atyewe ngkwenhe? (Who is your friend?)"],
   },
   {
@@ -227,6 +304,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["no, nothing, none", "A negative response"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Arrangkwe, ayenge arratye-apetyeke. (No, I'm not coming back.)"],
   },
   {
@@ -235,6 +313,7 @@ export const WORDS = [
     pos:        "determiner",
     definition: ["my, mine"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Arritnye atyenhe ... (My name is ...)"],
   },
   {
@@ -243,6 +322,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["what?"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Inwenhe arlte lyete? (What is the day today?)", "Inwenhe arritnye ngkwenhe? (What is your name?)"],
   },
   {
@@ -251,6 +331,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Name"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Inwenhe arritnye ngkwenhe? (What is your name?)", "Arritnye atyenhe ... (My name is ...)"],
   },
   {
@@ -259,6 +340,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["good, well, useable, proper, safe", "Nice, pleasant, welcome, enjoyable", "Useable, in working order, OK"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Unte mwerre? (You good?)", "Ye, ayenge mwerre (Yes, I am good)"],
     notes:      "Also spelled Mwarre in some sources",
   },
@@ -268,6 +350,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["Yes, Yeah", "May be an answer to a negative question"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   ["Ye, ayenge mwerre (Yes, I am good)"],
   },
   {
@@ -276,6 +359,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["woman; Aboriginal person"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -284,6 +368,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["man, initiated man"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -292,6 +377,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Child"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -300,6 +386,7 @@ export const WORDS = [
     pos:        "demonstrative",
     definition: ["over there, that (mid distance)"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -308,6 +395,7 @@ export const WORDS = [
     pos:        "demonstrative",
     definition: ["here, this (close by)"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -316,6 +404,7 @@ export const WORDS = [
     pos:        "demonstrative",
     definition: ["that, there (distant)"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -324,6 +413,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["long way, distant"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -332,6 +422,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["sit, live, be"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -340,6 +431,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to stand, be"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -348,6 +440,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["lie, lie down"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -356,6 +449,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["tree, bush, stick, wood, thing"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -364,6 +458,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Bed"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -372,6 +467,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["ground, land, earth"],
     tags:       ["beginner"],
+    groups:     ["level"],
     examples:   [],
   },
   {
@@ -380,6 +476,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["red kangaroo"],
     tags:       ["beginner", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -388,6 +485,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["dog"],
     tags:       ["beginner", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -396,6 +494,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bird"],
     tags:       ["beginner", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -404,6 +503,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["echidna, spiny anteater"],
     tags:       ["beginner", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
     notes:      "Inarlenge — character in Apmwe-kenhe Arne story",
   },
@@ -413,6 +513,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mouth"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -421,6 +522,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["hand, fingers"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   ["Anwerne iltye atwelheme"],
   },
   {
@@ -429,6 +531,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["head"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -437,6 +540,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["nose"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -445,6 +549,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["eye"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -453,6 +558,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["knee"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -461,6 +567,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["foot, toe"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -469,6 +576,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["ear"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -477,6 +585,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["shoulder"],
     tags:       ["beginner", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -485,6 +594,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["skinny, thin"],
     tags:       ["beginner", "body", "describing"],
+    groups:     ["body", "language", "level"],
     examples:   [],
   },
   {
@@ -493,6 +603,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Time for morning tea / Let's have morning tea"],
     tags:       ["beginner", "classroom"],
+    groups:     ["level", "people"],
     examples:   ["Merne arlkwetye-ke anteme (10:30–11:00)"],
   },
   {
@@ -501,6 +612,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["come here!"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -509,6 +621,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["say it again"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -517,6 +630,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["say it louder"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   ["Irnterre angkaye (say it louder)"],
   },
   {
@@ -525,6 +639,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["say it slower"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   ["Mwantye angkaye (say it slower)"],
   },
   {
@@ -533,6 +648,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Stand up!"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -541,6 +657,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Sit down!"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -549,6 +666,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Listen to the word!"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -557,6 +675,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Repeat the word!"],
     tags:       ["beginner", "classroom", "command"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -565,6 +684,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["intensely, energetically, loudly"],
     tags:       ["beginner", "classroom", "describing"],
+    groups:     ["language", "level", "people"],
     examples:   ["Irnterre angkaye (say it louder)"],
   },
   {
@@ -573,6 +693,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["how do you say ___?"],
     tags:       ["beginner", "classroom", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Nthakene unte angkeme ___? (how do you say ___?)"],
   },
   {
@@ -581,6 +702,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["language, message"],
     tags:       ["beginner", "communication", "culture"],
+    groups:     ["culture", "level", "people"],
     examples:   [],
   },
   {
@@ -589,6 +711,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["town"],
     tags:       ["beginner", "country"],
+    groups:     ["country", "level"],
     examples:   ["Tantyape-werne (to town)"],
   },
   {
@@ -597,6 +720,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["The Alice Springs town area"],
     tags:       ["beginner", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -605,6 +729,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Country, land, region", "Place, location, site, spot", "Camp, home, house"],
     tags:       ["beginner", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -613,6 +738,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["bad, wrong, not useable"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -621,6 +747,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["very, really"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -629,6 +756,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["perhaps, maybe"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -637,6 +765,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["tall, long"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -645,6 +774,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["slowly, carefully, cautiously"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -653,6 +783,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["true, right, real, straight"],
     tags:       ["beginner", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -661,6 +792,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["'Oh!', 'Oh no!', 'Wow.'"],
     tags:       ["beginner", "emotion"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -669,6 +801,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["'Dunno.', 'I don't know'"],
     tags:       ["beginner", "emotion"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -677,6 +810,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["sad, feeling sorrow"],
     tags:       ["beginner", "emotion"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -685,6 +819,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["poor thing, dear thing", "expression of sympathy"],
     tags:       ["beginner", "emotion", "interaction"],
+    groups:     ["emotions", "level", "people"],
     examples:   [],
   },
   {
@@ -693,6 +828,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["meat, game animal"],
     tags:       ["beginner", "food", "animals"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -701,6 +837,7 @@ export const WORDS = [
     pos:        "determiner",
     definition: ["Your (possessive)"],
     tags:       ["beginner", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Iwenhe arritnye ngkwenhe? (What is your name?)"],
   },
   {
@@ -709,6 +846,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["why?, what for?"],
     tags:       ["beginner", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -717,6 +855,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["how?"],
     tags:       ["beginner", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -725,6 +864,7 @@ export const WORDS = [
     pos:        "determiner",
     definition: ["my, mine"],
     tags:       ["beginner", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
     notes:      "Alternate form of atyenhe",
   },
@@ -734,6 +874,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["Very good / Excellent"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Apmere nhenhe mwerre anthurre (This place is very good)"],
   },
   {
@@ -742,6 +883,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["I forgot"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Ayenge alkngwirre-ke (I forgot)"],
   },
   {
@@ -750,6 +892,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["I understand"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Kele, the aweme (I understand)"],
   },
   {
@@ -758,6 +901,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["let's go!"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Mpe! Alhetyeke (Come on! Let's go)"],
   },
   {
@@ -766,6 +910,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["goodbye, farewell; later, in a while"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Urreke! Nhenhe apetyeke. (Goodbye! See you later.)"],
     notes:      "Site defines as 'later, in a while, after' — also used as farewell",
   },
@@ -775,6 +920,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["trying but unable to, unsuccessfully"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Uyarne the aweme (I don't understand)"],
   },
   {
@@ -783,6 +929,7 @@ export const WORDS = [
     pos:        "phrase",
     definition: ["I don't understand"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Uyarne the aweme (I don't understand)"],
   },
   {
@@ -791,6 +938,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["just, only; nothing much (answer to 'Werte?')"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Werte? — Ware (What's up? — Not much)"],
   },
   {
@@ -799,6 +947,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["'What's up?' 'What's going on?'"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Werte? — Ware (What's up? — Not much)"],
   },
   {
@@ -807,6 +956,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["'Done!', 'OK', finished, already"],
     tags:       ["beginner", "interaction"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -814,7 +964,8 @@ export const WORDS = [
     phonetic:   "uh-RGEN-eh",
     pos:        "noun",
     definition: ["fun, play, joking"],
-    tags:       ["beginner", "interaction"],
+    tags:       ["beginner", "interaction", "fun", "cheeky"],
+    groups:     ["cheeky", "level", "people"],
     examples:   [],
   },
   {
@@ -823,6 +974,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["where to?"],
     tags:       ["beginner", "location", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -831,6 +983,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["rock, stone, hill, money"],
     tags:       ["beginner", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
     notes:      "Consonant pronounced with rounded lips (w-form)",
   },
@@ -840,6 +993,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["fire"],
     tags:       ["beginner", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -848,6 +1002,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["car"],
     tags:       ["beginner", "objects"],
+    groups:     ["daily life", "level"],
     examples:   ["Unte mutekaye-kwenye? (You don't have a car?)"],
   },
   {
@@ -856,6 +1011,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["I (1st person singular)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   ["Ayenge mwerre (I am good)", "Arritnye atyenhe ... (My name is ...)"],
   },
   {
@@ -864,6 +1020,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["You (2nd person singular)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   ["Unte mwerre? (You good?)", "Unte nthenhe-arenye? (Where are you from?)"],
   },
   {
@@ -872,6 +1029,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["He / She / It (3rd person singular)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -880,6 +1038,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["We two (1st person dual)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -888,6 +1047,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["You two (2nd person dual)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -896,6 +1056,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["the two of them, they (subject)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -904,6 +1065,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["we (more than two people; subject)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -912,6 +1074,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["you (more than two people; subject)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -920,6 +1083,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["they (more than two; subject)"],
     tags:       ["beginner", "pronoun"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -928,6 +1092,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["your (possessive 2nd person singular)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Ampe ngkwinhe atherre (your two children)"],
   },
   {
@@ -936,6 +1101,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["our (possessive 1st person plural)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Apmere anwerne-kenhe (our home)"],
   },
   {
@@ -944,6 +1110,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["for them (dative 3rd person plural)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Ayeye itne-ke ileke (told them the story)"],
   },
   {
@@ -952,6 +1119,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["for him/her/it (dative 3rd person singular)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Ikwere the merne iteke (cooked food for him/her)"],
   },
   {
@@ -960,6 +1128,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["theirs (possessive 3rd person plural)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Kere arlewatyerre itnekenhe (their goanna meat)"],
   },
   {
@@ -968,6 +1137,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["for me (dative 1st person singular)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Kwatye atyenge inaye! (Get water for me!)"],
   },
   {
@@ -976,6 +1146,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["his/her/its (possessive 3rd person singular)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Merne ikwerenhe (his/her food)"],
   },
   {
@@ -984,6 +1155,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["for you (dative 2nd person singular)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Ngkwenge re apay-uthneme-ke (he/she asked for you)"],
   },
   {
@@ -992,6 +1164,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["I (subject of transitive verb)"],
     tags:       ["beginner", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["The merne iteme (I am cooking the food)"],
     notes:      "Used as subject of transitive verbs; ayenge used for intransitive verbs",
   },
@@ -1001,6 +1174,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["big, much, a lot"],
     tags:       ["beginner", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1009,6 +1183,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["small, little, not much"],
     tags:       ["beginner", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1017,6 +1192,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["day, daylight"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   ["Inwenhe arlte lyete? (What is the day today?)"],
   },
   {
@@ -1025,6 +1201,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["yesterday"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   ["Iwenhe apmwerrke aneke (Yesterday was ...)"],
   },
   {
@@ -1033,6 +1210,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["tomorrow"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
     notes:      "Site lists as 'yesterday' — slides use apmwerrke = tomorrow; check with language advisor",
   },
@@ -1042,6 +1220,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["The day after tomorrow / future time"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -1050,6 +1229,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["still, yet, continuing"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -1058,6 +1238,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["now, then"],
     tags:       ["beginner", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -1066,6 +1247,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["when?"],
     tags:       ["beginner", "time", "grammar"],
+    groups:     ["daily life", "language", "level"],
     examples:   [],
   },
   {
@@ -1074,6 +1256,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["forget"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   ["Ayenge alkngwirre-ke (I forgot)"],
   },
   {
@@ -1082,6 +1265,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["Work"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   ["Unte nthenhe-le urrkepeme? (Where do you work?)", "Ayenge (workplace)-le urrkepeme (I work at ...)"],
   },
   {
@@ -1090,6 +1274,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["Eat"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1098,6 +1283,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["cook, light (a fire)"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1106,6 +1292,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["drink something"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1114,6 +1301,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["hit, kill"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
     notes:      "Consonant pronounced with rounded lips (w-form)",
   },
@@ -1123,6 +1311,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["eat; ache"],
     tags:       ["beginner", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1131,6 +1320,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["speak, talk"],
     tags:       ["beginner", "verb", "communication"],
+    groups:     ["language", "level", "people"],
     examples:   [],
   },
   {
@@ -1139,6 +1329,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["hear, listen to, understand"],
     tags:       ["beginner", "verb", "communication"],
+    groups:     ["language", "level", "people"],
     examples:   [],
   },
   {
@@ -1147,6 +1338,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["Was (past tense of aneme)"],
     tags:       ["beginner", "verb", "grammar"],
+    groups:     ["language", "level"],
     examples:   ["Iwenhe apmwerrke aneke (Yesterday was ...)"],
     notes:      "Past tense form of aneme (is)",
   },
@@ -1156,6 +1348,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["Will be (future tense of aneme)"],
     tags:       ["beginner", "verb", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
     notes:      "Future tense form of aneme (is)",
   },
@@ -1165,6 +1358,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["go, go along, travel"],
     tags:       ["beginner", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1173,6 +1367,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["come"],
     tags:       ["beginner", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1181,6 +1376,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["remember, know, decide, think"],
     tags:       ["beginner", "verb", "thinking"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1189,6 +1385,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["think"],
     tags:       ["beginner", "verb", "thinking"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1197,6 +1394,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["water, rain", "Rain", "Ice, vapour, rain clouds"],
     tags:       ["beginner", "weather"],
+    groups:     ["country", "level"],
     examples:   ["Thipe nyingkele apele kwatye imerntye akngerre..."],
   },
   {
@@ -1205,6 +1403,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["snake"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1213,6 +1412,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["sand goanna"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   ["Kere arlewatyerre itnekenhe (their goanna meat)"],
   },
   {
@@ -1221,6 +1421,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bilby, rabbit-eared bandicoot"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1229,6 +1430,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["fly (insect)"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1237,6 +1439,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bearded dragon (lizard)"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1245,6 +1448,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["possum"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1253,6 +1457,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["black kite (bird)"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1261,6 +1466,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["euro (kangaroo)"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1269,6 +1475,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["emu"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1277,6 +1484,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["rock wallaby"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1285,6 +1493,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["animal"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1293,6 +1502,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["joey"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1301,6 +1511,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["black cockatoo"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1309,6 +1520,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["wedge-tailed eagle"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1317,6 +1529,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["horse"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1325,6 +1538,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["thorny devil (lizard)"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1333,6 +1547,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["sheep"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1341,6 +1556,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["ant"],
     tags:       ["intermediate", "animals"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1349,6 +1565,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["honey-ant"],
     tags:       ["intermediate", "animals", "food"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -1357,6 +1574,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["throat"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1365,6 +1583,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["liver"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1373,6 +1592,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["blood"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1381,6 +1601,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["hair, fur"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1389,6 +1610,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["elbow"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1397,6 +1619,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["arm"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1405,6 +1628,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["back (body part)"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1413,6 +1637,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["teeth"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1421,6 +1646,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["stomach"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1429,6 +1655,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["throat, front of neck"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1437,6 +1664,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["saliva, spit"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1445,6 +1673,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["thigh"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1453,6 +1682,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["back of neck, neck"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1461,6 +1691,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["forehead"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1469,6 +1700,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["sore (on body), wound"],
     tags:       ["intermediate", "body"],
+    groups:     ["body", "level"],
     examples:   [],
   },
   {
@@ -1477,6 +1709,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["(person's) body; Aboriginal person"],
     tags:       ["intermediate", "body", "people"],
+    groups:     ["body", "level", "people"],
     examples:   [],
   },
   {
@@ -1485,6 +1718,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["hungry"],
     tags:       ["intermediate", "body", "states"],
+    groups:     ["body", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1493,6 +1727,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["thirsty"],
     tags:       ["intermediate", "body", "states"],
+    groups:     ["body", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1501,6 +1736,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["tired"],
     tags:       ["intermediate", "body", "states"],
+    groups:     ["body", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1509,6 +1745,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["pregnant"],
     tags:       ["intermediate", "body", "states"],
+    groups:     ["body", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1517,6 +1754,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["sick"],
     tags:       ["intermediate", "body", "states"],
+    groups:     ["body", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1525,6 +1763,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to breathe"],
     tags:       ["intermediate", "body", "verb"],
+    groups:     ["body", "language", "level"],
     examples:   [],
   },
   {
@@ -1533,6 +1772,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["red and some shades of pink and orange"],
     tags:       ["intermediate", "colour"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1541,6 +1781,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["white"],
     tags:       ["intermediate", "colour"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1549,6 +1790,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["dark colours, especially black; Aboriginal person"],
     tags:       ["intermediate", "colour", "culture"],
+    groups:     ["culture", "language", "level"],
     examples:   [],
   },
   {
@@ -1557,6 +1799,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["'I know this myself', definitely"],
     tags:       ["intermediate", "communication"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1565,6 +1808,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["story, message"],
     tags:       ["intermediate", "communication", "culture"],
+    groups:     ["culture", "level", "people"],
     examples:   ["Ayeye itne-ke ileke (told them the story)"],
   },
   {
@@ -1573,6 +1817,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["path, road, track"],
     tags:       ["intermediate", "country", "travel"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1581,6 +1826,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["rotten, bad, very bad"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1589,6 +1835,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["grey-haired, old"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1597,6 +1844,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["together, co-operatively"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1605,6 +1853,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["fast, quickly"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1613,6 +1862,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["hard, strong, solid, tight"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1621,6 +1871,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["quiet, quietly"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1629,6 +1880,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["fine, powdery, soft"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1637,6 +1889,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["heavy"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1645,6 +1898,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["new, flash"],
     tags:       ["intermediate", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1652,7 +1906,8 @@ export const WORDS = [
     phonetic:   "uh-RERT-eh",
     pos:        "adjective",
     definition: ["mad, crazy, silly; deaf"],
-    tags:       ["intermediate", "describing", "states"],
+    tags:       ["intermediate", "describing", "states", "cheeky"],
+    groups:     ["cheeky", "emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1661,6 +1916,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["dirty"],
     tags:       ["intermediate", "describing", "states"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1669,6 +1925,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["in anger, angrily, fighting"],
     tags:       ["intermediate", "emotion"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -1676,7 +1933,8 @@ export const WORDS = [
     phonetic:   "AH-eh ug-NGERR-eh",
     pos:        "adjective",
     definition: ["aggressive, 'cheeky', angry"],
-    tags:       ["intermediate", "emotion"],
+    tags:       ["intermediate", "emotion", "cheeky"],
+    groups:     ["cheeky", "emotions", "level"],
     examples:   [],
   },
   {
@@ -1685,6 +1943,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["shy, ashamed, embarrassed, reserved"],
     tags:       ["intermediate", "emotion", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -1693,6 +1952,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["scared, afraid, frightened"],
     tags:       ["intermediate", "emotion", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -1701,6 +1961,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["brave, confident, not scared"],
     tags:       ["intermediate", "emotion", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -1709,6 +1970,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["lonely, homesick"],
     tags:       ["intermediate", "emotion", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -1717,6 +1979,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["be angry, get aggressive"],
     tags:       ["intermediate", "emotion", "verb"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1724,7 +1987,8 @@ export const WORDS = [
     phonetic:   "uh-GUNG-gem-eh",
     pos:        "verb",
     definition: ["be happy, be pleased"],
-    tags:       ["intermediate", "emotion", "verb"],
+    tags:       ["intermediate", "emotion", "verb", "fun"],
+    groups:     ["cheeky", "emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -1733,6 +1997,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["father, father's brother"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1741,6 +2006,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["younger brother or sister"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1749,6 +2015,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["older brother"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1757,6 +2024,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mother, mother's sister"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1765,6 +2033,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["older sister"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1773,6 +2042,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["older sister"],
     tags:       ["intermediate", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1781,6 +2051,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["Egg"],
     tags:       ["intermediate", "food"],
+    groups:     ["daily life", "level"],
     examples:   [],
     notes:      "Consonant pronounced with rounded lips (w-form)",
   },
@@ -1790,6 +2061,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["fat, grease"],
     tags:       ["intermediate", "food"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -1798,6 +2070,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["sweet"],
     tags:       ["intermediate", "food", "describing"],
+    groups:     ["daily life", "language", "level"],
     examples:   [],
   },
   {
@@ -1806,6 +2079,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["ripe, cooked"],
     tags:       ["intermediate", "food", "describing"],
+    groups:     ["daily life", "language", "level"],
     examples:   [],
   },
   {
@@ -1814,6 +2088,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bush tomato"],
     tags:       ["intermediate", "food", "plants"],
+    groups:     ["country", "daily life", "level"],
     examples:   ["Awele-awele iwenhe-artyeke? (What does the bush tomato taste like?)"],
   },
   {
@@ -1822,6 +2097,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bush potato, type of yam"],
     tags:       ["intermediate", "food", "plants"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -1830,6 +2106,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["seed, fruit"],
     tags:       ["intermediate", "food", "plants"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -1838,6 +2115,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["wild orange"],
     tags:       ["intermediate", "food", "plants"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -1846,6 +2124,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["wild onion"],
     tags:       ["intermediate", "food", "plants"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -1854,6 +2133,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["whose?"],
     tags:       ["intermediate", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1862,6 +2142,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["how many?, how much?"],
     tags:       ["intermediate", "grammar", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1870,6 +2151,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["'Eh?', 'I'm surprised; can that be right?'", "surprise or seeking confirmation"],
     tags:       ["intermediate", "interaction"],
+    groups:     ["level", "people"],
     examples:   ["Kweye?"],
   },
   {
@@ -1878,6 +2160,7 @@ export const WORDS = [
     pos:        "interjection",
     definition: ["yes, OK"],
     tags:       ["intermediate", "interaction"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -1886,6 +2169,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["up, on top"],
     tags:       ["intermediate", "location"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1894,6 +2178,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["outside, in the open, clearing, plain"],
     tags:       ["intermediate", "location"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1902,6 +2187,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["down, low, inside"],
     tags:       ["intermediate", "location"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1910,6 +2196,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["middle"],
     tags:       ["intermediate", "location", "describing"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1918,6 +2205,7 @@ export const WORDS = [
     pos:        "interrogative",
     definition: ["where?"],
     tags:       ["intermediate", "location", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -1926,6 +2214,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["flame, light"],
     tags:       ["intermediate", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1934,6 +2223,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["hot coals"],
     tags:       ["intermediate", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1942,6 +2232,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["moon"],
     tags:       ["intermediate", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1950,6 +2241,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["shade, patchy or dappled shade"],
     tags:       ["intermediate", "nature"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1958,6 +2250,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["cave"],
     tags:       ["intermediate", "nature", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1966,6 +2259,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["sky"],
     tags:       ["intermediate", "nature", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1974,6 +2268,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["hole, pit, hollow, grave"],
     tags:       ["intermediate", "nature", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1982,6 +2277,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["creek, river"],
     tags:       ["intermediate", "nature", "country"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1990,6 +2286,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["coolibah tree"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -1998,6 +2295,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["flower"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2006,6 +2304,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["leaf, petal, feather, wing"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2014,6 +2313,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["root"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2022,6 +2322,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["spinifex"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2030,6 +2331,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["desert oak"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2038,6 +2340,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["grass"],
     tags:       ["intermediate", "nature", "plants"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2046,6 +2349,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["grass, small plants; green colour"],
     tags:       ["intermediate", "nature", "plants", "colour"],
+    groups:     ["country", "language", "level"],
     examples:   [],
   },
   {
@@ -2054,6 +2358,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["cloud"],
     tags:       ["intermediate", "nature", "weather"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2062,6 +2367,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["whirlwind, willy-willy"],
     tags:       ["intermediate", "nature", "weather"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2070,6 +2376,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["hailstones"],
     tags:       ["intermediate", "nature", "weather"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2078,6 +2385,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["sun, summer"],
     tags:       ["intermediate", "nature", "weather"],
+    groups:     ["country", "level"],
     examples:   [],
   },
   {
@@ -2086,6 +2394,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["knife"],
     tags:       ["intermediate", "objects"],
+    groups:     ["daily life", "level"],
     examples:   ["Arelhe-le irrtyurtne-le merne akeme (woman cuts food with a knife)"],
   },
   {
@@ -2094,6 +2403,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["bicycle"],
     tags:       ["intermediate", "objects"],
+    groups:     ["daily life", "level"],
     examples:   ["Unte pathekele-akerte? (Do you have a bicycle?)"],
   },
   {
@@ -2102,6 +2412,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["smoke, cigarette"],
     tags:       ["intermediate", "objects"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2110,6 +2421,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["clothes, cloth"],
     tags:       ["intermediate", "objects"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2118,6 +2430,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["house, building, wall"],
     tags:       ["intermediate", "objects", "country"],
+    groups:     ["country", "daily life", "level"],
     examples:   [],
   },
   {
@@ -2126,6 +2439,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["older or middle-aged man"],
     tags:       ["intermediate", "people"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -2134,6 +2448,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["middle-aged or mature person"],
     tags:       ["intermediate", "people"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -2142,6 +2457,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["female (girl, female animal)"],
     tags:       ["intermediate", "people", "animals"],
+    groups:     ["country", "level", "people"],
     examples:   [],
   },
   {
@@ -2150,6 +2466,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["expert, clever, skilled person"],
     tags:       ["intermediate", "people", "describing"],
+    groups:     ["language", "level", "people"],
     examples:   [],
   },
   {
@@ -2158,6 +2475,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["girl"],
     tags:       ["intermediate", "people", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -2166,6 +2484,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["boy"],
     tags:       ["intermediate", "people", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -2174,6 +2493,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["teenage girl, young woman"],
     tags:       ["intermediate", "people", "family"],
+    groups:     ["level", "people"],
     examples:   [],
   },
   {
@@ -2182,6 +2502,7 @@ export const WORDS = [
     pos:        "pronoun",
     definition: ["you (one person; object form)"],
     tags:       ["intermediate", "pronoun", "grammar"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2190,6 +2511,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["two, both, pair"],
     tags:       ["intermediate", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2198,6 +2520,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["three, a few"],
     tags:       ["intermediate", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2206,6 +2529,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["one, alone"],
     tags:       ["intermediate", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2214,6 +2538,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["many, a lot, lots"],
     tags:       ["intermediate", "quantity"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2222,6 +2547,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["awake"],
     tags:       ["intermediate", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -2230,6 +2556,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["asleep"],
     tags:       ["intermediate", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -2238,6 +2565,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["alive"],
     tags:       ["intermediate", "states"],
+    groups:     ["emotions", "level"],
     examples:   [],
   },
   {
@@ -2246,6 +2574,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["knowing how to, knowing about"],
     tags:       ["intermediate", "thinking", "culture"],
+    groups:     ["culture", "emotions", "level"],
     examples:   [],
     notes:      "The name of this app — akaltye means 'knowing how to'",
   },
@@ -2255,6 +2584,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["always"],
     tags:       ["intermediate", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2263,6 +2593,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["mid-afternoon"],
     tags:       ["intermediate", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2271,6 +2602,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["late afternoon"],
     tags:       ["intermediate", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2279,6 +2611,7 @@ export const WORDS = [
     pos:        "adverb",
     definition: ["long time ago, for a long time"],
     tags:       ["intermediate", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2287,6 +2620,7 @@ export const WORDS = [
     pos:        "noun",
     definition: ["morning"],
     tags:       ["intermediate", "time"],
+    groups:     ["daily life", "level"],
     examples:   [],
   },
   {
@@ -2295,6 +2629,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["get up"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2303,6 +2638,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["bring"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2311,6 +2647,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["wash something"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2319,6 +2656,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["burn"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2327,6 +2665,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["give"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2335,6 +2674,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["see, look at, watch"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2343,6 +2683,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["hold, have, keep, look after"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2351,6 +2692,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["fight ('hit each other')"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2359,6 +2701,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["take, get"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2367,6 +2710,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["throw, throw away"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2375,6 +2719,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["shut, close, block off, turn off"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2383,6 +2728,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["make, do, fix"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2391,6 +2737,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["grab, snatch, take away"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2399,6 +2746,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["dig for something, dig something out"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2407,6 +2755,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to bite"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2415,6 +2764,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["hit (by throwing something at)"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2423,6 +2773,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["wait"],
     tags:       ["intermediate", "verb"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2430,7 +2781,8 @@ export const WORDS = [
     phonetic:   "un-DEW-eh IR-rem-eh",
     pos:        "verb",
     definition: ["to vomit"],
-    tags:       ["intermediate", "verb", "body"],
+    tags:       ["intermediate", "verb", "body", "cheeky"],
+    groups:     ["body", "cheeky", "language", "level"],
     examples:   [],
   },
   {
@@ -2439,6 +2791,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to ache"],
     tags:       ["intermediate", "verb", "body"],
+    groups:     ["body", "language", "level"],
     examples:   [],
   },
   {
@@ -2447,6 +2800,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["swell up"],
     tags:       ["intermediate", "verb", "body"],
+    groups:     ["body", "language", "level"],
     examples:   [],
   },
   {
@@ -2454,7 +2808,8 @@ export const WORDS = [
     phonetic:   "arl-GEM-eh",
     pos:        "verb",
     definition: ["shout out, call out, scream"],
-    tags:       ["intermediate", "verb", "communication"],
+    tags:       ["intermediate", "verb", "communication", "cheeky"],
+    groups:     ["cheeky", "language", "level", "people"],
     examples:   [],
   },
   {
@@ -2463,6 +2818,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["compliment, praise"],
     tags:       ["intermediate", "verb", "communication"],
+    groups:     ["language", "level", "people"],
     examples:   [],
   },
   {
@@ -2471,6 +2827,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["sing (a song)"],
     tags:       ["intermediate", "verb", "culture"],
+    groups:     ["culture", "language", "level"],
     examples:   [],
     notes:      "Also spelled ilyelheme in Eastern Arrernte",
   },
@@ -2480,6 +2837,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["sing (a song)"],
     tags:       ["intermediate", "verb", "culture"],
+    groups:     ["culture", "language", "level"],
     examples:   [],
     notes:      "Eastern Arrernte form; Central form: alyelheme",
   },
@@ -2489,6 +2847,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["cry, bawl"],
     tags:       ["intermediate", "verb", "emotion"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -2496,7 +2855,8 @@ export const WORDS = [
     phonetic:   "ud-ERR-em-eh",
     pos:        "verb",
     definition: ["laugh, giggle, smile"],
-    tags:       ["intermediate", "verb", "emotion"],
+    tags:       ["intermediate", "verb", "emotion", "fun", "cheeky"],
+    groups:     ["cheeky", "emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -2505,6 +2865,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["feel (some way)"],
     tags:       ["intermediate", "verb", "emotion"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -2513,6 +2874,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["feed someone, serve"],
     tags:       ["intermediate", "verb", "food"],
+    groups:     ["daily life", "language", "level"],
     examples:   [],
   },
   {
@@ -2520,7 +2882,8 @@ export const WORDS = [
     phonetic:   "uh-RGEN-eh IR-rem-eh",
     pos:        "verb",
     definition: ["to play"],
-    tags:       ["intermediate", "verb", "interaction"],
+    tags:       ["intermediate", "verb", "interaction", "fun", "cheeky"],
+    groups:     ["cheeky", "language", "level", "people"],
     examples:   [],
   },
   {
@@ -2529,6 +2892,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["pass by, go past"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2537,6 +2901,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to get lost"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2545,6 +2910,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["run, run off"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2553,6 +2919,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["run, hurry along"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2561,6 +2928,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["look for, walk around"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2569,6 +2937,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["turn around to go back"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2577,6 +2946,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["return, go back"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2585,6 +2955,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["follow someone, follow a path"],
     tags:       ["intermediate", "verb", "movement"],
+    groups:     ["language", "level"],
     examples:   [],
   },
   {
@@ -2593,6 +2964,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["learn"],
     tags:       ["intermediate", "verb", "thinking"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -2601,6 +2973,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["teach"],
     tags:       ["intermediate", "verb", "thinking"],
+    groups:     ["emotions", "language", "level"],
     examples:   [],
   },
   {
@@ -2609,6 +2982,7 @@ export const WORDS = [
     pos:        "verb",
     definition: ["to rain, to water"],
     tags:       ["intermediate", "verb", "weather"],
+    groups:     ["country", "language", "level"],
     examples:   [],
   },
   {
@@ -2617,6 +2991,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["hot (thing or weather)"],
     tags:       ["intermediate", "weather", "describing"],
+    groups:     ["country", "language", "level"],
     examples:   [],
   },
   {
@@ -2625,6 +3000,7 @@ export const WORDS = [
     pos:        "adjective",
     definition: ["cold, cold weather"],
     tags:       ["intermediate", "weather", "states"],
+    groups:     ["country", "emotions", "level"],
     examples:   [],
   },
 ];
