@@ -266,6 +266,8 @@ header {
   justify-content: space-between;
   width: 100%;
   padding: var(--space-4) var(--space-6);
+  gap: var(--space-3);
+  /*adding a gap between the sign in button and menu icon*/
 }
 
 .logo {
@@ -2298,4 +2300,458 @@ header {
 .group-tile.active {
   border-color: var(--clr-primary-a0);
   background: rgba(201, 175, 194, 0.07);
+}
+
+/* =============================================================
+   ANIMATIONS — Card flip + Heart particle burst
+   Add these to the bottom of styles.css (section 10)
+   ============================================================= */
+
+
+/* ── CARD FLIP ───────────────────────────────────────────────
+   The .card gets a 3D flip instead of the fade-out class.
+   The card wrapper needs perspective; the card itself flips
+   on Y axis. Front = current word, back = next word (same el,
+   we swap content mid-flip at 90°).
+   ─────────────────────────────────────────────────────────── */
+
+/* Give the .app perspective so 3D transforms work */
+.app {
+  perspective: 1200px;
+}
+
+/* Remove the old fade-out transition — flip handles it now */
+.card {
+  transform-style: preserve-3d;
+  /* override the old opacity/transform transition */
+  transition: box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+/* Flip forward (next) */
+.card.flip-next {
+  animation: flipNext 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Flip backward (prev) */
+.card.flip-prev {
+  animation: flipPrev 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes flipNext {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+
+  45% {
+    transform: rotateY(-90deg);
+    opacity: 0.4;
+  }
+
+  55% {
+    transform: rotateY(90deg);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes flipPrev {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+
+  45% {
+    transform: rotateY(90deg);
+    opacity: 0.4;
+  }
+
+  55% {
+    transform: rotateY(-90deg);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+/* Subtle lift shadow while flipping */
+.card.flip-next,
+.card.flip-prev {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ── HEART PARTICLE BURST ────────────────────────────────────
+   Canvas-free pure CSS approach: we spawn small <span>
+   particles via JS, each gets a random direction via
+   CSS custom properties, and they animate outward then fade.
+   ─────────────────────────────────────────────────────────── */
+
+/* Container that particles are appended to — sits over the button */
+.fav-particle-origin {
+  position: absolute;
+  pointer-events: none;
+  z-index: 300;
+  /* centered on the fav button — set via JS */
+}
+
+/* Each particle */
+.fav-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particleBurst 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  /* direction + distance come from JS via custom props */
+  transform-origin: center;
+}
+
+@keyframes particleBurst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  60% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* The fav button itself gets a spring pop when activated */
+.btn-fav.heart-pop {
+  animation: heartPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.5);
+  }
+
+  70% {
+    transform: scale(0.88);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Pulse ring that radiates out from the button on favourite */
+.fav-ring {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--clr-ochre);
+  pointer-events: none;
+  animation: ringExpand 0.5s ease-out forwards;
+}
+
+@keyframes ringExpand {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* =============================================================
+   EXPLORE TILE CASCADE
+   Tiles fan in one by one on page load using staggered
+   animation-delay. Each tile fades up and slightly scales in.
+   ============================================================= */
+
+/* Base state — tiles start invisible */
+.explore-GroupList,
+.explore-UserTopics {
+  opacity: 0;
+  animation: tileReveal 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+@keyframes tileReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Stagger delays */
+.explore-GroupList:nth-child(1),
+.explore-UserTopics:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.explore-GroupList:nth-child(2),
+.explore-UserTopics:nth-child(2) {
+  animation-delay: 0.10s;
+}
+
+.explore-GroupList:nth-child(3),
+.explore-UserTopics:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.explore-GroupList:nth-child(4),
+.explore-UserTopics:nth-child(4) {
+  animation-delay: 0.22s;
+}
+
+.explore-GroupList:nth-child(5),
+.explore-UserTopics:nth-child(5) {
+  animation-delay: 0.28s;
+}
+
+.explore-GroupList:nth-child(6),
+.explore-UserTopics:nth-child(6) {
+  animation-delay: 0.34s;
+}
+
+.explore-GroupList:nth-child(7),
+.explore-UserTopics:nth-child(7) {
+  animation-delay: 0.40s;
+}
+
+.explore-GroupList:nth-child(8),
+.explore-UserTopics:nth-child(8) {
+  animation-delay: 0.46s;
+}
+
+.explore-GroupList:nth-child(9),
+.explore-UserTopics:nth-child(9) {
+  animation-delay: 0.52s;
+}
+
+.explore-GroupList:nth-child(10),
+.explore-UserTopics:nth-child(10) {
+  animation-delay: 0.58s;
+}
+
+.explore-GroupList:nth-child(11),
+.explore-UserTopics:nth-child(11) {
+  animation-delay: 0.64s;
+}
+
+.explore-GroupList:nth-child(12),
+.explore-UserTopics:nth-child(12) {
+  animation-delay: 0.70s;
+}
+
+
+/* =============================================================
+   MILESTONE CELEBRATION OVERLAY
+   Full-screen moment that plays when user hits 10 / 25 / 50
+   words seen. Tap anywhere to dismiss.
+   ============================================================= */
+
+.milestone-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(18, 16, 16, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: overlayIn 0.35s ease forwards;
+  cursor: pointer;
+}
+
+.milestone-overlay.hiding {
+  animation: overlayOut 0.4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlayOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.milestone-card {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-primary-a0);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: cardBounceIn 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) 0.1s both;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer sweep across the card */
+.milestone-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg,
+      transparent 40%,
+      rgba(201, 175, 194, 0.12) 50%,
+      transparent 60%);
+  animation: shimmer 1.4s ease 0.4s both;
+  pointer-events: none;
+}
+
+@keyframes cardBounceIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.milestone-emoji {
+  font-size: 3rem;
+  line-height: 1;
+  animation: emojiBounce 0.6s cubic-bezier(0.34, 1.8, 0.64, 1) 0.3s both;
+}
+
+@keyframes emojiBounce {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.milestone-count {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 600;
+  color: var(--clr-primary-a0);
+  letter-spacing: -3px;
+  line-height: 1;
+  animation: countPop 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) 0.35s both;
+}
+
+@keyframes countPop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.milestone-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-top: -0.5rem;
+}
+
+.milestone-message {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--clr-primary-a30);
+  line-height: 1.4;
+}
+
+.milestone-sub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--clr-surface-a40);
+  text-transform: uppercase;
+}
+
+.milestone-ring {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid var(--clr-primary-a30);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: milestoneRing 0.8s ease-out 0.2s both;
+  pointer-events: none;
+}
+
+.milestone-ring:nth-child(2) {
+  animation-delay: 0.35s;
+  border-color: var(--clr-ochre);
+  opacity: 0.5;
+}
+
+@keyframes milestoneRing {
+  from {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.6;
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0;
+  }
 }

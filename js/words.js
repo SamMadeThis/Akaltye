@@ -1,11 +1,16 @@
 // ═══════════════════════════════════════════════════
-//  words.js — Word card browser for ALKATYE
+//  words.js — Word card browser for AKALTYE
 //
 //  WHAT: Displays Arrernte word cards one at a time.
 //        Users can mark words as seen or favourite them.
-//  HOW:  Reads ?tag=, ?pos=, and ?group= from the URL to filter words.
+//  HOW:  Reads ?tag=, ?pos=, and ?group= from the URL to filter.
 //        Special case: ?tag=favourite filters by localStorage.
 //        All state stored in localStorage.
+//
+//  ANIMATIONS:
+//    - Card flip on next/prev (CSS keyframes, content swaps mid-flip)
+//    - Heart particle burst on favourite (JS-spawned CSS particles)
+//    - Milestone celebration at 10 / 25 / 50 / 100 words seen
 // ═══════════════════════════════════════════════════
 
 import { WORDS }                                          from './words-data.js';
@@ -13,7 +18,6 @@ import { auth }                                           from './firebase-confi
 import { onAuthStateChanged }                             from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore, syncSeen, syncFavourites, syncBookmarks } from './sync.js';
 
-// Track the signed-in uid — null if not signed in
 let currentUid = null;
 
 onAuthStateChanged(auth, user => {
@@ -39,17 +43,98 @@ let words      = shuffle(WORDS);
 let current    = 0;
 let seenCounts = JSON.parse(localStorage.getItem('lexicon_seen')  || '{}');
 let viewLog    = JSON.parse(localStorage.getItem('lexicon_log')   || '[]');
-
-// Auto-seen timer — cancelled if the user navigates before 1.5s
 let autoSeenTimer = null;
-
 let favourites = new Set(JSON.parse(localStorage.getItem('lexicon_favourites') || '[]'));
 let bookmarks  = new Set(JSON.parse(localStorage.getItem('lexicon_bookmarks')  || '[]'));
 
 
 // ═══════════════════════════════════════════════════
+//  MILESTONE CELEBRATION
+//  Shows a full-screen overlay at 10, 25, 50, 100 unique words seen.
+//  Each milestone only ever fires once (tracked in localStorage).
+// ═══════════════════════════════════════════════════
+
+const MILESTONES = [
+  {
+    count: 10,
+    emoji: '🌱',
+    message: 'You\'ve started something special.',
+    sub: '10 words learned'
+  },
+  {
+    count: 25,
+    emoji: '✨',
+    message: 'A quarter-century of words — keep going.',
+    sub: '25 words learned'
+  },
+  {
+    count: 50,
+    emoji: '🔥',
+    message: 'Fifty words. You\'re building real knowledge.',
+    sub: '50 words learned'
+  },
+  {
+    count: 100,
+    emoji: '🌟',
+    message: 'One hundred words. Truly remarkable.',
+    sub: '100 words learned'
+  },
+];
+
+// Milestones already shown — persisted so they never repeat
+let shownMilestones = new Set(
+  JSON.parse(localStorage.getItem('lexicon_milestones_shown') || '[]')
+);
+
+function checkMilestone(totalSeen) {
+  const milestone = MILESTONES.find(
+    m => totalSeen >= m.count && !shownMilestones.has(m.count)
+  );
+  if (!milestone) return;
+
+  // Mark as shown immediately so rapid re-renders don't double-fire
+  shownMilestones.add(milestone.count);
+  localStorage.setItem(
+    'lexicon_milestones_shown',
+    JSON.stringify([...shownMilestones])
+  );
+
+  showMilestone(milestone);
+}
+
+function showMilestone({ count, emoji, message, sub }) {
+  // Build overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'milestone-overlay';
+  overlay.innerHTML = `
+    <div class="milestone-card">
+      <span class="milestone-ring"></span>
+      <span class="milestone-ring"></span>
+      <div class="milestone-emoji">${emoji}</div>
+      <div class="milestone-count">${count}</div>
+      <div class="milestone-label">words studied</div>
+      <div class="milestone-message">${message}</div>
+      <div class="milestone-sub">tap anywhere to continue</div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Dismiss on tap/click — fade out then remove
+  function dismiss() {
+    overlay.classList.add('hiding');
+    overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+  }
+
+  overlay.addEventListener('click', dismiss);
+
+  // Auto-dismiss after 4.5s if user doesn't tap
+  setTimeout(dismiss, 4500);
+}
+
+
+// ═══════════════════════════════════════════════════
 //  AUTO-SEEN
-//  Marks a word as seen after 1.5s of staying on the card.
 // ═══════════════════════════════════════════════════
 
 function scheduleAutoSeen(w) {
@@ -66,6 +151,10 @@ function scheduleAutoSeen(w) {
     viewLog.unshift({ word: w.word, time: timeStr, iso: isoNow });
 
     syncSeen(currentUid, seenCounts, viewLog);
+
+    const totalSeen = Object.keys(seenCounts).length;
+    checkMilestone(totalSeen);
+
     applyWord(w);
   }, 1500);
 }
@@ -75,16 +164,38 @@ function scheduleAutoSeen(w) {
 //  RENDER
 // ═══════════════════════════════════════════════════
 
-function renderCard(animate = false) {
+let isFlipping = false;
+
+/*
+ * renderCard
+ * dir: 'next' | 'prev' | null
+ *   null  → no animation (initial load, filter change, fav toggle)
+ *   'next'/'prev' → 3D flip, content swaps at the mid-point (90°)
+ */
+function renderCard(dir = null) {
   const card = document.getElementById('wordCard');
   const w    = words[current];
-  if (animate) {
-    card.classList.add('fade-out');
-    setTimeout(() => { applyWord(w); card.classList.remove('fade-out'); }, 200);
-  } else {
+
+  if (!dir) {
     applyWord(w);
+    scheduleAutoSeen(w);
+    return;
   }
-  scheduleAutoSeen(w);
+
+  if (isFlipping) return;
+  isFlipping = true;
+
+  const flipClass = dir === 'next' ? 'flip-next' : 'flip-prev';
+  card.classList.add(flipClass);
+
+  // Swap content at the exact mid-point of the flip (half of 420ms)
+  setTimeout(() => applyWord(w), 210);
+
+  card.addEventListener('animationend', () => {
+    card.classList.remove(flipClass);
+    isFlipping = false;
+    scheduleAutoSeen(w);
+  }, { once: true });
 }
 
 function applyWord(w) {
@@ -99,14 +210,12 @@ function applyWord(w) {
     .map((d, i) => `<span class="def-line"><span class="def-num">${i + 1}.</span> ${d}</span>`)
     .join('');
 
-  // Examples — render each item in the array, hide container if none
+  // Examples
   const examplesEl = document.getElementById('examples');
   if (examplesEl) {
     const exs = Array.isArray(w.examples) ? w.examples.filter(Boolean) : [];
     if (exs.length) {
-      examplesEl.innerHTML = exs
-        .map(e => `<p class="example">${e}</p>`)
-        .join('');
+      examplesEl.innerHTML = exs.map(e => `<p class="example">${e}</p>`).join('');
       examplesEl.style.display = '';
     } else {
       examplesEl.innerHTML     = '';
@@ -114,11 +223,11 @@ function applyWord(w) {
     }
   }
 
-  // Notes (optional field)
+  // Notes
   const notesEl = document.getElementById('notes');
   if (notesEl) {
     if (w.notes) {
-      notesEl.textContent  = w.notes;
+      notesEl.textContent   = w.notes;
       notesEl.style.display = '';
     } else {
       notesEl.textContent   = '';
@@ -140,7 +249,7 @@ function applyWord(w) {
     seenBadge.style.display = 'none';
   }
 
-  // Favourite button
+  // Favourite button state
   const favBtn  = document.getElementById('favBtn');
   const favIcon = favBtn.querySelector('i');
   if (favourites.has(w.word)) {
@@ -151,7 +260,7 @@ function applyWord(w) {
     favBtn.classList.remove('active');
   }
 
-  // Bookmark button
+  // Bookmark button state
   const bookmarkBtn = document.getElementById('bookmarkBtn');
   if (bookmarkBtn) {
     bookmarks.has(w.word)
@@ -183,13 +292,75 @@ function showToast(msg) {
 
 
 // ═══════════════════════════════════════════════════
+//  HEART PARTICLE BURST
+// ═══════════════════════════════════════════════════
+
+const PARTICLE_COLOURS = [
+  '#B87333', // ochre
+  '#c9afc2', // primary mauve
+  '#8B2500', // earth red
+  '#e8a44a', // warm gold
+  '#d5c0cf', // light mauve
+  '#e06030', // burnt orange
+];
+
+function burstParticles(btn) {
+  const rect    = btn.getBoundingClientRect();
+  const originX = rect.left + rect.width  / 2;
+  const originY = rect.top  + rect.height / 2;
+  const fragments = [];
+
+  for (let i = 0; i < 14; i++) {
+    const el       = document.createElement('span');
+    el.className   = 'fav-particle';
+    const angle    = (i / 14) * 360 + (Math.random() - 0.5) * 25;
+    const distance = 28 + Math.random() * 38;
+    const rad      = (angle * Math.PI) / 180;
+    const size     = 5 + Math.random() * 6;
+
+    el.style.width      = size + 'px';
+    el.style.height     = size + 'px';
+    el.style.background = PARTICLE_COLOURS[Math.floor(Math.random() * PARTICLE_COLOURS.length)];
+    el.style.setProperty('--tx', Math.cos(rad) * distance + 'px');
+    el.style.setProperty('--ty', Math.sin(rad) * distance + 'px');
+    el.style.animationDelay = Math.random() * 0.08 + 's';
+    el.style.position   = 'fixed';
+    el.style.left       = (originX - size / 2) + 'px';
+    el.style.top        = (originY - size / 2) + 'px';
+    el.style.zIndex     = '9999';
+
+    document.body.appendChild(el);
+    fragments.push(el);
+  }
+
+  // Pulse ring
+  const ring         = document.createElement('span');
+  ring.className     = 'fav-ring';
+  ring.style.position = 'fixed';
+  ring.style.left     = (originX - 22) + 'px';
+  ring.style.top      = (originY - 22) + 'px';
+  ring.style.zIndex   = '9999';
+  document.body.appendChild(ring);
+  fragments.push(ring);
+
+  // Spring pop on the heart icon
+  btn.classList.remove('heart-pop');
+  void btn.offsetWidth;
+  btn.classList.add('heart-pop');
+  btn.addEventListener('animationend', () => btn.classList.remove('heart-pop'), { once: true });
+
+  setTimeout(() => fragments.forEach(el => el.remove()), 900);
+}
+
+
+// ═══════════════════════════════════════════════════
 //  ACTIONS
 // ═══════════════════════════════════════════════════
 
 function navigate(dir) {
   if (autoSeenTimer) clearTimeout(autoSeenTimer);
   current = Math.max(0, Math.min(words.length - 1, current + dir));
-  renderCard(true);
+  renderCard(dir > 0 ? 'next' : 'prev');
 }
 
 function toggleFavourite() {
@@ -199,7 +370,9 @@ function toggleFavourite() {
   const dateStr = now.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
   let favLog    = JSON.parse(localStorage.getItem('lexicon_favourite_log') || '[]');
 
-  if (favourites.has(w.word)) {
+  const isAdding = !favourites.has(w.word);
+
+  if (!isAdding) {
     favourites.delete(w.word);
     favLog = favLog.filter(e => e.word !== w.word);
     showToast('removed from favourites');
@@ -207,10 +380,21 @@ function toggleFavourite() {
     favourites.add(w.word);
     favLog.unshift({ word: w.word, time: timeStr, date: dateStr, iso: now.toISOString() });
     showToast('♥ added to favourites');
+    burstParticles(document.getElementById('favBtn'));
   }
 
   syncFavourites(currentUid, Array.from(favourites), favLog);
-  renderCard();
+
+  // Update button state without re-rendering the whole card
+  const favBtn  = document.getElementById('favBtn');
+  const favIcon = favBtn.querySelector('i');
+  if (favourites.has(w.word)) {
+    favIcon.className = 'fa-solid fa-heart';
+    favBtn.classList.add('active');
+  } else {
+    favIcon.className = 'fa-regular fa-heart';
+    favBtn.classList.remove('active');
+  }
 }
 
 function toggleBookmark() {
@@ -231,33 +415,24 @@ function toggleBookmark() {
   }
 
   syncBookmarks(currentUid, Array.from(bookmarks), bmLog);
-  renderCard();
+
+  const bookmarkBtn = document.getElementById('bookmarkBtn');
+  if (bookmarkBtn) {
+    bookmarks.has(w.word)
+      ? bookmarkBtn.classList.add('active')
+      : bookmarkBtn.classList.remove('active');
+  }
 }
 
-/*
- * applyFilter — filters WORDS by group, tag, and/or pos from URL params.
- *
- * ?group=people  → matches words where w.groups includes 'people'
- * ?tag=beginner  → matches words where w.tags includes 'beginner'
- * ?pos=noun      → matches words where w.pos === 'noun'
- *
- * Special tag values:
- *   tag=favourite → filter by favourites set in localStorage
- *   tag=bookmark  → filter by bookmarks set in localStorage
- *   tag=all       → no tag filter (show everything)
- */
 function applyFilter(group, tag, pos) {
   const filtered = WORDS.filter(w => {
-    // ── Group filter (from Lexicon tiles in explore.html) ──────────────
     let groupMatch;
     if (!group || group === 'all') {
       groupMatch = true;
     } else {
-      // w.groups is an array like ["people", "level"] — check if it includes the group
       groupMatch = Array.isArray(w.groups) && w.groups.includes(group);
     }
 
-    // ── Tag filter (from Level tiles, or special favourite/bookmark) ───
     let tagMatch;
     if (!tag || tag === 'all') {
       tagMatch = true;
@@ -269,16 +444,13 @@ function applyFilter(group, tag, pos) {
       tagMatch = Array.isArray(w.tags) && w.tags.includes(tag);
     }
 
-    // ── Part-of-speech filter ──────────────────────────────────────────
     const posMatch = !pos || w.pos === pos;
-
     return groupMatch && tagMatch && posMatch;
   });
 
-  words   = shuffle(filtered.length ? filtered : WORDS); // fallback to all if nothing matched
+  words   = shuffle(filtered.length ? filtered : WORDS);
   current = 0;
 
-  // Update the page heading to reflect the active filter
   const headingEl = document.querySelector('h2');
   if (headingEl) {
     if (group && group !== 'all') {
@@ -292,7 +464,7 @@ function applyFilter(group, tag, pos) {
     }
   }
 
-  renderCard();
+  renderCard(null);
 }
 
 
@@ -305,16 +477,21 @@ document.getElementById('nextBtn').addEventListener('click', () => navigate(1));
 document.getElementById('favBtn').addEventListener('click', toggleFavourite);
 document.getElementById('bookmarkBtn')?.addEventListener('click', toggleBookmark);
 
-const params    = new URLSearchParams(window.location.search);
-const startGroup = params.get('group') || null;   // ← NEW: read ?group=
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') navigate(1);
+  if (e.key === 'ArrowLeft')  navigate(-1);
+});
+
+const params     = new URLSearchParams(window.location.search);
+const startGroup = params.get('group') || null;
 const startTag   = params.get('tag')   || null;
 const startPos   = params.get('pos')   || null;
 const startWord  = params.get('word')  || null;
 
 applyFilter(startGroup, startTag, startPos);
 
-// If a specific word was requested via ?word=Kwatye, jump to it
 if (startWord) {
   const idx = words.findIndex(w => w.word === startWord);
-  if (idx !== -1) { current = idx; renderCard(); }
+  if (idx !== -1) { current = idx; renderCard(null); }
 }
