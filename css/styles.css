@@ -85,9 +85,9 @@
   /* page content background         */
   --clr-surface-a10: #312e2e;
   --clr-surface-a20: #474444;
-  --clr-surface-a30: #5f5c5c;
-  --clr-surface-a40: #777575;
-  --clr-surface-a50: #918f8f;
+  --clr-surface-a30: #8a8888;   /* timestamps like "4 Apr 14:32" — was 2.64x FAIL, now 4.95x ✅ */
+  --clr-surface-a40: #919090;   /* muted labels, exit btn, log-clear — was 3.25x, now 4.68x ✅ */
+   --clr-surface-a50: #a8a6a6;   /* notes text on card bg — was 3.47x, now 4.61x ✅ */
   --clr-surface-a60: #abaaaa;
   --clr-surface-a70: #c7c6c6;
 
@@ -116,7 +116,7 @@
   --clr-warning-a20: #ecd7b2;
 
   --clr-danger-a0: #9c2121;
-  --clr-danger-a10: #d94a4a;
+   --clr-danger-a10: #e85f5f;   /* "wrong answer" feedback on dark bg — was 4.18x, now 5.18x ✅ */
   --clr-danger-a20: #eb9e9e;
 
   --clr-info-a0: #515357;
