@@ -4,10 +4,6 @@
 
    HOW THIS FILE IS ORGANISED:
      1. Design tokens  (:root)
-        — Fonts (placeholders — fill in when decided)
-        — Colour palette
-        — Spacing & radius scale
-        — Transition speeds
      2. Reset
      3. Base (body, typography defaults)
      4. Layout  (.page-content, .app)
@@ -17,10 +13,14 @@
      8. Log shared  (.log-list, .log-item, .log-word …)
      9. Explore page (.explore, .explore-Groups …)
     10. Animations   (@keyframes)
-
-   Page-specific styles live in their own CSS files:
-     practice.css  — Practice & Quiz page
-     history.css   — History page
+    11. Practice & Quiz page
+    12. History page
+    13. Favourite & Bookmark buttons
+    14. Profile page
+    15. Nav auth button
+    16. Home sign-in prompt
+    17. Footer
+    18. Sub-tag chips & explore drawer (two-tier filter)
    ============================================================= */
 
 
@@ -31,11 +31,7 @@
 :root {
 
   /* -----------------------------------------------------------
-     TYPOGRAPHY — placeholders
-     Replace the font-family values once fonts are decided.
-     The role comments explain where each is used so the swap
-     is mechanical — no hunting through every file.
-
+     TYPOGRAPHY
      ROLE: --font-display   → headings, logo, word cards
      ROLE: --font-body      → body copy, definitions, examples
      ROLE: --font-mono      → badges, labels, metadata, code
@@ -46,28 +42,26 @@
 
   /* Font sizes — mobile-first scale */
   --text-xs: 0.625rem;
-  /*  10px — labels, fine print          */
+  /*  10px — labels, fine print       */
   --text-sm: 0.75rem;
-  /*  12px — badges, timestamps          */
+  /*  12px — badges, timestamps       */
   --text-base: 0.9rem;
-  /*  14px — body copy, buttons          */
+  /*  14px — body copy, buttons       */
   --text-md: 1rem;
-  /*  16px — definitions                 */
+  /*  16px — definitions              */
   --text-lg: 1.4rem;
-  /*  22px — sub-headings                */
+  /*  22px — sub-headings             */
   --text-xl: 2rem;
-  /*  32px — page headings               */
+  /*  32px — page headings            */
   --text-2xl: 2.8rem;
-  /*  45px — word display on card        */
+  /*  45px — word display on card     */
   --text-3xl: 4rem;
-  /*  64px — score screen numeral        */
+  /*  64px — score screen numeral     */
 
   /* -----------------------------------------------------------
      COLOUR PALETTE
-
-     Primary — dusty mauve/pink; used for accents, highlights,
-     interactive borders, the logo ATYE, hamburger lines.
-     Scale goes 0 (darkest/most saturated) → 90 (near white).
+     Primary — dusty mauve/pink; accents, highlights, borders.
+     Scale: 0 (darkest/most saturated) → 90 (near white).
      ----------------------------------------------------------- */
   --clr-primary-a0: #c9afc2;
   --clr-primary-a10: #cfb8c9;
@@ -82,16 +76,18 @@
 
   /* Surface — warm dark greys for backgrounds and cards */
   --clr-surface-a0: #1c1919;
-  /* page content background         */
   --clr-surface-a10: #312e2e;
   --clr-surface-a20: #474444;
-  --clr-surface-a30: #8a8888;   /* timestamps like "4 Apr 14:32" — was 2.64x FAIL, now 4.95x ✅ */
-  --clr-surface-a40: #919090;   /* muted labels, exit btn, log-clear — was 3.25x, now 4.68x ✅ */
-   --clr-surface-a50: #a8a6a6;   /* notes text on card bg — was 3.47x, now 4.61x ✅ */
+  --clr-surface-a30: #8a8888;
+  /* timestamps — 4.95x on dark ✅  */
+  --clr-surface-a40: #919090;
+  /* muted labels — 4.68x on dark ✅ */
+  --clr-surface-a50: #a8a6a6;
+  /* notes text — 4.61x on card ✅   */
   --clr-surface-a60: #abaaaa;
   --clr-surface-a70: #c7c6c6;
 
-  /* Tonal surface — slightly warmer/pinker dark greys for cards */
+  /* Tonal surface — slightly warmer/pinker dark greys */
   --clr-surface-tonal-a0: #2b2627;
   --clr-surface-tonal-a10: #3f3a3b;
   --clr-surface-tonal-a20: #545051;
@@ -101,9 +97,15 @@
   --clr-surface-tonal-a60: #b2b0b0;
   --clr-surface-tonal-a70: #cbcaca;
 
+  /* Country colours — red earth + ochre
+     --clr-earth : deep red sandstone — Uluru, Mparntwe rock
+     --clr-ochre : warm copper ochre — dry grass, painted rock
+     Used for tags, next button, fav/bookmark buttons, card accents */
+  --clr-earth: #8B2500;
+  --clr-ochre: #B87333;
+
   /* Base */
   --clr-dark: #121010;
-  /* true page background (body)          */
   --clr-light: #ffffff;
 
   /* Semantic — feedback colours */
@@ -116,7 +118,8 @@
   --clr-warning-a20: #ecd7b2;
 
   --clr-danger-a0: #9c2121;
-   --clr-danger-a10: #e85f5f;   /* "wrong answer" feedback on dark bg — was 4.18x, now 5.18x ✅ */
+  --clr-danger-a10: #e85f5f;
+  /* wrong-answer feedback — 5.18x on dark ✅ */
   --clr-danger-a20: #eb9e9e;
 
   --clr-info-a0: #515357;
@@ -124,7 +127,7 @@
   --clr-info-a20: #b8b9bc;
 
   /* -----------------------------------------------------------
-     SPACING — consistent scale used across padding/gap/margin
+     SPACING
      ----------------------------------------------------------- */
   --space-1: 0.25rem;
   /*  4px */
@@ -143,17 +146,16 @@
 
   /* -----------------------------------------------------------
      BORDER RADIUS
-     Using slightly uneven values to hint at hand-made organics.
-     Swap for perfectly round values if preference changes.
+     Slightly uneven values hint at hand-made organics.
      ----------------------------------------------------------- */
   --radius-sm: 8px;
-  /* tags, small badges                    */
+  /* tags, small badges  */
   --radius-md: 14px;
-  /* cards, mode cards                     */
+  /* cards, mode cards   */
   --radius-lg: 18px;
-  /* word card, large panels               */
+  /* word card, panels   */
   --radius-pill: 99px;
-  /* chips, pills, toast                   */
+  /* chips, pills, toast */
 
   /* -----------------------------------------------------------
      TRANSITIONS
@@ -180,7 +182,6 @@
    3. BASE
    ============================================================= */
 
-/* Body — dark background, primary text colour, mobile-first flex column */
 body {
   font-family: var(--font-body);
   font-weight: 300;
@@ -194,7 +195,6 @@ body {
   align-items: stretch;
 }
 
-/* Headings default to display font */
 h1,
 h2,
 h3,
@@ -216,7 +216,6 @@ h2 {
   font-size: var(--text-lg);
 }
 
-/* Links — unstyled by default; individual components style as needed */
 a {
   color: inherit;
   text-decoration: none;
@@ -227,17 +226,9 @@ a {
    4. LAYOUT
    ============================================================= */
 
-/*
- * .page-content
- * WHAT: Main content wrapper used on every page
- * HOW:  Centres content, constrains max-width, pads edges;
- *       flex column so children stack naturally
- * WHY:  Single token for consistent page margins across all pages
- */
 .page-content {
   width: 100%;
   max-width: 640px;
-  /* comfortable reading width on desktop */
   margin: var(--space-6) auto 0;
   padding: var(--space-8) var(--space-4);
   min-height: 100%;
@@ -247,12 +238,6 @@ a {
   border-radius: var(--radius-md);
 }
 
-/*
- * .app
- * WHAT: Secondary inner wrapper used on word-card pages
- * HOW:  Full width within .page-content, slight padding
- * WHY:  Keeps the word card and controls grouped together
- */
 .app {
   width: 100%;
   max-width: 600px;
@@ -266,13 +251,6 @@ a {
    5. NAVIGATION
    ============================================================= */
 
-/*
- * header
- * WHAT: Top bar containing logo + hamburger + slide-out nav
- * HOW:  Flex row, sticky at top; primary-tinted bottom border
- * WHY:  Consistent header across all pages; border echoes the
- *       primary accent colour
- */
 header {
   display: flex;
   align-items: center;
@@ -290,7 +268,6 @@ header {
   padding: var(--space-4) var(--space-6);
 }
 
-/* Logo — display font, two-tone: ALK white, ATYE primary */
 .logo {
   font-family: var(--font-display);
   font-weight: 600;
@@ -304,14 +281,6 @@ header {
   color: var(--clr-primary-a0);
 }
 
-/* -----------------------------------------------------------
-   Hamburger menu — CSS-only checkbox toggle
-   HOW: Hidden checkbox; label acts as the button;
-        :checked sibling selectors drive open/close states
-   ----------------------------------------------------------- */
-
-/* Hidden checkbox — positioned off-screen, not display:none
-   so it still receives focus for accessibility */
 .menu-toggler {
   position: absolute;
   opacity: 0;
@@ -319,7 +288,6 @@ header {
   top: 10px;
 }
 
-/* The three-line icon */
 .show-menu {
   width: 32px;
   height: 22px;
@@ -357,7 +325,6 @@ header {
   top: 18px;
 }
 
-/* Open state — middle bar hidden, top & bottom rotate to × */
 .menu-toggler:checked+.show-menu span {
   background-color: transparent;
 }
@@ -376,7 +343,6 @@ header {
   transform: translateX(0);
 }
 
-/* Slide-out nav drawer */
 .nav {
   position: fixed;
   right: 0;
@@ -411,15 +377,11 @@ header {
    6. WORD CARDS  (words.html)
    ============================================================= */
 
-/*
- * .card
- * WHAT: The main word display card
- * HOW:  Dark tonal bg, accent border, flex column with gap;
- *       fade-out class used during card transitions
- */
 .card {
-  background: var(--clr-surface-tonal-a10);
-  border: 1px solid var(--clr-primary-a50);
+  background: #ffffff;
+  /* white card */
+  border: 1px solid var(--clr-primary-a30);
+  /* softer border on white */
   border-radius: var(--radius-lg);
   padding: var(--space-8) var(--space-8) var(--space-6);
   min-height: 280px;
@@ -442,35 +404,42 @@ header {
   gap: var(--space-4);
 }
 
-/* Large Arrernte word */
+/* Arrernte word — rich ochre, AA on white (4.71x ✅) */
 .word {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -1px;
-  color: var(--clr-light);
+  color: var(--clr-dark);
 }
 
-/* Phonetic transcription below the word */
+/* .word-block — wraps word + phonetic with consistent gap */
+.word-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Phonetic — dark enough on white (9.64x ✅) */
 .phonetic {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--clr-primary-a60);
-  margin-top: -0.25rem;
+  color: var(--clr-surface-a20);
+  margin-top: var(--space-1);
 }
 
-/* Definition block — light bg with left accent border */
+/* Definition block — no background, left accent border only */
 .definition {
   font-family: var(--font-display);
   font-size: var(--text-md);
   font-style: italic;
   line-height: 1.7;
   color: var(--clr-dark);
-  background-color: var(--clr-primary-a60);
-  border-left: 2px solid var(--clr-primary-a10);
+  background-color: transparent;
+  border-left: 3px solid var(--clr-earth);
   padding-left: var(--space-4);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border-radius: 0;
 }
 
 .def-line {
@@ -483,7 +452,7 @@ header {
   margin-right: 0.3em;
 }
 
-/* Example sentences — one <p class="example"> per item in examples[] array */
+/* Examples — one <p class="example"> per item in examples[] */
 .examples {
   display: flex;
   flex-direction: column;
@@ -493,7 +462,8 @@ header {
 .example {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  color: var(--clr-primary-a10);
+  color: var(--clr-surface-tonal-a20);
+  /* dark on white — 7.94x ✅ */
   line-height: 1.6;
 }
 
@@ -505,18 +475,19 @@ header {
   content: '\201D';
 }
 
-/* Notes — variant forms and dialect notes, shown below examples */
+/* Notes — variant forms, dialect notes */
 .notes {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--clr-surface-a50);
-  border-left: 2px solid var(--clr-primary-a30);
+  color: var(--clr-surface-a20);
+  /* dark on white — 9.64x ✅ */
+  border-left: 3px solid var(--clr-ochre);
   padding-left: var(--space-3);
   line-height: 1.6;
   letter-spacing: 0.02em;
 }
 
-/* Tags row at the bottom of the card */
+/* Tags row */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -524,7 +495,7 @@ header {
   margin-top: auto;
 }
 
-/* Progress bar row above word cards */
+/* Progress bar row */
 .progress-row {
   display: flex;
   align-items: center;
@@ -554,13 +525,7 @@ header {
   white-space: nowrap;
 }
 
-/*
- * .controls — navigation button row
- * WHAT: Holds prev, icon buttons, and next in a single line
- * HOW:  flex row; prev/next grow equally via flex:1 so the
- *       fixed-width icon buttons land naturally in the centre
- * WHY:  Keeps all navigation on one line without manual widths
- */
+/* Controls row — prev / fav / bookmark / next */
 .controls {
   display: flex;
   gap: var(--space-2);
@@ -569,19 +534,29 @@ header {
   margin-bottom: var(--space-8);
 }
 
-/* Prev and Next stretch to fill remaining space equally */
-#prevBtn,
-#nextBtn {
+#prevBtn {
   flex: 1;
 }
 
-/*
- * .btn-icon — square icon-only button (fav + bookmark)
- * WHAT: Fixed 44×44 px tap target; sits between prev/next
- * HOW:  flex: 0 0 auto so it never grows or shrinks
- * WHY:  Icon alone needs no text padding; fixed size keeps
- *       the two icon buttons visually balanced
- */
+/* next button — red earth, the primary action */
+#nextBtn {
+  flex: 1;
+  background: var(--clr-earth);
+  border-color: var(--clr-earth);
+  color: var(--clr-light);
+}
+
+#nextBtn:hover {
+  background: #a32c00;
+  border-color: #a32c00;
+}
+
+#nextBtn:disabled {
+  background: transparent;
+  border-color: var(--clr-primary-a50);
+  color: var(--clr-primary-a50);
+}
+
 .btn-icon {
   flex: 0 0 auto;
   width: 44px;
@@ -599,9 +574,6 @@ header {
    7. SHARED UI — buttons, badges, tags, toast
    ============================================================= */
 
-/*
- * .btn — base button used on word cards (prev / next)
- */
 .btn {
   background: transparent;
   border: 1px solid var(--clr-primary-a50);
@@ -632,7 +604,6 @@ header {
   transform: none;
 }
 
-/* "Mark as seen" variant — kept in case it's needed elsewhere */
 .btn-seen {
   flex: 1;
   border-color: var(--clr-primary-a0);
@@ -650,49 +621,44 @@ header {
   color: var(--clr-dark);
 }
 
-/*
- * Badges — pill labels on word cards
- */
+/* POS badge — dark pill, stays readable against white card */
 .pos-badge {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--clr-light);
-  background: var(--clr-surface-a0);
+  background: var(--clr-surface-tonal-a10);
   border: 1px solid var(--clr-info-a10);
   border-radius: var(--radius-pill);
   padding: 3px 10px;
   white-space: nowrap;
 }
 
+/* Seen badge */
 .seen-badge {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--clr-light);
   background: var(--clr-surface-a20);
-  border: 1px solid var(--clr-surface-a40);
+  border: 1px solid var(--clr-surface-a30);
   border-radius: var(--radius-pill);
   padding: 3px 10px;
   white-space: nowrap;
 }
 
-/*
- * .tag — small category label inside word cards
- */
+/* Tag chips on word card — filled dusty mauve, white text */
 .tag {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--clr-info-a20);
-  border: 1px solid var(--clr-info-a0);
+  color: var(--clr-light);
+  background: var(--clr-earth);
+  border: 1px solid var(--clr-earth);
   border-radius: var(--radius-pill);
   padding: 2px 9px;
   letter-spacing: 0.03em;
 }
 
-/*
- * .header-meta — small text showing "N words studied"
- */
 .header-meta {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -700,12 +666,6 @@ header {
   letter-spacing: 0.05em;
 }
 
-/*
- * .toast — brief confirmation message fixed at screen bottom
- * WHAT: Non-blocking feedback e.g. "logged ✓"
- * HOW:  Fixed position, opacity animated via .show class
- * WHY:  Doesn't interrupt the user's flow with a modal
- */
 .toast {
   position: fixed;
   bottom: var(--space-8);
@@ -732,10 +692,9 @@ header {
 
 
 /* =============================================================
-   8. LOG SHARED STYLES  (used by history.html and words.html)
+   8. LOG SHARED STYLES
    ============================================================= */
 
-/* Section header row — title left, clear button right */
 .log-header {
   display: flex;
   align-items: center;
@@ -767,7 +726,6 @@ header {
   color: var(--clr-danger-a10);
 }
 
-/* Scrollable list container */
 .log-list {
   display: flex;
   flex-direction: column;
@@ -778,7 +736,6 @@ header {
   scrollbar-color: var(--clr-primary-a30) transparent;
 }
 
-/* Individual log row */
 .log-item {
   display: flex;
   align-items: center;
@@ -813,7 +770,6 @@ header {
   color: var(--clr-surface-a40);
 }
 
-/* Empty state placeholder */
 .log-empty {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
@@ -824,9 +780,27 @@ header {
   border-radius: var(--radius-md);
 }
 
+.log-item--link {
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.log-item--link:hover {
+  border-color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.05);
+  transform: translateY(-1px);
+}
+
+.log-item--link:active {
+  transform: scale(0.99);
+}
+
 
 /* =============================================================
-   9. EXPLORE PAGE  (explore.html / index.html)
+   9. EXPLORE PAGE
    ============================================================= */
 
 .explore {
@@ -836,7 +810,6 @@ header {
   width: 100%;
 }
 
-/* Topic group rows — flex-wrap, full width, mobile-friendly */
 .explore-Topbar,
 .explore-Groups {
   display: flex;
@@ -846,7 +819,6 @@ header {
   gap: var(--space-4);
 }
 
-/* Individual group tiles */
 .explore-UserTopics,
 .explore-GroupList {
   display: flex;
@@ -875,7 +847,6 @@ header {
   width: 100%;
 }
 
-/* Clickable filter tiles */
 .explore-GroupList.filter-btn {
   cursor: pointer;
 }
@@ -885,7 +856,6 @@ header {
   background: var(--clr-surface-a0);
 }
 
-/* Inner content wrapper — centres icon above label */
 .explore-UserTopics>div,
 .explore-GroupList>div {
   display: flex;
@@ -896,23 +866,20 @@ header {
   gap: var(--space-2);
 }
 
-/* Tile icons — sized relative to viewport, never hardcoded px */
 .explore-UserTopics i,
 .explore-GroupList i {
   font-size: clamp(1.25rem, 4vw, 1.75rem);
-  color: var(--clr-surface-a60);
+  color: var(--clr-primary-a50);
   line-height: 1;
 }
 
-/* Tile label — presentational text inside each tile button */
 .tile-label {
   font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 400;
-  color: var(--clr-surface-a60);
+  color: var(--clr-surface-a70);
 }
 
-/* Section headings — Groups, Parts of Speech, Levels, Lexicon */
 .explore h2 {
   font-family: var(--font-display);
   font-size: var(--text-base);
@@ -922,14 +889,24 @@ header {
   align-self: flex-start;
 }
 
+.explore-tile-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  margin-top: var(--space-1);
+}
+
+.explore-tile-icon {
+  font-size: 1.1rem;
+  color: var(--clr-primary-a0);
+  margin-bottom: var(--space-1);
+}
+
 
 /* =============================================================
    10. ANIMATIONS
    ============================================================= */
 
-/*
- * slideIn — used by log items when they are injected into the DOM
- */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -942,9 +919,6 @@ header {
   }
 }
 
-/*
- * fadeUp — used by quiz/practice screens when switching
- */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -959,7 +933,7 @@ header {
 
 
 /* =============================================================
-   11. PRACTICE & QUIZ PAGE  (practice.html)
+   11. PRACTICE & QUIZ PAGE
    ============================================================= */
 
 .practice-wrap {
@@ -1045,6 +1019,30 @@ header {
   border-color: var(--clr-success-a0);
   color: var(--clr-success-a10);
   background: rgba(34, 148, 110, 0.09);
+}
+
+/* Sub-tag chips — second filter tier */
+.chip--sub {
+  font-size: var(--text-xs);
+  padding: 4px 10px;
+  border-color: var(--clr-surface-a20);
+  color: var(--clr-surface-a40);
+  background: var(--clr-surface-a0);
+}
+
+.chip--sub.on {
+  border-color: var(--clr-primary-a20);
+  color: var(--clr-primary-a30);
+  background: rgba(201, 175, 194, 0.07);
+}
+
+/* Live word count next to filter label */
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  margin-left: var(--space-2);
+  letter-spacing: 0.03em;
 }
 
 .mode-grid {
@@ -1143,10 +1141,6 @@ header {
 .also-link:hover {
   border-color: var(--clr-primary-a30);
   color: var(--clr-primary-a40);
-}
-
-.also-icon {
-  font-size: 0.9rem;
 }
 
 .quiz-topbar {
@@ -1622,7 +1616,7 @@ header {
 
 
 /* =============================================================
-   12. HISTORY PAGE  (history.html)
+   12. HISTORY PAGE
    ============================================================= */
 
 .history-wrap {
@@ -1662,17 +1656,6 @@ header {
 
 .history-clear-btn:hover {
   color: var(--clr-danger-a10);
-}
-
-.quiz-log-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-3);
-  background: var(--clr-surface-a0);
-  border: 1px solid var(--clr-surface-a20);
-  border-radius: var(--radius-sm);
-  animation: slideIn 0.2s ease;
 }
 
 .quiz-log-top {
@@ -1728,84 +1711,42 @@ header {
 
 
 /* =============================================================
-   FAVOURITE BUTTON  (words.html)
+   13. FAVOURITE & BOOKMARK BUTTONS
    ============================================================= */
 
-/*
- * .btn-fav — favourite toggle; icon-only square in the nav row
- * Active state fills with primary colour
- */
 .btn-fav {
-  border-color: var(--clr-primary-a0);
-  color: var(--clr-primary-a0);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
 }
 
 .btn-fav:hover {
-  background: rgba(201, 175, 194, 0.12);
+  background: rgba(184, 115, 51, 0.15);
 }
 
 .btn-fav.active {
-  background: var(--clr-primary-a0);
-  color: var(--clr-dark);
-  border-color: var(--clr-primary-a0);
+  background: var(--clr-ochre);
+  color: var(--clr-light);
+  border-color: var(--clr-ochre);
 }
 
-/* Clickable log row — used on saved.html */
-.log-item--link {
-  text-decoration: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.log-item--link:hover {
-  border-color: var(--clr-primary-a30);
-  background: rgba(201, 175, 194, 0.05);
-  transform: translateY(-1px);
-}
-
-.log-item--link:active {
-  transform: scale(0.99);
-}
-
-/* OLD */
 .btn-bookmark {
-  border-color: var(--clr-surface-a30);
-  color: var(--clr-surface-a50);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
 }
 
 .btn-bookmark:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--clr-surface-a50);
-  color: var(--clr-surface-a60);
+  background: rgba(184, 115, 51, 0.15);
 }
 
 .btn-bookmark.active {
-  background: rgba(201, 175, 194, 0.1);
-  color: var(--clr-primary-a20);
-  border-color: var(--clr-primary-a30);
-}
-
-/* NEW — mirrors .btn-fav exactly */
-.btn-bookmark {
-  border-color: var(--clr-primary-a0);
-  color: var(--clr-primary-a0);
-}
-
-.btn-bookmark:hover {
-  background: rgba(201, 175, 194, 0.12);
-}
-
-.btn-bookmark.active {
-  background: var(--clr-primary-a0);
-  color: var(--clr-dark);
-  border-color: var(--clr-primary-a0);
+  background: var(--clr-ochre);
+  color: var(--clr-light);
+  border-color: var(--clr-ochre);
 }
 
 
 /* =============================================================
-   PROFILE PAGE  (profile.html)
+   14. PROFILE PAGE
    ============================================================= */
 
 .profile-wrap {
@@ -1834,7 +1775,7 @@ header {
   background: var(--clr-surface-tonal-a0);
   border: 1px solid var(--clr-surface-a20);
   border-radius: var(--radius-md);
-  padding: var(--space-5) var(--space-5);
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -1859,6 +1800,20 @@ header {
   letter-spacing: 0.05em;
 }
 
+.last-test-score {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--clr-light);
+  margin-top: var(--space-1);
+}
+
+.last-test-pct {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a50);
+  letter-spacing: 0.05em;
+}
+
 .last-test-bar-track {
   width: 100%;
   height: 3px;
@@ -1874,20 +1829,6 @@ header {
   transition: width 0.7s ease;
 }
 
-.last-test-score {
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  color: var(--clr-light);
-  margin-top: var(--space-1);
-}
-
-.last-test-pct {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--clr-surface-a50);
-  letter-spacing: 0.05em;
-}
-
 .stat-btn {
   display: flex;
   flex-direction: column;
@@ -1899,9 +1840,7 @@ header {
   border-radius: var(--radius-md);
   padding: var(--space-6) var(--space-4);
   text-decoration: none;
-  transition: border-color var(--transition-fast),
-    background var(--transition-fast),
-    transform 0.1s ease;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform 0.1s ease;
 }
 
 .stat-btn:hover {
@@ -1989,9 +1928,61 @@ header {
   color: var(--clr-primary-a40);
 }
 
+.profile-about-card {
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.about-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+}
+
+.about-edit-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-primary-a0);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.about-edit-link:hover {
+  color: var(--clr-primary-a20);
+}
+
+.about-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.about-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.about-row-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+}
+
+.about-row-value {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a60);
+  line-height: 1.5;
+}
+
 
 /* =============================================================
-   NAV AUTH BUTTON  (index.html + all pages eventually)
+   15. NAV AUTH BUTTON
    ============================================================= */
 
 .nav-auth {
@@ -2062,59 +2053,39 @@ header {
   letter-spacing: 0.05em;
 }
 
-
-/* =============================================================
-   HOME — SIGN-IN PROMPT SECTION
-   ============================================================= */
-
-.home-signin-prompt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  border: 1px dashed var(--clr-surface-a20);
-  border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
-  animation: fadeUp 0.55s ease 0.28s both;
-}
-
-.home-signin-prompt-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.home-signin-prompt-title {
-  font-family: var(--font-display);
-  font-size: var(--text-base);
-  color: var(--clr-surface-a60);
-}
-
-.home-signin-prompt-sub {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-surface-a30);
-  line-height: 1.6;
-  letter-spacing: 0.03em;
-}
-
-.home-signin-prompt-btn {
+.account-signout-btn {
   flex-shrink: 0;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  color: var(--clr-primary-a0);
-  border: 1px solid var(--clr-primary-a30);
+  color: var(--clr-surface-a40);
+  background: none;
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.account-signout-btn:hover {
+  color: var(--clr-danger-a10);
+  border-color: var(--clr-danger-a0);
+}
+
+.account-signin-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-dark);
+  background: var(--clr-primary-a0);
+  border: none;
   border-radius: var(--radius-pill);
   padding: var(--space-2) var(--space-4);
   text-decoration: none;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
+  transition: background var(--transition-fast);
 }
 
-.home-signin-prompt-btn:hover {
-  background: rgba(201, 175, 194, 0.08);
-  border-color: var(--clr-primary-a0);
+.account-signin-btn:hover {
+  background: var(--clr-primary-a10);
 }
 
 .profile-account-card {
@@ -2177,114 +2148,64 @@ header {
   text-overflow: ellipsis;
 }
 
-.account-signout-btn {
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-surface-a40);
-  background: none;
-  border: 1px solid var(--clr-surface-a20);
-  border-radius: var(--radius-pill);
-  padding: var(--space-2) var(--space-3);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.account-signout-btn:hover {
-  color: var(--clr-danger-a10);
-  border-color: var(--clr-danger-a0);
-}
-
-.account-signin-btn {
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-dark);
-  background: var(--clr-primary-a0);
-  border: none;
-  border-radius: var(--radius-pill);
-  padding: var(--space-2) var(--space-4);
-  text-decoration: none;
-  transition: background var(--transition-fast);
-}
-
-.account-signin-btn:hover {
-  background: var(--clr-primary-a10);
-}
-
 
 /* =============================================================
-   PROFILE — ABOUT YOU CARD
+   16. HOME — SIGN-IN PROMPT
    ============================================================= */
 
-.profile-about-card {
-  background: var(--clr-surface-tonal-a0);
-  border: 1px solid var(--clr-surface-a20);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
-}
-
-.about-empty {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--clr-surface-a40);
-}
-
-.about-edit-link {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-primary-a0);
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-.about-edit-link:hover {
-  color: var(--clr-primary-a20);
-}
-
-.about-rows {
+.home-signin-prompt {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
+  border: 1px dashed var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  animation: fadeUp 0.55s ease 0.28s both;
 }
 
-.about-row {
+.home-signin-prompt-text {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
 }
 
-.about-row-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--clr-surface-a40);
-}
-
-.about-row-value {
-  font-family: var(--font-body);
+.home-signin-prompt-title {
+  font-family: var(--font-display);
   font-size: var(--text-base);
   color: var(--clr-surface-a60);
-  line-height: 1.5;
 }
 
-.explore-tile-count {
+.home-signin-prompt-sub {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--clr-primary-a0);
-  margin-top: var(--space-1);
+  color: var(--clr-surface-a30);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
 }
 
-.explore-tile-icon {
-  font-size: 1.1rem;
+.home-signin-prompt-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
   color: var(--clr-primary-a0);
-  margin-bottom: var(--space-1);
+  border: 1px solid var(--clr-primary-a30);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.home-signin-prompt-btn:hover {
+  background: rgba(201, 175, 194, 0.08);
+  border-color: var(--clr-primary-a0);
 }
 
 
 /* =============================================================
-   FOOTER
+   17. FOOTER
    ============================================================= */
 
 .site-footer {
@@ -2313,4 +2234,68 @@ header {
 
 .site-footer-link:hover {
   color: var(--clr-primary-a30);
+}
+
+
+/* =============================================================
+   18. SUB-TAG CHIPS & EXPLORE DRAWER
+   ============================================================= */
+
+/* Explore — sub-tag drawer slides open below a group tile */
+.subtag-drawer {
+  width: 100%;
+  background: var(--clr-surface-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-top: calc(-1 * var(--space-2));
+  animation: fadeUp 0.18s ease;
+}
+
+.subtag-drawer-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  margin-bottom: var(--space-3);
+}
+
+.subtag-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.subtag-chip {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a50);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-pill);
+  padding: 5px 13px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.03em;
+}
+
+.subtag-chip:hover {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+  background: rgba(201, 175, 194, 0.06);
+}
+
+.subtag-chip--all {
+  border-color: var(--clr-primary-a30);
+  color: var(--clr-primary-a40);
+}
+
+.subtag-chip--all:hover {
+  background: rgba(201, 175, 194, 0.1);
+}
+
+/* Active state on group tile when drawer is open */
+.group-tile.active {
+  border-color: var(--clr-primary-a0);
+  background: rgba(201, 175, 194, 0.07);
 }

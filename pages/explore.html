@@ -8,34 +8,28 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-17ZB632V40');
     </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts — shared across the app -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <title>AKALTYE</title>
+    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
+    <title>AKALTYE — Explore</title>
 </head>
 
 <body>
 
-    <!--Navigation BAR-->
     <header>
         <div class="nav-bar">
             <a href="../index.html" class="logo">AKA<span>LTYE</span></a>
-
             <input id="menu-toggler" type="checkbox" class="menu-toggler">
-            <label for="menu-toggler" class="show-menu">
-                <span></span>
-            </label>
-
+            <label for="menu-toggler" class="show-menu"><span></span></label>
             <nav class="nav">
                 <ul class="nav__menu">
                     <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
@@ -51,38 +45,27 @@
         <div class="explore">
             <h1>Explore</h1>
 
+            <!-- ── TOP BAR — saved lists + quick access ── -->
             <div class="explore-Topbar">
 
-                <div class="explore-GroupList" id="favTile" style="cursor:pointer" onclick="location.href='saved.html'">
+                <div class="explore-GroupList" style="cursor:pointer" onclick="location.href='saved.html'">
                     <div>
                         <i class="fa-regular fa-heart"></i>
                         <span class="tile-label">Favourites</span>
-                        <div class="explore-tile-count" id="favTileCount"></div>
                     </div>
                 </div>
 
-
-
-                <div class="explore-GroupList" id="bookmarkTile" style="cursor:pointer"
-                    onclick="location.href='saved.html'">
+                <div class="explore-GroupList" style="cursor:pointer" onclick="location.href='saved.html'">
                     <div>
                         <i class="fa-solid fa-bookmark"></i>
                         <span class="tile-label">Bookmarks</span>
-                        <div class="explore-tile-count" id="bookmarkTileCount"></div>
                     </div>
                 </div>
 
-                <div class="explore-GroupList filter-btn" data-tag="all">
+                <div class="explore-GroupList filter-btn" data-group="all">
                     <div>
                         <i class="fa-regular fa-message"></i>
                         <span class="tile-label">All Words</span>
-                    </div>
-                </div>
-
-                <div class="explore-UserTopics">
-                    <div>
-                        <i class="fa-solid fa-layer-group"></i>
-                        <span class="tile-label">Collections</span>
                     </div>
                 </div>
 
@@ -97,42 +80,110 @@
 
             </div>
 
-            <!-- Groups -->
-            <h2>Groups</h2>
-            <div class="explore-Groups">
-                <div class="explore-GroupList filter-btn" data-tag="country">
-                    <div>
-                        <i class="fa-solid fa-leaf"></i>
-                        <span class="tile-label">Country</span>
-                    </div>
-                </div>
-                <div class="explore-GroupList filter-btn" data-tag="weather">
-                    <div>
-                        <i class="fa-solid fa-cloud-sun-rain"></i>
-                        <span class="tile-label">Weather</span>
-                    </div>
-                </div>
-                <div class="explore-GroupList filter-btn" data-tag="emotions">
-                    <div>
-                        <i class="fa-regular fa-face-grin-beam"></i>
-                        <span class="tile-label">Emotions</span>
-                    </div>
-                </div>
-                <div class="explore-GroupList filter-btn" data-tag="body">
-                    <div>
-                        <i class="fa-solid fa-child-reaching"></i>
-                        <span class="tile-label">Body</span>
-                    </div>
-                </div>
-                <div class="explore-GroupList filter-btn" data-tag="people">
+
+            <!-- ══════════════════════════════════════════
+                 LEXICON — group tiles navigate directly
+                 to words.html?group=X
+                 ══════════════════════════════════════════ -->
+            <h2>Lexicon</h2>
+
+            <div class="explore-Groups" id="lexiconGroups">
+
+                <div class="explore-GroupList group-tile" data-group="people">
                     <div>
                         <i class="fa-solid fa-people-line"></i>
                         <span class="tile-label">People</span>
                     </div>
                 </div>
+
+                <div class="explore-GroupList group-tile" data-group="country">
+                    <div>
+                        <i class="fa-solid fa-leaf"></i>
+                        <span class="tile-label">Country</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="emotions">
+                    <div>
+                        <i class="fa-regular fa-face-grin-beam"></i>
+                        <span class="tile-label">Emotions</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="body">
+                    <div>
+                        <i class="fa-solid fa-child-reaching"></i>
+                        <span class="tile-label">Body</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="language">
+                    <div>
+                        <i class="fa-solid fa-language"></i>
+                        <span class="tile-label">Language</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="daily life">
+                    <div>
+                        <i class="fa-solid fa-sun"></i>
+                        <span class="tile-label">Daily Life</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="culture">
+                    <div>
+                        <i class="fa-solid fa-fire"></i>
+                        <span class="tile-label">Culture</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="cheeky">
+                    <div>
+                        <i class="fa-regular fa-face-grin-squint-tears"></i>
+                        <span class="tile-label">Cheeky</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList group-tile" data-group="rude">
+                    <div>
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span class="tile-label">Rude Words</span>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Parts of Speech -->
+
+            <!-- ── LEVELS — separate from Lexicon groups ── -->
+            <h2>Level</h2>
+            <div class="explore-Groups">
+
+                <div class="explore-GroupList filter-btn" data-tag="beginner">
+                    <div>
+                        <i class="fa-regular fa-star"></i>
+                        <span class="tile-label">Beginner</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList filter-btn" data-tag="intermediate">
+                    <div>
+                        <i class="fa-solid fa-star-half-stroke"></i>
+                        <span class="tile-label">Intermediate</span>
+                    </div>
+                </div>
+
+                <div class="explore-GroupList filter-btn" data-tag="advanced">
+                    <div>
+                        <i class="fa-solid fa-star"></i>
+                        <span class="tile-label">Advanced</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ── PARTS OF SPEECH ── -->
             <h2>Parts of Speech</h2>
             <div class="explore-Groups">
                 <div class="explore-GroupList pos-btn" data-pos="noun">
@@ -147,55 +198,47 @@
                 <div class="explore-GroupList pos-btn" data-pos="interjection">
                     <span class="tile-label">Interjection</span>
                 </div>
-            </div>
-
-            <!-- Levels -->
-            <h2>Levels</h2>
-            <div class="explore-Groups">
-                <div class="explore-GroupList filter-btn" data-tag="beginner">
-                    <span class="tile-label">Beginner</span>
+                <div class="explore-GroupList pos-btn" data-pos="pronoun">
+                    <span class="tile-label">Pronoun</span>
+                </div>
+                <div class="explore-GroupList pos-btn" data-pos="adverb">
+                    <span class="tile-label">Adverb</span>
                 </div>
             </div>
 
-            <!-- Lexicon -->
-            <h2>Lexicon</h2>
-            <div class="explore-Groups">
-                <div class="explore-GroupList filter-btn" data-tag="interaction">
-                    <div>
-                        <i class="fa-solid fa-people-arrows"></i>
-                        <span class="tile-label">Interactions</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
+        </div><!-- /explore -->
+    </div><!-- /page-content -->
 
 
-    <!-- type="module" required for Firebase ES module imports in app.js -->
     <script type="module" src="../js/app.js"></script>
-    <!--Fontawesome icons-->
-    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
     <script src="../js/main.js"></script>
 
-    <!--
-      Inline script — shows the favourite count on the tile.
-      WHY: Gives immediate feedback without navigating into the list.
-      HOW: Reads lexicon_favourites from localStorage; only shows
-           the count if at least one word has been favourited.
-    -->
-
     <script>
-        const favs = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
-        const countEl = document.getElementById('favTileCount');
-        if (countEl && favs.length > 0) {
-            countEl.textContent = favs.length;
-        }
-        const bms = JSON.parse(localStorage.getItem('lexicon_bookmarks') || '[]');
-        const bmCountEl = document.getElementById('bookmarkTileCount');
-        if (bmCountEl && bms.length > 0) {
-            bmCountEl.textContent = bms.length;
-        }
+        // ── Group tiles → words.html?group=X ────────────────────────
+        document.querySelectorAll('.group-tile').forEach(tile => {
+            tile.addEventListener('click', () => {
+                location.href = `words.html?group=${encodeURIComponent(tile.dataset.group)}`;
+            });
+        });
+
+        // ── Level tiles → words.html?tag=X ──────────────────────────
+        document.querySelectorAll('.filter-btn[data-tag]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                location.href = `words.html?tag=${encodeURIComponent(btn.dataset.tag)}`;
+            });
+        });
+
+        // ── POS tiles → words.html?pos=X ────────────────────────────
+        document.querySelectorAll('.pos-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                location.href = `words.html?pos=${encodeURIComponent(btn.dataset.pos)}`;
+            });
+        });
+
+        // ── All Words tile ───────────────────────────────────────────
+        document.querySelector('.filter-btn[data-group="all"]')?.addEventListener('click', () => {
+            location.href = 'words.html';
+        });
     </script>
 
 </body>

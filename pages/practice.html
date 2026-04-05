@@ -3,69 +3,45 @@
   practice.html — Practice & Quiz page for ALKATYE
 
   WHAT: Single page combining the practice hub and all quiz modes.
-        No separate quiz.html needed — everything lives here.
-
   HOW:  Three screens toggled by JS (.active class):
           #modeScreen  — mode picker with filters + recent log
           #quizScreen  — active question with progress bar
           #scoreScreen — final result with replay actions
-        Styles in practice.css. Logic in practice.js.
-
-  WHY:  The old practice.html was just a list of links and
-        quiz.html was just the destination — merging removes
-        a navigation step and keeps the experience faster.
+  WHY:  Merging practice + quiz removes a navigation step.
 
   FILES NEEDED:
-    styles.css    — global tokens, nav, layout
-    practice.css  — all styles for this page
-    practice.js   — all quiz logic
+    styles.css   — global tokens, nav, layout
+    practice.js  — all quiz logic (imports WORDS from words-data.js)
 -->
 <html lang="en">
 
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-17ZB632V40');
     </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Fonts — shared across the app -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
-
-
-    <!-- Global app styles: colour tokens, nav, layout -->
     <link rel="stylesheet" href="../css/styles.css">
-
-    <!-- Practice + quiz styles -->
-
     <title>AKALTYE — Practice</title>
 </head>
 
 <body>
 
-    <!-- ═══════════════════════════════════════════
-         NAVIGATION BAR
-         - CSS-only hamburger (checkbox hack in styles.css)
-         - Same markup pattern used on every page
-         ═══════════════════════════════════════════ -->
     <header>
         <div class="nav-bar">
             <a href="../index.html" class="logo">AKA<span>LTYE</span></a>
-
             <input id="menu-toggler" type="checkbox" class="menu-toggler">
             <label for="menu-toggler" class="show-menu"><span></span></label>
-
             <nav class="nav">
                 <ul class="nav__menu">
                     <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
@@ -77,48 +53,69 @@
         </div>
     </header>
 
-
-    <!-- ═══════════════════════════════════════════
-         PAGE CONTENT
-         - .page-content centres and constrains width
-           (defined in global styles.css)
-         ═══════════════════════════════════════════ -->
     <div class="page-content">
         <div class="practice-wrap">
 
 
             <!-- ═══════════════════════════════════════════
                  SCREEN 1 — MODE PICKER
-                 Shown on load. JS hides it when a mode card
-                 is tapped and shows #quizScreen instead.
                  ═══════════════════════════════════════════ -->
             <div class="screen active" id="modeScreen">
 
-                <!-- Page heading -->
                 <div>
                     <div class="practice-heading">Practice.<span> ✦</span></div>
                     <div class="practice-sub">choose a quiz mode to begin</div>
                 </div>
 
                 <!-- ─────────────────────────────────────────
-                     FILTER — Topic tags
-                     data-tag read by practice.js to narrow
-                     the word pool before a quiz starts
+                     FILTER ROW 1 — Lexicon group
+                     Two-tier: selecting a group chip reveals
+                     sub-tag chips beneath it.
+                     data-group read by practice.js getFiltered()
                      ───────────────────────────────────────── -->
                 <div>
-                    <div class="filter-label">Topic</div>
-                    <div class="chip-row" id="tagChips">
-                        <div class="chip on" data-tag="all">All words</div>
-                        <div class="chip" data-tag="beginner">Beginner</div>
-                        <div class="chip" data-tag="interaction">Interactions</div>
-                        <div class="chip" data-tag="country">Country</div>
-                        <div class="chip" data-tag="weather">Weather</div>
+                    <div class="filter-label">
+                        Lexicon group
+                        <span class="filter-count" id="filterCount"></span>
+                    </div>
+                    <div class="chip-row" id="groupChips">
+                        <div class="chip on" data-group="all">All</div>
+                        <div class="chip" data-group="people">People</div>
+                        <div class="chip" data-group="country">Country</div>
+                        <div class="chip" data-group="emotions">Emotions</div>
+                        <div class="chip" data-group="body">Body</div>
+                        <div class="chip" data-group="language">Language</div>
+                        <div class="chip" data-group="daily life">Daily Life</div>
+                        <div class="chip" data-group="culture">Culture</div>
+                        <div class="chip" data-group="cheeky">Cheeky</div>
+                        <div class="chip" data-group="rude">Rude</div>
+                    </div>
+
+                    <!--
+                        Sub-tag chips — hidden until a group chip is selected.
+                        Populated by inline JS below; read by practice.js.
+                    -->
+                    <div class="chip-row chip-row--sub" id="subtagChips" style="display:none; margin-top:6px">
+                        <div class="chip chip--sub on" data-tag="all-sub" id="allSubChip">All in group</div>
                     </div>
                 </div>
 
                 <!-- ─────────────────────────────────────────
-                     FILTER — Part of speech
-                     data-pos read by practice.js
+                     FILTER ROW 2 — Level
+                     Separate from Lexicon groups per design
+                     ───────────────────────────────────────── -->
+                <div>
+                    <div class="filter-label">Level</div>
+                    <div class="chip-row" id="levelChips">
+                        <div class="chip on" data-level="all">All levels</div>
+                        <div class="chip" data-level="beginner">Beginner</div>
+                        <div class="chip" data-level="intermediate">Intermediate</div>
+                        <div class="chip" data-level="advanced">Advanced</div>
+                    </div>
+                </div>
+
+                <!-- ─────────────────────────────────────────
+                     FILTER ROW 3 — Part of speech
                      ───────────────────────────────────────── -->
                 <div>
                     <div class="filter-label">Part of speech</div>
@@ -132,8 +129,7 @@
                 </div>
 
                 <!-- ─────────────────────────────────────────
-                     FILTER — Seen / unseen words
-                     Reads lexicon_seen from localStorage
+                     FILTER ROW 4 — Seen / unseen
                      ───────────────────────────────────────── -->
                 <div>
                     <div class="filter-label">Study set</div>
@@ -145,9 +141,6 @@
 
                 <!-- ─────────────────────────────────────────
                      QUIZ MODE CARDS
-                     data-mode on each card is read by
-                     practice.js startQuiz() to know which
-                     question type(s) to build
                      ───────────────────────────────────────── -->
                 <div class="mode-grid">
 
@@ -165,7 +158,6 @@
 
                     <div class="mode-card" data-mode="gap">
                         <i class="fa-solid fa-pencil"></i>
-
                         <div class="mode-name">Fill the Gap</div>
                         <div class="mode-desc">Complete the sentence with the missing word</div>
                     </div>
@@ -176,7 +168,6 @@
                         <div class="mode-desc">Tap to pair Arrernte words with their meanings</div>
                     </div>
 
-                    <!-- Shuffle spans full width — mixes all four types -->
                     <div class="mode-card shuffle-card" data-mode="shuffle">
                         <i class="fa-solid fa-dice"></i>
                         <div>
@@ -185,13 +176,8 @@
                         </div>
                     </div>
 
-                </div><!-- /mode-grid -->
+                </div>
 
-                <!-- ─────────────────────────────────────────
-                     OTHER ACTIVITIES
-                     Quick-access links so Word Cards and
-                     History are still one tap away
-                     ───────────────────────────────────────── -->
                 <div>
                     <div class="filter-label">Also</div>
                     <div class="also-row">
@@ -204,11 +190,6 @@
                     </div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     RECENT QUIZ LOG
-                     Last 6 results injected by practice.js
-                     on page load from lexicon_quiz_log
-                     ───────────────────────────────────────── -->
                 <div>
                     <div class="quiz-log-header">Recent quizzes</div>
                     <div id="quizLogContainer"></div>
@@ -219,22 +200,14 @@
 
             <!-- ═══════════════════════════════════════════
                  SCREEN 2 — ACTIVE QUIZ
-                 Hidden on load. Shown by practice.js when
-                 a mode card is tapped.
                  ═══════════════════════════════════════════ -->
             <div class="screen" id="quizScreen">
 
-                <!-- Top bar: mode label left, back button right
-                     Back button returns to #modeScreen without
-                     reloading the page -->
                 <div class="quiz-topbar">
                     <div class="quiz-mode-lbl" id="quizModeLbl">—</div>
                     <button class="quiz-exit" id="exitBtn">← back</button>
                 </div>
 
-                <!-- Progress bar + question counter
-                     #progFill width set by practice.js as
-                     each question is answered -->
                 <div class="q-prog-row">
                     <div class="q-prog-track">
                         <div class="q-prog-fill" id="progFill"></div>
@@ -242,9 +215,6 @@
                     <div class="q-prog-lbl" id="progLbl">1 / —</div>
                 </div>
 
-                <!-- Question card
-                     All inner text set by practice.js
-                     per question type -->
                 <div class="q-card">
                     <span class="q-type-pill" id="qTypePill">—</span>
                     <div class="q-instruction" id="qInstruction">—</div>
@@ -252,21 +222,14 @@
                     <div class="q-sub" id="qSub"></div>
                 </div>
 
-                <!-- Answer area 1: Multiple choice
-                     Used by Guess the Word + Meaning Match.
-                     Hidden by default; shown by practice.js -->
                 <div class="ans-grid" id="ansGrid"></div>
 
-                <!-- Answer area 2: Fill the Gap text input
-                     Hidden by default; shown by practice.js -->
                 <div class="gap-wrap" id="gapWrap" style="display:none">
                     <input class="gap-input" id="gapInput" type="text" placeholder="Type the Arrernte word…"
                         autocomplete="off" autocorrect="off" spellcheck="false">
                     <button class="gap-submit" id="gapSubmit">Check answer</button>
                 </div>
 
-                <!-- Answer area 3: Match Synonym columns
-                     Hidden by default; shown by practice.js -->
                 <div id="matchWrap" style="display:none">
                     <div class="match-instructions">
                         Tap a word on the left, then its meaning on the right.
@@ -284,12 +247,7 @@
                     </div>
                 </div>
 
-                <!-- Feedback line: correct / incorrect message
-                     Text + .ok / .bad class set by practice.js -->
                 <div class="feedback" id="feedback"></div>
-
-                <!-- Next button: hidden until answer submitted
-                     practice.js adds .show class to reveal -->
                 <button class="btn-next" id="nextBtn">Next →</button>
 
             </div><!-- /quizScreen -->
@@ -297,30 +255,19 @@
 
             <!-- ═══════════════════════════════════════════
                  SCREEN 3 — SCORE
-                 Hidden until the last question is answered.
                  ═══════════════════════════════════════════ -->
             <div class="screen" id="scoreScreen">
                 <div class="score-wrap">
-
-                    <!-- Large score numeral e.g. "7 / 10"
-                         Set by finishQuiz() in practice.js -->
                     <div class="score-big" id="scoreBig">0 <span>/ 0</span></div>
                     <div class="score-tag">correct answers</div>
-
-                    <!-- Score bar animated to pct width by practice.js -->
                     <div class="score-bar-track">
                         <div class="score-bar-fill" id="scoreBarFill"></div>
                     </div>
-
-                    <!-- Contextual message based on score percentage -->
                     <div class="score-quip" id="scoreQuip">—</div>
-
-                    <!-- Action buttons -->
                     <div class="score-actions">
                         <button class="btn-primary" id="playAgainBtn">Play again</button>
                         <button class="btn-ghost" id="backToModeBtn">Choose another mode</button>
                     </div>
-
                 </div>
             </div><!-- /scoreScreen -->
 
@@ -328,12 +275,87 @@
         </div><!-- /practice-wrap -->
     </div><!-- /page-content -->
 
-
-    <!-- Toast: brief confirmation messages e.g. "Need at least 2 words"
-         Shown by showToast() in practice.js -->
     <div class="toast" id="toast"></div>
     <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
-    <!-- Quiz logic — type="module" needed for ES import syntax in practice.js -->
+
+    <!--
+        Sub-tag chip population for the group filter.
+        Runs before practice.js so the chips are in the DOM
+        when practice.js wires up its event listeners.
+    -->
+    <script>
+        const GROUP_SUBTAGS = {
+            'people': ['family', 'people', 'interaction', 'communication', 'classroom', 'command'],
+            'country': ['nature', 'animals', 'plants', 'weather', 'country', 'place names', 'travel'],
+            'emotions': ['emotion', 'states', 'thinking'],
+            'body': ['body'],
+            'language': ['verb', 'grammar', 'pronoun', 'describing', 'quantity', 'location', 'movement', 'colour'],
+            'daily life': ['food', 'objects', 'time'],
+            'culture': ['culture', 'spiritual'],
+            'cheeky': ['cheeky', 'fun'],
+            'rude': ['rude', 'curses'],
+        };
+
+        const TAG_LABELS = {
+            'family': 'Family', 'people': 'People', 'interaction': 'Interaction',
+            'communication': 'Communication', 'classroom': 'Classroom', 'command': 'Commands',
+            'nature': 'Nature', 'animals': 'Animals', 'plants': 'Plants',
+            'weather': 'Weather', 'country': 'Country', 'place names': 'Place Names', 'travel': 'Travel',
+            'emotion': 'Emotion', 'states': 'States', 'thinking': 'Thinking',
+            'body': 'Body',
+            'verb': 'Verbs', 'grammar': 'Grammar', 'pronoun': 'Pronouns',
+            'describing': 'Describing', 'quantity': 'Quantity', 'location': 'Location',
+            'movement': 'Movement', 'colour': 'Colour',
+            'food': 'Food', 'objects': 'Objects', 'time': 'Time',
+            'culture': 'Culture', 'spiritual': 'Spiritual',
+            'cheeky': 'Cheeky', 'fun': 'Fun',
+            'rude': 'Rude', 'curses': 'Curses',
+        };
+
+        const subtagRow = document.getElementById('subtagChips');
+        const allSubChip = document.getElementById('allSubChip');
+
+        document.querySelectorAll('#groupChips .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const group = chip.dataset.group;
+
+                // Deselect siblings
+                document.querySelectorAll('#groupChips .chip').forEach(c => c.classList.remove('on'));
+                chip.classList.add('on');
+
+                if (group === 'all') {
+                    subtagRow.style.display = 'none';
+                    return;
+                }
+
+                // Build sub-tag chips
+                const tags = GROUP_SUBTAGS[group] || [];
+                // Keep "All in group" chip, rebuild the rest
+                subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.remove());
+                tags.forEach(tag => {
+                    const c = document.createElement('div');
+                    c.className = 'chip chip--sub';
+                    c.dataset.tag = tag;
+                    c.textContent = TAG_LABELS[tag] || tag;
+                    subtagRow.appendChild(c);
+                });
+
+                // Reset sub-selection to "all in group"
+                allSubChip.classList.add('on');
+                subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.classList.remove('on'));
+                subtagRow.style.display = 'flex';
+            });
+        });
+
+        // Sub-tag single-select
+        subtagRow.addEventListener('click', e => {
+            const chip = e.target.closest('.chip--sub');
+            if (!chip) return;
+            subtagRow.querySelectorAll('.chip--sub').forEach(c => c.classList.remove('on'));
+            chip.classList.add('on');
+        });
+    </script>
+
     <script type="module" src="../js/practice.js"></script>
 
 </body>

@@ -1,24 +1,19 @@
 /* =============================================================
    practice.js — Quiz logic for ALKATYE
-   
-   WHY:  Separating behaviour from structure (HTML) and style
-         (CSS) makes the codebase easier to read, debug and
-         extend independently.
-   HOW:  Loaded as type="module" in practice.html so ES module
-         imports work correctly.
-   WHAT: Handles filter state, question generation for all four
-         quiz types, answer evaluation, screen transitions,
-         score tracking and localStorage persistence.
+
+   HOW:  Loaded as type="module" in practice.html.
+   WHAT: Handles filter state (group → sub-tag → level → pos →
+         seen/unseen), question generation for all four quiz
+         types, answer evaluation, screen transitions, score
+         tracking and Firestore/localStorage persistence.
    ============================================================= */
 
-import { auth }                          from './firebase-config.js';
-import { onAuthStateChanged }            from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+import { auth }                           from './firebase-config.js';
+import { onAuthStateChanged }             from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore, syncQuizLog } from './sync.js';
 import { WORDS }                          from './words-data.js';
 
-// Track signed-in uid — null if not signed in
 let currentUid = null;
-
 onAuthStateChanged(auth, user => {
   currentUid = user ? user.uid : null;
   if (currentUid) pullFromFirestore(currentUid);
@@ -26,7 +21,7 @@ onAuthStateChanged(auth, user => {
 
 
 /* =============================================================
-   UTILITY FUNCTIONS
+   UTILITY
    ============================================================= */
 
 const $ = id => document.getElementById(id);
@@ -40,13 +35,7 @@ const shuffle = arr => {
   return a;
 };
 
-/*
- * firstDef — picks a definition from a word, cycling through all senses
- * Cycles through all senses across calls so repeated quizzes on
- * the same word expose different definitions each time.
- */
-const defIndex = new Map(); // { wordString → nextIndex }
-
+const defIndex = new Map();
 const firstDef = w => {
   const defs = Array.isArray(w.definition) ? w.definition : [w.definition];
   if (defs.length === 1) return defs[0];
@@ -64,19 +53,17 @@ function showToast(msg) {
 
 
 /* =============================================================
-   LOCALSTORAGE — READ & WRITE
+   LOCALSTORAGE
    ============================================================= */
 
-const getSeenCounts = () => JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
+const getSeenCounts = () => JSON.parse(localStorage.getItem('lexicon_seen')     || '{}');
 const getQuizLog    = () => JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
 
 function saveQuizResult(mode, score, total) {
   const log = getQuizLog();
   const now = new Date();
   log.unshift({
-    mode,
-    score,
-    total,
+    mode, score, total,
     pct:  Math.round(score / total * 100),
     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     date: now.toLocaleDateString([], { day: 'numeric', month: 'short' }),
@@ -87,7 +74,7 @@ function saveQuizResult(mode, score, total) {
 
 
 /* =============================================================
-   RECENT QUIZ LOG RENDERER (mode screen)
+   QUIZ LOG RENDERER
    ============================================================= */
 
 function renderQuizLog() {
@@ -109,9 +96,16 @@ function renderQuizLog() {
 
 /* =============================================================
    FILTER STATE
+   - selGroup   : top-level lexicon group ('all' or e.g. 'people')
+   - selTag     : sub-tag within the group ('all-sub' or e.g. 'family')
+   - selLevel   : difficulty level ('all', 'beginner', etc.)
+   - selPos     : part of speech ('all', 'noun', etc.)
+   - seenOnly / unseenOnly : localStorage-based study set filters
    ============================================================= */
 
-let selTag     = 'all';
+let selGroup   = 'all';
+let selTag     = 'all-sub';
+let selLevel   = 'all';
 let selPos     = 'all';
 let seenOnly   = false;
 let unseenOnly = false;
@@ -119,32 +113,61 @@ let unseenOnly = false;
 function getFiltered() {
   const seen = getSeenCounts();
   return WORDS.filter(w => {
-    const tagOk    = selTag === 'all' || (w.tags && w.tags.includes(selTag));
-    const posOk    = selPos === 'all' || w.pos === selPos;
-    const seenOk   = !seenOnly        || !!seen[w.word];
-    const unseenOk = !unseenOnly      || !seen[w.word];
-    return tagOk && posOk && seenOk && unseenOk;
+    // Group filter — uses the groups[] array on each word
+    const groupOk = selGroup === 'all' || (w.groups && w.groups.includes(selGroup));
+
+    // Sub-tag filter — uses the tags[] array
+    const tagOk = selTag === 'all-sub' || (w.tags && w.tags.includes(selTag));
+
+    // Level filter — beginner/intermediate/advanced are tags
+    const levelOk = selLevel === 'all' || (w.tags && w.tags.includes(selLevel));
+
+    // Part of speech filter
+    const posOk = selPos === 'all' || w.pos === selPos;
+
+    // Seen / unseen
+    const seenOk   = !seenOnly   || !!seen[w.word];
+    const unseenOk = !unseenOnly || !seen[w.word];
+
+    return groupOk && tagOk && levelOk && posOk && seenOk && unseenOk;
   });
 }
 
-/*
- * updateFilterCount — shows how many words are in the current pool
- * so users can see immediately whether their filters have any effect
- */
 function updateFilterCount() {
   const count = getFiltered().length;
   const el    = $('filterCount');
-  if (el) el.textContent = `${count} word${count !== 1 ? 's' : ''} in pool`;
+  if (el) el.textContent = `· ${count} word${count !== 1 ? 's' : ''}`;
 }
 
-// Chip click handlers — tag, POS, seen/unseen
-document.querySelectorAll('#tagChips .chip').forEach(c => c.addEventListener('click', () => {
-  document.querySelectorAll('#tagChips .chip').forEach(x => x.classList.remove('on'));
-  c.classList.add('on');
-  selTag = c.dataset.tag;
+
+/* =============================================================
+   FILTER CHIP WIRING
+   ============================================================= */
+
+// Group chips
+document.querySelectorAll('#groupChips .chip').forEach(c => c.addEventListener('click', () => {
+  selGroup = c.dataset.group;
+  selTag   = 'all-sub'; // reset sub-tag when group changes
   updateFilterCount();
 }));
 
+// Sub-tag chips (rendered by inline script in practice.html)
+document.getElementById('subtagChips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip--sub');
+  if (!chip) return;
+  selTag = chip.id === 'allSubChip' ? 'all-sub' : (chip.dataset.tag || 'all-sub');
+  updateFilterCount();
+});
+
+// Level chips
+document.querySelectorAll('#levelChips .chip').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('#levelChips .chip').forEach(x => x.classList.remove('on'));
+  c.classList.add('on');
+  selLevel = c.dataset.level;
+  updateFilterCount();
+}));
+
+// POS chips
 document.querySelectorAll('#posChips .chip').forEach(c => c.addEventListener('click', () => {
   document.querySelectorAll('#posChips .chip').forEach(x => x.classList.remove('on'));
   c.classList.add('on');
@@ -152,6 +175,7 @@ document.querySelectorAll('#posChips .chip').forEach(c => c.addEventListener('cl
   updateFilterCount();
 }));
 
+// Seen / unseen
 $('seenOnlyChip').addEventListener('click', () => {
   seenOnly = !seenOnly;
   if (seenOnly) unseenOnly = false;
@@ -170,7 +194,7 @@ $('unseenOnlyChip').addEventListener('click', () => {
 
 
 /* =============================================================
-   QUIZ ENGINE — STATE
+   QUIZ ENGINE STATE
    ============================================================= */
 
 const MODE_NAMES = {
@@ -234,18 +258,13 @@ function buildMC(word, type, pool) {
   }
 }
 
-/*
- * buildGap — fill-in-the-gap question
- * Uses examples[0] if available; falls back to a meaning MC
- * rather than a hollow "The word ___ means X" sentence.
- */
 function buildGap(word, pool) {
   const sentence = word.examples && word.examples[0];
   if (sentence) {
     const re      = new RegExp(word.word, 'gi');
     const blanked = re.test(sentence)
       ? sentence.replace(re, '______')
-      : sentence + ' (______)';
+      : sentence + ' (' + '______' + ')';
     return {
       type: 'gap', word,
       instruction: 'Fill in the missing Arrernte word.',
@@ -254,7 +273,7 @@ function buildGap(word, pool) {
       correct: word.word
     };
   }
-  // No example sentence — fall back to meaning MC so the question is still useful
+  // No example sentence — fall back to meaning MC
   return buildMC(word, 'meaning', pool);
 }
 
@@ -329,12 +348,7 @@ function renderQuestion() {
   $('gapWrap').style.display   = 'none';
   $('matchWrap').style.display = 'none';
 
-  const labels = {
-    guess:   'guess the word',
-    meaning: 'meaning match',
-    gap:     'fill the gap',
-    match:   'match synonym'
-  };
+  const labels = { guess: 'guess the word', meaning: 'meaning match', gap: 'fill the gap', match: 'match synonym' };
   $('qTypePill').textContent = labels[q.type] || q.type;
 
   if      (q.type === 'match') renderMatch(q);
@@ -352,9 +366,8 @@ function renderMC(q) {
   $('qMain').textContent        = q.main;
   $('qSub').textContent         = q.sub || '';
   $('ansGrid').style.display    = 'grid';
-
   q.options.forEach(opt => {
-    const btn       = document.createElement('button');
+    const btn = document.createElement('button');
     btn.className   = 'ans-btn';
     btn.textContent = opt;
     btn.addEventListener('click', () => handleMC(btn, opt, q));
@@ -380,12 +393,7 @@ function renderMatch(q) {
   $('qSub').textContent         = '';
   $('matchWrap').style.display  = 'block';
 
-  matchState = {
-    pairs:    q.pairs,
-    selLeft:  null,
-    selRight: null,
-    matched:  new Set()
-  };
+  matchState = { pairs: q.pairs, selLeft: null, selRight: null, matched: new Set() };
 
   const lefts  = shuffle(q.pairs.map(p => p.word));
   const rights = shuffle(q.pairs.map(p => p.def));
@@ -394,21 +402,16 @@ function renderMatch(q) {
   $('matchRight').innerHTML = '';
 
   lefts.forEach(word => {
-    const el        = document.createElement('div');
-    el.className    = 'match-item';
-    el.textContent  = word;
-    el.dataset.word = word;
-    el.dataset.side = 'left';
+    const el = document.createElement('div');
+    el.className = 'match-item'; el.textContent = word;
+    el.dataset.word = word; el.dataset.side = 'left';
     el.addEventListener('click', () => handleMatch(el));
     $('matchLeft').appendChild(el);
   });
-
   rights.forEach(def => {
-    const el        = document.createElement('div');
-    el.className    = 'match-item';
-    el.textContent  = def;
-    el.dataset.def  = def;
-    el.dataset.side = 'right';
+    const el = document.createElement('div');
+    el.className = 'match-item'; el.textContent = def;
+    el.dataset.def = def; el.dataset.side = 'right';
     el.addEventListener('click', () => handleMatch(el));
     $('matchRight').appendChild(el);
   });
@@ -422,10 +425,8 @@ function renderMatch(q) {
 function handleMC(btn, chosen, q) {
   const correct = chosen === q.correct;
   btn.classList.add(correct ? 'correct' : 'incorrect');
-  if (correct) {
-    setFeedback('Correct! Mwarre!', 'ok');
-    score++;
-  } else {
+  if (correct) { setFeedback('Correct! Mwarre!', 'ok'); score++; }
+  else {
     setFeedback(`Not quite — "${q.correct}"`, 'bad');
     document.querySelectorAll('.ans-btn').forEach(b => {
       if (b.textContent === q.correct) b.classList.add('correct');
@@ -442,12 +443,8 @@ function handleGapSubmit() {
   $('gapInput').className = `gap-input ${ok ? 'correct' : 'incorrect'}`;
   $('gapInput').disabled  = true;
   $('gapSubmit').disabled = true;
-  if (ok) {
-    setFeedback('Correct! Mwarre!', 'ok');
-    score++;
-  } else {
-    setFeedback(`The answer is "${q.correct}"`, 'bad');
-  }
+  if (ok) { setFeedback('Correct! Mwarre!', 'ok'); score++; }
+  else      setFeedback(`The answer is "${q.correct}"`, 'bad');
   $('nextBtn').classList.add('show');
 }
 
@@ -490,8 +487,7 @@ function handleMatch(el) {
       setFeedback('Try again!', 'bad');
     }
 
-    matchState.selLeft  = null;
-    matchState.selRight = null;
+    matchState.selLeft = matchState.selRight = null;
 
     if (matchState.matched.size === matchState.pairs.length) {
       setTimeout(() => {
@@ -509,23 +505,14 @@ function setFeedback(msg, cls) {
 
 
 /* =============================================================
-   NEXT BUTTON HANDLER
+   NEXT / FINISH
    ============================================================= */
 
 function handleNext() {
   currentIdx++;
-  if (currentIdx < questions.length) {
-    renderQuestion();
-  } else {
-    $('progFill').style.width = '100%';
-    finishQuiz();
-  }
+  if (currentIdx < questions.length) renderQuestion();
+  else { $('progFill').style.width = '100%'; finishQuiz(); }
 }
-
-
-/* =============================================================
-   FINISH QUIZ
-   ============================================================= */
 
 function finishQuiz() {
   const total  = questions.length;
@@ -546,7 +533,6 @@ function finishQuiz() {
     [0,   'Just getting started — keep going!']
   ];
   $('scoreQuip').textContent = (quips.find(([t]) => pct >= t) || quips.at(-1))[1];
-
   showScreen('scoreScreen');
 }
 
@@ -568,7 +554,7 @@ $('backToModeBtn').addEventListener('click', goHome);
 
 
 /* =============================================================
-   INITIALISATION
+   INIT
    ============================================================= */
 
 renderQuizLog();
