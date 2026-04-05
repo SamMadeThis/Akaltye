@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKALTYE — Sentence Scramble</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300;400&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --earth: #8B2500;
+            --ochre: #B87333;
+            --dark: #121010;
+            --surface: #1c1919;
+            --card: #2b2627;
+            --card2: #3f3a3b;
+            --muted: #919090;
+            --light: #ffffff;
+            --primary: #c9afc2;
+            --success: #47d5a6;
+            --danger: #e85f5f;
+            --radius: 12px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Vollkorn', serif;
+            background: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #2b2627;
+            border-bottom: 1px solid var(--primary);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Lora', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .back-btn {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-decoration: none;
+            border: 1px solid #474444;
+            border-radius: 99px;
+            padding: 4px 12px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        main {
+            flex: 1;
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ── SCREENS ── */
+        .screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* ── INTRO SCREEN ── */
+        .intro-title {
+            font-family: 'Lora', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .intro-title span {
+            color: var(--primary);
+        }
+
+        .intro-card {
+            background: var(--card);
+            border: 1px solid #474444;
+            border-radius: 18px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .rule-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .rule-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .rule-icon.earth {
+            background: var(--earth);
+        }
+
+        .rule-icon.ochre {
+            background: var(--ochre);
+        }
+
+        .rule-icon.danger {
+            background: rgba(232, 95, 95, 0.2);
+            border: 1px solid var(--danger);
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        .rule-title {
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: 0.2rem;
+        }
+
+        .rule-desc {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+
+        .rule-desc strong {
+            color: var(--danger);
+            font-weight: 400;
+        }
+
+        .hint-penalty-badge {
+            background: rgba(232, 95, 95, 0.12);
+            border: 1px solid var(--danger);
+            border-radius: 99px;
+            padding: 6px 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--danger);
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 16px;
+            background: var(--earth);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--light);
+            font-family: 'Lora', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: -0.2px;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .btn-start:hover {
+            background: #a32c00;
+        }
+
+        .btn-start:active {
+            transform: scale(0.98);
+        }
+
+        /* ── PROGRESS ── */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 2px;
+            background: #474444;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--earth);
+            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-lbl {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* ── SCORE BAR ── */
+        .score-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .score-display {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        .score-pts {
+            font-family: 'Lora', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--light);
+            transition: color 0.3s;
+        }
+
+        .score-pts.tick-up {
+            color: var(--success);
+        }
+
+        .score-pts.tick-down {
+            color: var(--danger);
+        }
+
+        /* ── SENTENCE CARD ── */
+        .sentence-card {
+            background: var(--light);
+            border: 1px solid #dbc9d6;
+            border-radius: 18px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-pill {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--light);
+            background: var(--earth);
+            border-radius: 99px;
+            padding: 3px 10px;
+            align-self: flex-start;
+        }
+
+        .english-prompt {
+            font-family: 'Lora', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+
+        .reveal-sentence {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: #8a8888;
+            display: none;
+            letter-spacing: 0.02em;
+        }
+
+        /* ── ANSWER ZONE ── */
+        .answer-zone {
+            min-height: 56px;
+            border: 2px dashed #dbc9d6;
+            border-radius: 10px;
+            padding: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .answer-zone.correct-state {
+            border-color: var(--success);
+            background: rgba(71, 213, 166, 0.08);
+        }
+
+        .answer-zone.wrong-state {
+            border-color: var(--danger);
+            background: rgba(232, 95, 95, 0.08);
+            animation: shake 0.35s ease;
+        }
+
+        .answer-placeholder {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            color: #b0aeb0;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+        }
+
+        .feedback {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            text-align: center;
+            min-height: 1.2em;
+            letter-spacing: 0.03em;
+            transition: color 0.2s;
+            color: transparent;
+        }
+
+        .feedback.ok {
+            color: var(--success);
+        }
+
+        .feedback.bad {
+            color: var(--danger);
+        }
+
+        /* ── TILES ── */
+        .tile {
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s ease, background 0.15s;
+            user-select: none;
+            white-space: nowrap;
+            animation: pop 0.15s ease;
+        }
+
+        .tile-bank {
+            background: var(--card2);
+            color: var(--light);
+            border: 1px solid #545051;
+        }
+
+        .tile-bank:hover {
+            background: var(--earth);
+            border-color: var(--earth);
+            transform: translateY(-2px);
+        }
+
+        .tile-bank:active {
+            transform: scale(0.96);
+        }
+
+        .tile-answer {
+            background: #fff8f4;
+            color: var(--dark);
+            border: 1px solid var(--ochre);
+        }
+
+        .tile-answer:hover {
+            background: #fef0e6;
+            transform: translateY(-2px);
+        }
+
+        .tile-answer:active {
+            transform: scale(0.96);
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 52px;
+        }
+
+        /* ── HINT PANEL ── */
+        .hint-panel {
+            background: var(--card);
+            border: 1px solid var(--danger);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .hint-panel.visible {
+            display: flex;
+        }
+
+        .hint-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hint-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--danger);
+        }
+
+        .hint-penalty-note {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--danger);
+            opacity: 0.7;
+        }
+
+        /* Hints show phonetics only — no meanings, not a giveaway */
+        .hint-words {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .hint-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #3f3a3b;
+        }
+
+        .hint-row:last-child {
+            border-bottom: none;
+        }
+
+        .hint-arrernte {
+            font-family: 'Lora', serif;
+            font-size: 0.9rem;
+            color: var(--light);
+            min-width: 100px;
+        }
+
+        .hint-phonetic {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            color: #6b6767;
+        }
+
+        .hint-meaning {
+            font-family: 'Vollkorn', serif;
+            font-style: italic;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        /* ── ACTIONS ── */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Vollkorn', serif;
+            font-size: 0.9rem;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.15s ease;
+        }
+
+        .btn-next {
+            flex: 1;
+            background: var(--earth);
+            border-color: var(--earth);
+            color: var(--light);
+            display: none;
+        }
+
+        .btn-next.show {
+            display: block;
+        }
+
+        .btn-next:hover {
+            background: #a32c00;
+        }
+
+        .btn-hint {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-hint:hover {
+            background: rgba(232, 95, 95, 0.1);
+        }
+
+        .btn-hint.active {
+            background: rgba(232, 95, 95, 0.15);
+        }
+
+        .btn-clear {
+            background: transparent;
+            border-color: #474444;
+            color: var(--muted);
+        }
+
+        .btn-clear:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* ── SCORE SCREEN ── */
+        .score-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .score-big {
+            font-family: 'Lora', serif;
+            font-size: 5rem;
+            font-weight: 600;
+            color: var(--light);
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .score-big span {
+            color: var(--primary);
+            font-size: 2.5rem;
+        }
+
+        .score-big-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: -1rem;
+        }
+
+        .score-bar-track {
+            width: 100%;
+            height: 3px;
+            background: #474444;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: var(--earth);
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-quip {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .hint-used-note {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+
+        .btn-replay {
+            width: 100%;
+            padding: 14px;
+            background: var(--earth);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--light);
+            font-family: 'Vollkorn', serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-replay:hover {
+            background: #a32c00;
+        }
+
+        .btn-back {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-6px);
+            }
+
+            40% {
+                transform: translateX(6px);
+            }
+
+            60% {
+                transform: translateX(-4px);
+            }
+
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scoreFlash {
+            0% {
+                transform: scale(1);
+            }
+
+            40% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .score-pts.animate {
+            animation: scoreFlash 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="../index.html" class="logo">AKA<span>LTYE</span></a>
+        <a href="practice.html" class="back-btn">← practice</a>
+    </header>
+
+    <main>
+
+        <!-- ══ INTRO SCREEN ══ -->
+        <div class="screen active" id="introScreen">
+
+            <div>
+                <div class="intro-title">Sentence<br><span>Scramble</span></div>
+            </div>
+
+            <div class="intro-card">
+
+                <div class="rule-row">
+                    <div class="rule-icon earth">🔀</div>
+                    <div class="rule-text">
+                        <div class="rule-title">5 random phrases</div>
+                        <div class="rule-desc">Each round gives you 5 phrases drawn from the Arrernte lexicon. Tap the
+                            scrambled words to build the correct sentence.</div>
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="rule-icon ochre">⭐</div>
+                    <div class="rule-text">
+                        <div class="rule-title">2 points per phrase</div>
+                        <div class="rule-desc">Get it right first try — full 2 points. Maximum score is 10.</div>
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="rule-icon danger">💡</div>
+                    <div class="rule-text">
+                        <div class="rule-title">Hints cost points</div>
+                        <div class="rule-desc">Tap hint to reveal the phonetic pronunciation of each word. <strong>−1
+                                point</strong> is deducted from that phrase's score. You can still get 1 point if you
+                            use a hint and get it right.</div>
+                    </div>
+                </div>
+
+                <div class="hint-penalty-badge">💡 hint used = −1 point for that phrase</div>
+
+            </div>
+
+            <button class="btn-start" onclick="startGame()">start scramble →</button>
+
+        </div>
+
+        <!-- ══ QUIZ SCREEN ══ -->
+        <div class="screen" id="quizScreen">
+
+            <div class="progress-row">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progFill" style="width:0%"></div>
+                </div>
+                <div class="progress-lbl" id="progLbl">1 / 5</div>
+            </div>
+
+            <div class="score-bar">
+                <div class="score-display">score</div>
+                <div class="score-pts" id="scorePts">0</div>
+                <div class="score-display">/ 10</div>
+            </div>
+
+            <div class="sentence-card">
+                <span class="card-pill">sentence scramble</span>
+                <div class="english-prompt" id="englishPrompt">—</div>
+                <div class="reveal-sentence" id="revealSentence"></div>
+
+                <div class="answer-zone" id="answerZone">
+                    <span class="answer-placeholder">tap words below to build the sentence →</span>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <!-- Hint panel — phonetics only, no meanings -->
+            <div class="hint-panel" id="hintPanel">
+                <div class="hint-header">
+                    <div class="hint-label">💡 phonetic hint</div>
+                    <div class="hint-penalty-note">−1 point applied</div>
+                </div>
+                <div class="hint-words" id="hintWords"></div>
+            </div>
+
+            <div class="word-bank" id="wordBank"></div>
+
+            <div class="actions">
+                <button class="btn btn-hint" id="hintBtn" onclick="toggleHint()">💡 hint −1pt</button>
+                <button class="btn btn-clear" onclick="clearAnswer()">↩ clear</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">next →</button>
+            </div>
+
+        </div>
+
+        <!-- ══ SCORE SCREEN ══ -->
+        <div class="screen" id="scoreScreen">
+            <div class="score-wrap">
+                <div class="score-big" id="scoreNum">0 <span>/ 10</span></div>
+                <div class="score-big-label">points</div>
+                <div class="score-bar-track" style="width:100%">
+                    <div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div>
+                </div>
+                <div class="score-quip" id="scoreQuip">—</div>
+                <div class="hint-used-note" id="hintUsedNote"></div>
+                <button class="btn-replay" onclick="startGame()">play again</button>
+                <a href="practice.html" class="btn-back">← back to practice</a>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ── FULL SENTENCE DATABASE ─────────────────────────────────────
+        const ALL_SENTENCES = [
+            {
+                arrernte: "angwenhe unte?",
+                english: "Who are you?",
+                words: [
+                    { w: "Angwenhe", phonetic: "ang-wan-ha", meaning: "who, which person" },
+                    { w: "unte", phonetic: "oon-da", meaning: "you (singular)" },
+                ]
+            },
+            {
+                arrernte: "angwenhe atyewe ngkwenhe?",
+                english: "Who is your friend?",
+                words: [
+                    { w: "angwenge", phonetic: "ang-wan-ha", meaning: "who" },
+                    { w: "atyewe", phonetic: "uh-CHEW-eh", meaning: "friend" },
+                    { w: "ngkwenhe", phonetic: "ng-GWEN-eh", meaning: "your (possessive)" },
+                ]
+            },
+            {
+                arrernte: "arrangkwe, ayenge arratye-apetyeke.",
+                english: "No, I'm not coming back.",
+                words: [
+                    { w: "arrangkwe", phonetic: "a-rang-kwa", meaning: "no, not" },
+                    { w: "ayenge", phonetic: "ay-eng-a", meaning: "I (subject)" },
+                    { w: "arratye-apetyeke", phonetic: "ah-RAH-jeh uh-BEJ-eh-geh", meaning: "not coming back" },
+                ]
+            },
+            {
+                arrernte: "inwenhe arlte lyete?",
+                english: "What is the day today?",
+                words: [
+                    { w: "inwenhe", phonetic: "in-wen-ha", meaning: "what" },
+                    { w: "arlte", phonetic: "arl-da", meaning: "day, daylight" },
+                    { w: "lyete", phonetic: "lyeh-da", meaning: "today" },
+                ]
+            },
+            {
+                arrernte: "inwenhe arritnye ngkwenhe?",
+                english: "What is your name?",
+                words: [
+                    { w: "inwenhe", phonetic: "in-wen-ha", meaning: "what" },
+                    { w: "arritnye", phonetic: "ah-RIT-nyeh", meaning: "name" },
+                    { w: "ngkwenge", phonetic: "ng-GWEN-eh", meaning: "for you, at you, to you" },
+                ]
+            },
+            {
+                arrernte: "unte mwerre?",
+                english: "You good?",
+                words: [
+                    { w: "unte", phonetic: "oon-da", meaning: "you (singular)" },
+                    { w: "mwerre", phonetic: "mwa-rra", meaning: "good, well, fine" },
+                ]
+            },
+            {
+                arrernte: "Ye, ayenge mwerre",
+                english: "Yes, I am good",
+                words: [
+                    { w: "Ye", phonetic: "ya", meaning: "yes" },
+                    { w: "ayenge", phonetic: "ay-eng-a", meaning: "I, me" },
+                    { w: "mwerre", phonetic: "mwa-rra", meaning: "good" },
+                ]
+            },
+            {
+                arrernte: "urreke! nhenhe apetyeke.",
+                english: "Goodbye! See you later.",
+                words: [
+                    { w: "urreke", phonetic: "oo-ree-ga", meaning: "goodbye, farewell" },
+                    { w: "nhenhe", phonetic: "nen-eh", meaning: "this, here" },
+                    { w: "apetyeke", phonetic: "uh-BEJ-eh-geh", meaning: "see you later" },
+                ]
+            },
+            {
+                arrernte: "Kwatye atyenge inaye!",
+                english: "Get water for me!",
+                words: [
+                    { w: "Kwatye", phonetic: "kwa-dja", meaning: "water, rain" },
+                    { w: "atyenge", phonetic: "uh-CHEN-ga", meaning: "for me (dative)" },
+                    { w: "inaye", phonetic: "in-AY-eh", meaning: "get it, fetch it!" },
+                ]
+            },
+            {
+                arrernte: "the merne iteme",
+                english: "I am cooking the food",
+                words: [
+                    { w: "The", phonetic: "da", meaning: "I (transitive subject)" },
+                    { w: "merne", phonetic: "mern-eh", meaning: "food, plant food" },
+                    { w: "iteme", phonetic: "it-em-eh", meaning: "cook, light a fire" },
+                ]
+            },
+            {
+                arrernte: "mpe! alhetyeke",
+                english: "Come on! Let's go",
+                words: [
+                    { w: "Mpe", phonetic: "m-beh", meaning: "come on! (exclamation)" },
+                    { w: "alhetyeke", phonetic: "ul-HEH-jeh-geh", meaning: "let's go" },
+                ]
+            },
+            {
+                arrernte: "uyarne the aweme",
+                english: "I don't understand",
+                words: [
+                    { w: "uyarne", phonetic: "oo-YAR-neh", meaning: "not, don't" },
+                    { w: "the", phonetic: "da", meaning: "I (transitive subject)" },
+                    { w: "aweme", phonetic: "uh-WEM-eh", meaning: "hear, understand" },
+                ]
+            },
+            {
+                arrernte: "kele, the aweme",
+                english: "I understand",
+                words: [
+                    { w: "kele", phonetic: "geh-leh", meaning: "yes, ok, alright" },
+                    { w: "the", phonetic: "da", meaning: "only when doing the action of a transitive verb" },
+                    { w: "aweme", phonetic: "uh-WEM-eh", meaning: "understand something" },
+                ]
+            },
+            {
+                arrernte: "apmere anwerne-kenhe",
+                english: "Our home",
+                words: [
+                    { w: "apmere", phonetic: "ap-mara", meaning: "country, home, place" },
+                    { w: "anwerne-kenhe", phonetic: "un-WER-neh-gen-eh", meaning: "ours, belonging to us" },
+                ]
+            },
+            {
+                arrernte: "unte nthenhe-le urrkepeme?",
+                english: "Where do you work?",
+                words: [
+                    { w: "unte", phonetic: "oon-da", meaning: "you" },
+                    { w: "nthenhe-le", phonetic: "n-DEN-eh-leh", meaning: "where" },
+                    { w: "urrkepeme", phonetic: "oor-geh-BEM-eh", meaning: "work, be employed" },
+                ]
+            },
+            {
+                arrernte: "ayeye itne-ke ileke",
+                english: "Told them the story",
+                words: [
+                    { w: "ayeye", phonetic: "ay-EH-yeh", meaning: "story, message" },
+                    { w: "itne-ke", phonetic: "it-neh-geh", meaning: "for them" },
+                    { w: "ileke", phonetic: "il-EH-geh", meaning: "told, said" },
+                ]
+            },
+            {
+                arrernte: "unte pathekele-akerte",
+                english: "Do you have a bicycle?",
+                words: [
+                    { w: "Unte", phonetic: "oon-da", meaning: "you" },
+                    { w: "pathekele-akerte", phonetic: "pah-deh-GEH-leh ug-ERT-eh", meaning: "have a bicycle" },
+                ]
+            },
+            {
+                arrernte: "arelhe-le irrtyurtne-le merne akeme",
+                english: "Woman cuts food with a knife",
+                words: [
+                    { w: "arelhe-le", phonetic: "ah-REL-eh-leh", meaning: "woman (subject)" },
+                    { w: "irrtyurtne-le", phonetic: "irr-CHOORT-neh-leh", meaning: "with a knife" },
+                    { w: "merne", phonetic: "mern-eh", meaning: "food" },
+                    { w: "akeme", phonetic: "ug-EM-eh", meaning: "cut, slice" },
+                ]
+            },
+        ];
+
+        // ── GAME STATE ─────────────────────────────────────────────────
+        const ROUND_SIZE = 5;
+        const PTS_CORRECT = 2;
+        const PTS_HINT = 1;   // penalty — full score becomes 1 if hint used
+
+        let queue = [];
+        let currentIdx = 0;
+        let current = null;
+        let totalScore = 0;
+        let hintUsed = false;   // for current question
+        let hintUsedCount = 0;     // across the round
+        let answered = false;
+        let answerWords = [];
+        let bankWords = [];
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function showScreen(id) {
+            ['introScreen', 'quizScreen', 'scoreScreen'].forEach(s => {
+                document.getElementById(s).classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGame() {
+            queue = shuffle([...ALL_SENTENCES]).slice(0, ROUND_SIZE);
+            currentIdx = 0;
+            totalScore = 0;
+            hintUsedCount = 0;
+            showScreen('quizScreen');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= queue.length) { showScore(); return; }
+
+            current = queue[currentIdx];
+            answered = false;
+            hintUsed = false;
+            answerWords = [];
+
+            const tokens = tokenise(current.arrernte);
+            bankWords = shuffle([...tokens]);
+
+            // Progress
+            document.getElementById('progFill').style.width =
+                (currentIdx / ROUND_SIZE * 100) + '%';
+            document.getElementById('progLbl').textContent =
+                `${currentIdx + 1} / ${ROUND_SIZE}`;
+
+            // Score display
+            updateScoreDisplay();
+
+            // Card content
+            document.getElementById('englishPrompt').textContent = current.english;
+            const rev = document.getElementById('revealSentence');
+            rev.textContent = '';
+            rev.style.display = 'none';
+
+            // Feedback
+            setFeedback('', '');
+
+            // Answer zone
+            const az = document.getElementById('answerZone');
+            az.className = 'answer-zone';
+            az.innerHTML = '<span class="answer-placeholder">tap words below to build the sentence →</span>';
+
+            // Hint
+            document.getElementById('hintPanel').classList.remove('visible');
+            document.getElementById('hintBtn').classList.remove('active');
+            buildHintPanel();
+
+            // Next btn
+            document.getElementById('nextBtn').classList.remove('show');
+
+            renderBank();
+        }
+
+        function tokenise(s) {
+            return s.split(/\s+/).filter(Boolean);
+        }
+
+        function renderBank() {
+            const bank = document.getElementById('wordBank');
+            bank.innerHTML = '';
+            bankWords.forEach((word, i) => {
+                if (word === null) return;
+                const btn = document.createElement('button');
+                btn.className = 'tile tile-bank';
+                btn.textContent = word;
+                btn.addEventListener('click', () => pickFromBank(i));
+                bank.appendChild(btn);
+            });
+        }
+
+        function renderAnswer() {
+            const az = document.getElementById('answerZone');
+            az.innerHTML = '';
+            if (answerWords.length === 0) {
+                az.innerHTML = '<span class="answer-placeholder">tap words below to build the sentence →</span>';
+            } else {
+                answerWords.forEach((word, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tile tile-answer';
+                    btn.textContent = word;
+                    btn.addEventListener('click', () => returnToBank(i));
+                    az.appendChild(btn);
+                });
+            }
+
+            // Auto-check when all tokens placed
+            const total = tokenise(current.arrernte).length;
+            if (answerWords.length === total && !answered) {
+                checkAnswer();
+            }
+        }
+
+        function pickFromBank(idx) {
+            if (answered || bankWords[idx] === null) return;
+            answerWords.push(bankWords[idx]);
+            bankWords[idx] = null;
+            renderBank();
+            renderAnswer();
+        }
+
+        function returnToBank(idx) {
+            if (answered) return;
+            const word = answerWords.splice(idx, 1)[0];
+            const slot = bankWords.findIndex(w => w === null);
+            if (slot !== -1) bankWords[slot] = word;
+            else bankWords.push(word);
+            renderBank();
+            renderAnswer();
+        }
+
+        function clearAnswer() {
+            if (answered) return;
+            answerWords.forEach(w => {
+                const slot = bankWords.findIndex(b => b === null);
+                if (slot !== -1) bankWords[slot] = w;
+                else bankWords.push(w);
+            });
+            answerWords = [];
+            renderBank();
+            renderAnswer();
+            setFeedback('', '');
+            document.getElementById('answerZone').className = 'answer-zone';
+        }
+
+        function checkAnswer() {
+            answered = true;
+
+            const userSentence = answerWords.join(' ');
+            const norm = s => s.toLowerCase().replace(/[.,!?]/g, '').trim();
+            const isCorrect = norm(userSentence) === norm(current.arrernte);
+
+            const az = document.getElementById('answerZone');
+
+            if (isCorrect) {
+                // Points: 2 if no hint, 1 if hint was used
+                const pts = hintUsed ? PTS_HINT : PTS_CORRECT;
+                totalScore += pts;
+                az.className = 'answer-zone correct-state';
+
+                if (hintUsed) {
+                    setFeedback(`Mwarre! Correct — but hint used, so +${pts} pt`, 'ok');
+                } else {
+                    setFeedback(`Mwarre! Correct — +${pts} pts`, 'ok');
+                }
+                animateScore();
+            } else {
+                az.className = 'answer-zone wrong-state';
+                setFeedback(`Not quite — the correct sentence is shown above`, 'bad');
+                // Reveal correct sentence
+                const rev = document.getElementById('revealSentence');
+                rev.textContent = current.arrernte;
+                rev.style.display = 'block';
+            }
+
+            updateScoreDisplay();
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function toggleHint() {
+            // Only charge penalty once per question
+            if (!hintUsed) {
+                hintUsed = true;
+                hintUsedCount++;
+            }
+
+            const panel = document.getElementById('hintPanel');
+            const btn = document.getElementById('hintBtn');
+            const isVisible = panel.classList.contains('visible');
+
+            panel.classList.toggle('visible', !isVisible);
+            btn.classList.toggle('active', !isVisible);
+        }
+
+        function buildHintPanel() {
+            const container = document.getElementById('hintWords');
+            container.innerHTML = '';
+            current.words.forEach(w => {
+                const row = document.createElement('div');
+                row.className = 'hint-row';
+                row.innerHTML = `
+      <span class="hint-arrernte">${w.w}</span>
+      <span class="hint-phonetic">/ ${w.phonetic} /</span>
+      <span class="hint-meaning">${w.meaning || ''}</span>
+    `;
+                container.appendChild(row);
+            });
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            loadQuestion();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scorePts').textContent = totalScore;
+        }
+
+        function animateScore() {
+            const el = document.getElementById('scorePts');
+            el.classList.remove('animate');
+            void el.offsetWidth;
+            el.classList.add('animate');
+            setTimeout(() => el.classList.remove('animate'), 300);
+        }
+
+        function setFeedback(msg, cls) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = msg;
+            fb.className = cls ? `feedback ${cls}` : 'feedback';
+        }
+
+        function showScore() {
+            showScreen('scoreScreen');
+
+            const maxScore = ROUND_SIZE * PTS_CORRECT;
+            const pct = Math.round(totalScore / maxScore * 100);
+
+            document.getElementById('scoreNum').innerHTML =
+                `${totalScore} <span>/ ${maxScore}</span>`;
+
+            setTimeout(() => {
+                document.getElementById('scoreBarFill').style.width = pct + '%';
+            }, 50);
+
+            const quips = [
+                [100, 'Perfect! Mwarre anthurre! 🎉'],
+                [80, "Really solid — you're getting it!"],
+                [60, 'Good effort, keep practising.'],
+                [40, "A few more sessions and you'll nail it."],
+                [0, 'Just getting started — keep going!'],
+            ];
+            document.getElementById('scoreQuip').textContent =
+                (quips.find(([t]) => pct >= t) || quips.at(-1))[1];
+
+            document.getElementById('hintUsedNote').textContent =
+                hintUsedCount > 0
+                    ? `💡 hints used: ${hintUsedCount} — each cost 1 point from that phrase`
+                    : `No hints used — well done!`;
+        }
+    </script>
+
+</body>
+
+</html>
