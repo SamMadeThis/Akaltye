@@ -231,7 +231,7 @@ a {
   max-width: 640px;
   margin: var(--space-6) auto 0;
   padding: var(--space-8) var(--space-4);
-  min-height: 100%;
+  min-height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;
