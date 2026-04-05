@@ -337,6 +337,10 @@ let current    = 0;
 let seenCounts = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
 let viewLog    = JSON.parse(localStorage.getItem('lexicon_log')  || '[]');
 
+// Auto-seen timer — holds the setTimeout reference so it can be
+// cancelled if the user navigates away before 1.5 s is up.
+let autoSeenTimer = null;
+
 /*
  * favourites — Set of word strings e.g. { "Kwatye", "Werte" }
  * WHY: Set prevents duplicates automatically.
@@ -353,6 +357,42 @@ let bookmarks = new Set(JSON.parse(localStorage.getItem('lexicon_bookmarks') || 
 
 
 // ═══════════════════════════════════════════════════
+//  AUTO-SEEN
+//  Replaces the old manual "mark as seen" button.
+//  Called by renderCard() — marks the word after 1.5 s
+//  of the user staying on the card, so rapid skipping
+//  does not pollute the seen count.
+// ═══════════════════════════════════════════════════
+
+/*
+ * scheduleAutoSeen — starts a 1.5 s timer for the given word.
+ * WHAT: Cancels any existing timer first so navigating quickly
+ *       between cards never double-counts the previous word.
+ * HOW:  setTimeout stores its ID in autoSeenTimer so navigate()
+ *       can clearTimeout before starting the next card.
+ */
+function scheduleAutoSeen(w) {
+  if (autoSeenTimer) clearTimeout(autoSeenTimer);
+
+  autoSeenTimer = setTimeout(() => {
+    const now     = new Date();
+    const isoNow  = now.toISOString();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    if (!seenCounts[w.word]) seenCounts[w.word] = { count: 0, lastSeen: null };
+    seenCounts[w.word].count++;
+    seenCounts[w.word].lastSeen = isoNow;
+    viewLog.unshift({ word: w.word, time: timeStr, iso: isoNow });
+
+    syncSeen(currentUid, seenCounts, viewLog);
+
+    // Re-render so the seen badge updates without a flash
+    applyWord(w);
+  }, 1500);
+}
+
+
+// ═══════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════
 
@@ -365,6 +405,9 @@ function renderCard(animate = false) {
   } else {
     applyWord(w);
   }
+
+  // Kick off the auto-seen timer every time a new card is shown
+  scheduleAutoSeen(w);
 }
 
 function applyWord(w) {
@@ -386,42 +429,53 @@ function applyWord(w) {
   const tags = document.getElementById('tagsContainer');
   tags.innerHTML = (w.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
 
-  // Seen badge + button
+  // ── Seen badge ──────────────────────────────────────────────
+  // The manual seen button is gone — only the badge remains.
   const seenData  = seenCounts[w.word];
   const seenBadge = document.getElementById('seenBadge');
-  const seenBtn   = document.getElementById('seenBtn');
-
   if (seenData) {
     seenBadge.style.display = 'block';
     seenBadge.textContent   = `seen ${seenData.count}×`;
-    seenBtn.classList.add('already');
-    seenBtn.textContent = 'seen again ✓';
   } else {
     seenBadge.style.display = 'none';
-    seenBtn.classList.remove('already');
-    seenBtn.textContent = 'mark as seen';
   }
 
-  // Favourite button state
-  // WHY: Always reflects the current favourite status so the
-  //      button is accurate after navigating between cards.
-  const favBtn = document.getElementById('favBtn');
+  // OLD seen button update — removed with the button itself:
+  // const seenBtn = document.getElementById('seenBtn');
+  // if (seenData) {
+  //   seenBtn.classList.add('already');
+  //   seenBtn.textContent = 'seen again ✓';
+  // } else {
+  //   seenBtn.classList.remove('already');
+  //   seenBtn.textContent = 'mark as seen';
+  // }
+
+  // ── Favourite button — FA icon swap ─────────────────────────
+  // OLD: set textContent '♡' / '♥' — replaced because the button
+  //      now contains an <i> tag; textContent would wipe it out.
+  // NEW: swap between fa-regular (outline) and fa-solid (filled)
+  //      to match the heart icon used in explore.html.
+  const favBtn  = document.getElementById('favBtn');
+  const favIcon = favBtn.querySelector('i');
   if (favourites.has(w.word)) {
-    favBtn.textContent = '♥ favourited';
+    favIcon.className = 'fa-solid fa-heart';   // filled
     favBtn.classList.add('active');
   } else {
-    favBtn.textContent = '♡ favourite';
+    favIcon.className = 'fa-regular fa-heart'; // outline
     favBtn.classList.remove('active');
   }
 
-  // Bookmark button state
-  const bookmarkBtn = document.getElementById('bookmarkBtn');
+  // ── Bookmark button — FA icon, active state via CSS only ─────
+  // OLD: set textContent '🔖' — replaced for same reason as fav.
+  // NEW: icon stays fa-solid fa-bookmark always; only CSS
+  //      border/bg changes to show active state, matching
+  //      the bookmark icon used in explore.html.
+  const bookmarkBtn  = document.getElementById('bookmarkBtn');
   if (bookmarkBtn) {
+    // Icon class never changes — active state is CSS only
     if (bookmarks.has(w.word)) {
-      bookmarkBtn.textContent = '🔖 bookmarked';
       bookmarkBtn.classList.add('active');
     } else {
-      bookmarkBtn.textContent = '🔖 bookmark';
       bookmarkBtn.classList.remove('active');
     }
   }
@@ -454,34 +508,32 @@ function showToast(msg) {
 // ═══════════════════════════════════════════════════
 
 function navigate(dir) {
+  // Cancel the auto-seen timer before moving to the next card
+  if (autoSeenTimer) clearTimeout(autoSeenTimer);
   current = Math.max(0, Math.min(words.length - 1, current + dir));
   renderCard(true);
 }
 
-async function markSeen() {
-  const w       = words[current];
-  const now     = new Date();
-  const isoNow  = now.toISOString();
-  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-  if (!seenCounts[w.word]) seenCounts[w.word] = { count: 0, lastSeen: null };
-  seenCounts[w.word].count++;
-  seenCounts[w.word].lastSeen = isoNow;
-  viewLog.unshift({ word: w.word, time: timeStr, iso: isoNow });
-
-  syncSeen(currentUid, seenCounts, viewLog);
-
-  renderCard();
-  showToast('logged ✓');
-}
+// ── OLD manual markSeen — replaced by scheduleAutoSeen above ──
+// async function markSeen() {
+//   const w       = words[current];
+//   const now     = new Date();
+//   const isoNow  = now.toISOString();
+//   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+//
+//   if (!seenCounts[w.word]) seenCounts[w.word] = { count: 0, lastSeen: null };
+//   seenCounts[w.word].count++;
+//   seenCounts[w.word].lastSeen = isoNow;
+//   viewLog.unshift({ word: w.word, time: timeStr, iso: isoNow });
+//
+//   syncSeen(currentUid, seenCounts, viewLog);
+//
+//   renderCard();
+//   showToast('logged ✓');
+// }
 
 /*
  * toggleFavourite — adds or removes the current word from favourites
- * WHAT: Toggles membership in the favourites Set, saves to localStorage
- * HOW:  Set.has() checks; add/delete toggles; Array.from converts
- *       Set → array for JSON serialisation
- * WHY:  Set prevents duplicate entries automatically.
- *       localStorage persists the list across pages and sessions.
  */
 function toggleFavourite() {
   const w = words[current];
@@ -505,16 +557,8 @@ function toggleFavourite() {
   renderCard();
 }
 
-
 /*
  * toggleBookmark — saves or removes the current word from bookmarks
- * WHAT: Toggles membership in the bookmarks Set, saves to localStorage,
- *       and records a timestamped entry in lexicon_bookmark_log so the
- *       saved.html page can show when each word was bookmarked.
- * HOW:  Mirrors toggleFavourite but writes to a separate key so the two
- *       lists stay independent.
- * WHY:  Users may want to favourite words they love AND bookmark words
- *       they want to review — two distinct intents.
  */
 function toggleBookmark() {
   const w = words[current];
@@ -537,17 +581,13 @@ function toggleBookmark() {
   syncBookmarks(currentUid, Array.from(bookmarks), bmLog);
   renderCard();
 }
+
 //  Reads ?tag= and ?pos= from the URL.
 //  Special case: tag=favourite filters by localStorage.
 // ═══════════════════════════════════════════════════
 
 /*
  * applyFilter — filters WORDS by tag and/or pos
- * WHAT: Handles normal tags AND the special 'favourite' tag
- * HOW:  For 'favourite', checks the favourites Set rather than
- *       the word's own .tags array — no word data changes needed
- * WHY:  Favourites are user-specific and dynamic; baking them
- *       into word data would require rewriting the array on each change
  */
 function applyFilter(tag, pos) {
   const filtered = WORDS.filter(w => {
@@ -576,7 +616,10 @@ function applyFilter(tag, pos) {
 // ═══════════════════════════════════════════════════
 document.getElementById('prevBtn').addEventListener('click', () => navigate(-1));
 document.getElementById('nextBtn').addEventListener('click', () => navigate(1));
-document.getElementById('seenBtn').addEventListener('click', markSeen);
+
+// OLD: manual seen button listener — removed with the button.
+// document.getElementById('seenBtn').addEventListener('click', markSeen);
+
 document.getElementById('favBtn').addEventListener('click', toggleFavourite);
 document.getElementById('bookmarkBtn')?.addEventListener('click', toggleBookmark);
 
@@ -589,8 +632,7 @@ applyFilter(startTag, startPos);
 
 /*
  * If a specific word was requested via ?word=Kwatye, jump to that
- * card after the filter has been applied. Falls back gracefully if
- * the word isn't in the current filtered set.
+ * card after the filter has been applied.
  */
 if (startWord) {
   const idx = words.findIndex(w => w.word === startWord);

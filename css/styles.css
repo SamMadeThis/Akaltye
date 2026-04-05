@@ -24,17 +24,9 @@
    ============================================================= */
 
 
-
-
-
 /* =============================================================
    1. DESIGN TOKENS
    ============================================================= */
-
-
-
-
-
 
 :root {
 
@@ -249,7 +241,6 @@ a {
   margin: var(--space-6) auto 0;
   padding: var(--space-8) var(--space-4);
   min-height: 100%;
-  background-color: var(--clr-surface-a0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -549,12 +540,44 @@ header {
   white-space: nowrap;
 }
 
-/* Word card navigation controls */
+/*
+ * .controls — navigation button row
+ * WHAT: Holds prev, icon buttons, and next in a single line
+ * HOW:  flex row; prev/next grow equally via flex:1 so the
+ *       fixed-width icon buttons land naturally in the centre
+ * WHY:  Keeps all navigation on one line without manual widths
+ */
 .controls {
   display: flex;
   gap: var(--space-2);
   align-items: center;
+  justify-content: center;
   margin-bottom: var(--space-8);
+}
+
+/* Prev and Next stretch to fill remaining space equally */
+#prevBtn,
+#nextBtn {
+  flex: 1;
+}
+
+/*
+ * .btn-icon — square icon-only button (fav + bookmark)
+ * WHAT: Fixed 44×44 px tap target; sits between prev/next
+ * HOW:  flex: 0 0 auto so it never grows or shrinks
+ * WHY:  Icon alone needs no text padding; fixed size keeps
+ *       the two icon buttons visually balanced
+ */
+.btn-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 
@@ -563,7 +586,7 @@ header {
    ============================================================= */
 
 /*
- * .btn — base button used on word cards (prev / next / seen)
+ * .btn — base button used on word cards (prev / next)
  */
 .btn {
   background: transparent;
@@ -595,7 +618,7 @@ header {
   transform: none;
 }
 
-/* "Mark as seen" variant */
+/* "Mark as seen" variant — kept in case it's needed elsewhere */
 .btn-seen {
   flex: 1;
   border-color: var(--clr-primary-a0);
@@ -607,7 +630,6 @@ header {
   background: rgba(201, 175, 194, 0.12);
 }
 
-/* After marking seen */
 .btn-seen.already {
   background: var(--clr-surface-a60);
   border-color: var(--clr-surface-a20);
@@ -817,7 +839,6 @@ header {
   align-items: center;
   justify-content: center;
   background-color: var(--clr-surface-tonal-a0);
-  /* Grow to fill space; min ensures they don't get too small */
   flex: 1 1 calc(50% - var(--space-4));
   min-width: 130px;
   height: 110px;
@@ -927,12 +948,6 @@ header {
    11. PRACTICE & QUIZ PAGE  (practice.html)
    ============================================================= */
 
-/*
- * .practice-wrap
- * WHAT: Outermost column for all three quiz screens
- * HOW:  Flex column, full width up to 580px
- * WHY:  Centres and constrains content on all devices
- */
 .practice-wrap {
   width: 100%;
   max-width: 580px;
@@ -940,12 +955,6 @@ header {
   flex-direction: column;
 }
 
-/*
- * .screen — screen visibility & entrance animation
- * WHAT: Controls which screen is visible (mode / quiz / score)
- * HOW:  Hidden by default; practice.js adds .active to show one
- * WHY:  Single-page feel without a reload between steps
- */
 .screen {
   display: none;
   flex-direction: column;
@@ -958,7 +967,6 @@ header {
   display: flex;
 }
 
-/* --- Mode screen heading --- */
 .practice-heading {
   font-family: var(--font-display);
   font-size: var(--text-xl);
@@ -979,12 +987,6 @@ header {
   margin-top: var(--space-1);
 }
 
-/* --- Filter chips --- */
-/*
- * WHAT: Pill buttons to filter words by tag, POS, or seen status
- * HOW:  Flex-wrap row; .on state uses primary accent border
- * WHY:  Lets users narrow the word pool without navigating away
- */
 .filter-label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1031,12 +1033,6 @@ header {
   background: rgba(34, 148, 110, 0.09);
 }
 
-/* --- Mode cards --- */
-/*
- * WHAT: Five clickable cards for each quiz type + shuffle
- * HOW:  CSS grid 2-col; shuffle spans full width
- * WHY:  All options visible at once; grid keeps them aligned
- */
 .mode-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1089,7 +1085,6 @@ header {
   line-height: 1.5;
 }
 
-/* Shuffle card — full width, row layout */
 .shuffle-card {
   grid-column: 1 / -1;
   background: rgba(201, 175, 194, 0.06);
@@ -1112,7 +1107,6 @@ header {
   border-color: var(--clr-primary-a0);
 }
 
-/* --- Also row (Word Cards / History links) --- */
 .also-row {
   display: flex;
   gap: var(--space-2);
@@ -1141,7 +1135,6 @@ header {
   font-size: 0.9rem;
 }
 
-/* --- Quiz screen top bar --- */
 .quiz-topbar {
   display: flex;
   align-items: center;
@@ -1170,7 +1163,6 @@ header {
   color: var(--clr-primary-a0);
 }
 
-/* --- Quiz progress bar --- */
 .q-prog-row {
   display: flex;
   align-items: center;
@@ -1200,7 +1192,6 @@ header {
   white-space: nowrap;
 }
 
-/* --- Question card --- */
 .q-card {
   background: var(--clr-surface-tonal-a10);
   border: 1px solid var(--clr-primary-a50);
@@ -1246,12 +1237,6 @@ header {
   color: var(--clr-surface-a50);
 }
 
-/* --- Multiple choice answer grid --- */
-/*
- * WHAT: 2×2 grid of answer buttons for Guess + Meaning Match
- * HOW:  CSS grid; correct/incorrect classes added by JS after pick
- * WHY:  Large tap targets; instant colour feedback
- */
 .ans-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1294,7 +1279,6 @@ header {
   cursor: not-allowed;
 }
 
-/* --- Fill the Gap input --- */
 .gap-wrap {
   display: flex;
   flex-direction: column;
@@ -1351,12 +1335,6 @@ header {
   cursor: not-allowed;
 }
 
-/* --- Match synonym columns --- */
-/*
- * WHAT: Two-column tap-to-pair interface
- * HOW:  Grid 1fr 1fr; columns shuffled independently by JS
- * WHY:  Pairing trains associative memory differently to MC
- */
 .match-instructions {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1429,7 +1407,6 @@ header {
   cursor: not-allowed;
 }
 
-/* --- Feedback line --- */
 .feedback {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
@@ -1447,7 +1424,6 @@ header {
   color: var(--clr-danger-a10);
 }
 
-/* --- Next button --- */
 .btn-next {
   width: 100%;
   padding: 13px;
@@ -1474,7 +1450,6 @@ header {
   transform: scale(0.98);
 }
 
-/* --- Score screen --- */
 .score-wrap {
   display: flex;
   flex-direction: column;
@@ -1575,7 +1550,6 @@ header {
   color: var(--clr-primary-a40);
 }
 
-/* --- Recent quiz log strip on mode screen --- */
 .quiz-log-header {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1637,11 +1611,6 @@ header {
    12. HISTORY PAGE  (history.html)
    ============================================================= */
 
-/*
- * .history-wrap
- * WHAT: Outer column holding both log sections
- * HOW:  Flex column, full width, consistent gap
- */
 .history-wrap {
   display: flex;
   flex-direction: column;
@@ -1650,7 +1619,6 @@ header {
   max-width: 560px;
 }
 
-/* Section header row */
 .history-section-header {
   display: flex;
   align-items: center;
@@ -1682,7 +1650,6 @@ header {
   color: var(--clr-danger-a10);
 }
 
-/* Quiz log rows (word log rows reuse .log-item from section 8) */
 .quiz-log-item {
   display: flex;
   flex-direction: column;
@@ -1728,7 +1695,6 @@ header {
   overflow: hidden;
 }
 
-/* Bar fill width + colour set inline by history.js */
 .quiz-log-bar-fill {
   height: 100%;
   border-radius: 2px;
@@ -1746,18 +1712,14 @@ header {
   flex: 0 0 auto;
 }
 
+
 /* =============================================================
    FAVOURITE BUTTON  (words.html)
    ============================================================= */
 
 /*
- * .btn-fav — favourite toggle on the word card
- * WHAT: Sits next to the "seen" button; toggles a word in/out
- *       of the user's favourites list
- * HOW:  Inherits base .btn styles; primary-coloured border at
- *       rest; fills solid when .active (word is favourited)
- * WHY:  Visually distinct from "seen" so users understand the
- *       two actions serve different purposes
+ * .btn-fav — favourite toggle; icon-only square in the nav row
+ * Active state fills with primary colour
  */
 .btn-fav {
   border-color: var(--clr-primary-a0);
@@ -1768,13 +1730,11 @@ header {
   background: rgba(201, 175, 194, 0.12);
 }
 
-/* Word is currently favourited */
 .btn-fav.active {
   background: var(--clr-primary-a0);
   color: var(--clr-dark);
   border-color: var(--clr-primary-a0);
 }
-
 
 /* Clickable log row — used on saved.html */
 .log-item--link {
@@ -1795,10 +1755,8 @@ header {
   transform: scale(0.99);
 }
 
-/*Sits below the seen/favourite row; independent from favourite.=============================================================*/
-
+/* OLD */
 .btn-bookmark {
-  width: 100%;
   border-color: var(--clr-surface-a30);
   color: var(--clr-surface-a50);
 }
@@ -1815,12 +1773,27 @@ header {
   border-color: var(--clr-primary-a30);
 }
 
+/* NEW — mirrors .btn-fav exactly */
+.btn-bookmark {
+  border-color: var(--clr-primary-a0);
+  color: var(--clr-primary-a0);
+}
+
+.btn-bookmark:hover {
+  background: rgba(201, 175, 194, 0.12);
+}
+
+.btn-bookmark.active {
+  background: var(--clr-primary-a0);
+  color: var(--clr-dark);
+  border-color: var(--clr-primary-a0);
+}
+
 
 /* =============================================================
    PROFILE PAGE  (profile.html)
    ============================================================= */
 
-/* Outer column */
 .profile-wrap {
   display: flex;
   flex-direction: column;
@@ -1837,19 +1810,12 @@ header {
   letter-spacing: -0.5px;
 }
 
-/*
- * .profile-stats — two-column grid of stat tiles
- * WHAT: Shows words studied, favourited, bookmarked and practices
- *       completed as large tappable tiles; each is an <a> link.
- * WHY:  At-a-glance progress; tapping acts on the stat directly
- */
 .profile-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
 
-/* ── Last practice result card ── */
 .profile-last-test {
   background: var(--clr-surface-tonal-a0);
   border: 1px solid var(--clr-surface-a20);
@@ -1934,7 +1900,6 @@ header {
   transform: scale(0.98);
 }
 
-/* Favourites tile — warmer border accent */
 .stat-btn--fav {
   border-color: rgba(201, 175, 194, 0.3);
 }
@@ -1943,7 +1908,6 @@ header {
   border-color: var(--clr-primary-a0);
 }
 
-/* Bookmarks tile */
 .stat-btn--bookmark {
   border-color: rgba(201, 175, 194, 0.15);
 }
@@ -1952,7 +1916,6 @@ header {
   border-color: var(--clr-primary-a30);
 }
 
-/* Practices tile */
 .stat-btn--practice {
   border-color: rgba(34, 148, 110, 0.2);
 }
@@ -1961,7 +1924,6 @@ header {
   border-color: var(--clr-success-a0);
 }
 
-/* Large number */
 .stat-num {
   font-family: var(--font-display);
   font-size: var(--text-3xl);
@@ -1971,7 +1933,6 @@ header {
   line-height: 1;
 }
 
-/* Label below the number */
 .stat-label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1980,7 +1941,6 @@ header {
   color: var(--clr-surface-a50);
 }
 
-/* Section divider label */
 .profile-section-label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1990,7 +1950,6 @@ header {
   margin-bottom: calc(-1 * var(--space-3));
 }
 
-/* Quick-link pills */
 .profile-links {
   display: flex;
   flex-wrap: wrap;
@@ -2021,14 +1980,12 @@ header {
    NAV AUTH BUTTON  (index.html + all pages eventually)
    ============================================================= */
 
-/* Wrapper sits at the right of the nav bar */
 .nav-auth {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-/* Sign in button — shown when logged out */
 .nav-auth-btn {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -2048,7 +2005,6 @@ header {
   background: var(--clr-primary-a10);
 }
 
-/* Avatar + first name — shown when logged in */
 .nav-auth-user {
   display: flex;
   align-items: center;
@@ -2092,15 +2048,11 @@ header {
   letter-spacing: 0.05em;
 }
 
+
 /* =============================================================
    HOME — SIGN-IN PROMPT SECTION
    ============================================================= */
 
-/*
- * Shown only when the user is not signed in.
- * Sits between the CTAs and the footer note.
- * Uses a dashed border to feel like an invitation, not a demand.
- */
 .home-signin-prompt {
   display: flex;
   align-items: center;
@@ -2246,9 +2198,11 @@ header {
   background: var(--clr-primary-a10);
 }
 
+
 /* =============================================================
    PROFILE — ABOUT YOU CARD
    ============================================================= */
+
 .profile-about-card {
   background: var(--clr-surface-tonal-a0);
   border: 1px solid var(--clr-surface-a20);
@@ -2301,7 +2255,6 @@ header {
   line-height: 1.5;
 }
 
-/* Small count shown on the tile when > 0 */
 .explore-tile-count {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -2309,9 +2262,41 @@ header {
   margin-top: var(--space-1);
 }
 
-/* Heart icon above the tile label */
 .explore-tile-icon {
   font-size: 1.1rem;
   color: var(--clr-primary-a0);
   margin-bottom: var(--space-1);
+}
+
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+
+.site-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--clr-surface-a20);
+  margin-top: auto;
+}
+
+.site-footer-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  letter-spacing: 0.08em;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.site-footer-link {
+  color: var(--clr-primary-a0);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.site-footer-link:hover {
+  color: var(--clr-primary-a30);
 }
