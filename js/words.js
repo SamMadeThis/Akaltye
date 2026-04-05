@@ -3,7 +3,7 @@
 //
 //  WHAT: Displays Arrernte word cards one at a time.
 //        Users can mark words as seen or favourite them.
-//  HOW:  Reads ?tag= and ?pos= from the URL to filter words.
+//  HOW:  Reads ?tag=, ?pos=, and ?group= from the URL to filter words.
 //        Special case: ?tag=favourite filters by localStorage.
 //        All state stored in localStorage.
 // ═══════════════════════════════════════════════════
@@ -235,11 +235,29 @@ function toggleBookmark() {
 }
 
 /*
- * applyFilter — filters WORDS by tag and/or pos from URL params
- * Special cases: tag=favourite and tag=bookmark filter by localStorage sets
+ * applyFilter — filters WORDS by group, tag, and/or pos from URL params.
+ *
+ * ?group=people  → matches words where w.groups includes 'people'
+ * ?tag=beginner  → matches words where w.tags includes 'beginner'
+ * ?pos=noun      → matches words where w.pos === 'noun'
+ *
+ * Special tag values:
+ *   tag=favourite → filter by favourites set in localStorage
+ *   tag=bookmark  → filter by bookmarks set in localStorage
+ *   tag=all       → no tag filter (show everything)
  */
-function applyFilter(tag, pos) {
+function applyFilter(group, tag, pos) {
   const filtered = WORDS.filter(w => {
+    // ── Group filter (from Lexicon tiles in explore.html) ──────────────
+    let groupMatch;
+    if (!group || group === 'all') {
+      groupMatch = true;
+    } else {
+      // w.groups is an array like ["people", "level"] — check if it includes the group
+      groupMatch = Array.isArray(w.groups) && w.groups.includes(group);
+    }
+
+    // ── Tag filter (from Level tiles, or special favourite/bookmark) ───
     let tagMatch;
     if (!tag || tag === 'all') {
       tagMatch = true;
@@ -248,14 +266,32 @@ function applyFilter(tag, pos) {
     } else if (tag === 'bookmark') {
       tagMatch = bookmarks.has(w.word);
     } else {
-      tagMatch = w.tags && w.tags.includes(tag);
+      tagMatch = Array.isArray(w.tags) && w.tags.includes(tag);
     }
+
+    // ── Part-of-speech filter ──────────────────────────────────────────
     const posMatch = !pos || w.pos === pos;
-    return tagMatch && posMatch;
+
+    return groupMatch && tagMatch && posMatch;
   });
 
-  words   = shuffle(filtered);
+  words   = shuffle(filtered.length ? filtered : WORDS); // fallback to all if nothing matched
   current = 0;
+
+  // Update the page heading to reflect the active filter
+  const headingEl = document.querySelector('h2');
+  if (headingEl) {
+    if (group && group !== 'all') {
+      headingEl.textContent = group.charAt(0).toUpperCase() + group.slice(1);
+    } else if (tag && tag !== 'all') {
+      headingEl.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
+    } else if (pos) {
+      headingEl.textContent = pos.charAt(0).toUpperCase() + pos.slice(1) + 's';
+    } else {
+      headingEl.textContent = 'Lexicon';
+    }
+  }
+
   renderCard();
 }
 
@@ -270,11 +306,12 @@ document.getElementById('favBtn').addEventListener('click', toggleFavourite);
 document.getElementById('bookmarkBtn')?.addEventListener('click', toggleBookmark);
 
 const params    = new URLSearchParams(window.location.search);
-const startTag  = params.get('tag')  || 'all';
-const startPos  = params.get('pos')  || null;
-const startWord = params.get('word') || null;
+const startGroup = params.get('group') || null;   // ← NEW: read ?group=
+const startTag   = params.get('tag')   || null;
+const startPos   = params.get('pos')   || null;
+const startWord  = params.get('word')  || null;
 
-applyFilter(startTag, startPos);
+applyFilter(startGroup, startTag, startPos);
 
 // If a specific word was requested via ?word=Kwatye, jump to it
 if (startWord) {
