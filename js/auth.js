@@ -10,7 +10,7 @@
          consistent behaviour without duplicating code.
    ============================================================= */
 
-import { auth, db }           from "./firebase-config.js";
+import { auth, db }           from "firebase-config.js";
 import {
   GoogleAuthProvider,
   signInWithPopup,
