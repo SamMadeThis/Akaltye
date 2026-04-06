@@ -201,6 +201,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+
 }
 
 /* Home page overrides — tighter top, no bottom padding */
@@ -2580,7 +2581,7 @@ a.pos-badge:hover {
   gap: var(--space-6);
   max-width: 520px;
   width: 100%;
-  margin: 0 auto;
+  margin: 4rem auto auto;
   position: relative;
 }
 
