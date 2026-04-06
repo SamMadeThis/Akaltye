@@ -6,7 +6,10 @@
 *Preserving and revitalising language, one word at a time.*
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/516f50e0-419b-402d-bc6d-b9f880d73bef/deploy-status)](https://app.netlify.com/projects/akaltye/deploys)
-
+[![Live](https://img.shields.io/badge/live-akaltye.netlify.app-c9afc2?style=flat)](https://akaltye.netlify.app)
+[![Maintained](https://img.shields.io/badge/maintained-yes-B87333?style=flat)](https://github.com/SamMadeThis/Akaltye)
+[![Licence](https://img.shields.io/badge/licence-TBD-8B2500?style=flat)](https://github.com/SamMadeThis/Akaltye)
+[![Language](https://img.shields.io/badge/language-Arrernte-c9afc2?style=flat)](https://akaltye.netlify.app)
 </div>
 
 ---
