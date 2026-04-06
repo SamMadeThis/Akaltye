@@ -23,6 +23,7 @@
      lexicon_bookmarks      → users/{uid}/activity/bookmarks
      lexicon_bookmark_log   → users/{uid}/activity/bookmarkLog
      lexicon_quiz_log       → users/{uid}/activity/quizLog
+     lexicon_streak         → users/{uid}/activity/streak   [NEW]
    ============================================================= */
 
 import { db } from './firebase-config.js';
@@ -35,13 +36,15 @@ import {
    INTERNAL HELPERS
    ============================================================= */
 
-// The single Firestore document that holds all activity
 const activityRef = uid => doc(db, 'users', uid, 'activity', 'data');
 
 /*
- * writeToFirestore — saves the full activity snapshot
- * Called after every user action. Non-blocking (fire and forget).
- * If it fails, localStorage still has the data — nothing is lost.
+ * writeToFirestore — saves the full activity snapshot to Firestore.
+ * Non-blocking (fire and forget). If it fails, localStorage still
+ * has the data — nothing is lost.
+ *
+ * [CHANGE] Added lexicon_streak to the snapshot so streak data
+ * syncs across devices along with all other activity.
  */
 async function writeToFirestore(uid) {
   try {
@@ -53,6 +56,7 @@ async function writeToFirestore(uid) {
       bookmarks:    JSON.parse(localStorage.getItem('lexicon_bookmarks')     || '[]'),
       bookmarkLog:  JSON.parse(localStorage.getItem('lexicon_bookmark_log')  || '[]'),
       quizLog:      JSON.parse(localStorage.getItem('lexicon_quiz_log')      || '[]'),
+      streak:       JSON.parse(localStorage.getItem('lexicon_streak')        || '{}'), // [NEW]
       updatedAt:    serverTimestamp()
     });
   } catch (e) {
@@ -65,19 +69,20 @@ async function writeToFirestore(uid) {
    PULL FROM FIRESTORE → LOCALSTORAGE
    Called once on page load when auth state is known.
    Only runs if localStorage appears empty (new device).
+
+   [CHANGE] Now also restores streak from Firestore so the streak
+   is preserved when the user signs in on a new device.
    ============================================================= */
 export async function pullFromFirestore(uid) {
-  // If user already has local data, don't overwrite it
   const alreadyHasData = localStorage.getItem('lexicon_seen');
   if (alreadyHasData) return;
 
   try {
     const snap = await getDoc(activityRef(uid));
-    if (!snap.exists()) return; // No Firestore data yet either
+    if (!snap.exists()) return;
 
     const data = snap.data();
 
-    // Write each key to localStorage if Firestore has it
     if (data.seen)         localStorage.setItem('lexicon_seen',          JSON.stringify(data.seen));
     if (data.log)          localStorage.setItem('lexicon_log',           JSON.stringify(data.log));
     if (data.favourites)   localStorage.setItem('lexicon_favourites',    JSON.stringify(data.favourites));
@@ -85,10 +90,9 @@ export async function pullFromFirestore(uid) {
     if (data.bookmarks)    localStorage.setItem('lexicon_bookmarks',     JSON.stringify(data.bookmarks));
     if (data.bookmarkLog)  localStorage.setItem('lexicon_bookmark_log',  JSON.stringify(data.bookmarkLog));
     if (data.quizLog)      localStorage.setItem('lexicon_quiz_log',      JSON.stringify(data.quizLog));
+    if (data.streak)       localStorage.setItem('lexicon_streak',        JSON.stringify(data.streak)); // [NEW]
 
     console.log('Synced from Firestore ✓');
-
-    // Reload the page so the freshly populated localStorage is used
     window.location.reload();
   } catch (e) {
     console.warn('Could not pull from Firestore:', e);
@@ -98,9 +102,6 @@ export async function pullFromFirestore(uid) {
 
 /* =============================================================
    WRITE HELPERS — called from words.js and practice.js
-   Each writes to localStorage then syncs to Firestore.
-   uid is passed in; if null (not signed in) only localStorage
-   is written.
    ============================================================= */
 
 export function syncSeen(uid, seenCounts, viewLog) {
@@ -123,5 +124,14 @@ export function syncBookmarks(uid, bookmarksArray, bookmarkLog) {
 
 export function syncQuizLog(uid, quizLog) {
   localStorage.setItem('lexicon_quiz_log', JSON.stringify(quizLog));
+  if (uid) writeToFirestore(uid);
+}
+
+/*
+ * [NEW] syncStreak — called from badges.js after updateStreak().
+ * Keeps streak data in Firestore alongside all other activity.
+ */
+export function syncStreak(uid, streak) {
+  localStorage.setItem('lexicon_streak', JSON.stringify(streak));
   if (uid) writeToFirestore(uid);
 }

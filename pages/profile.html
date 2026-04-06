@@ -2,19 +2,16 @@
 <html lang="en">
 
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-17ZB632V40');
     </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts — shared across the app -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -22,20 +19,202 @@
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <title>AKALTYE — Profile</title>
+
+    <style>
+        /* ── Streak card ───────────────────────────────── */
+        .streak-card {
+            background: var(--clr-surface-tonal-a0);
+            border: 1px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .streak-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .streak-info {
+            flex: 1;
+        }
+
+        .streak-count {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--clr-light);
+            line-height: 1.1;
+        }
+
+        .streak-sub {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            margin-top: 2px;
+        }
+
+        /* Week pip row */
+        .streak-pips {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .pip {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0;
+            color: var(--clr-surface-a40);
+            border: 1px solid var(--clr-surface-a20);
+        }
+
+        .pip.done {
+            background: var(--clr-earth);
+            border-color: var(--clr-earth);
+            color: var(--clr-light);
+        }
+
+        .pip.today {
+            border-color: var(--clr-ochre);
+            color: var(--clr-ochre);
+        }
+
+        /* ── Badges ────────────────────────────────────── */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+        }
+
+        @media (max-width: 380px) {
+            .badges-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .badge-tile {
+            background: var(--clr-surface-tonal-a0);
+            border: 1px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-2);
+            text-align: center;
+            transition: border-color var(--transition-fast);
+        }
+
+        .badge-tile.earned {
+            border-color: var(--clr-ochre);
+        }
+
+        .badge-tile.locked {
+            opacity: 0.35;
+        }
+
+        .badge-emoji {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .badge-name {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 400;
+            color: var(--clr-surface-a60);
+            line-height: 1.3;
+        }
+
+        .badge-desc {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            color: var(--clr-surface-a40);
+            line-height: 1.3;
+        }
+
+        /* ── Next badge progress ───────────────────────── */
+        .next-badge-card {
+            background: var(--clr-surface-tonal-a0);
+            border: 1px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .next-badge-emoji {
+            font-size: 1.4rem;
+            line-height: 1;
+            flex-shrink: 0;
+            opacity: 0.5;
+        }
+
+        .next-badge-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .next-badge-label {
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            color: var(--clr-surface-a60);
+        }
+
+        .next-badge-track {
+            height: 2px;
+            background: var(--clr-surface-a20);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: var(--space-2);
+        }
+
+        .next-badge-fill {
+            height: 100%;
+            background: var(--clr-primary-a0);
+            border-radius: 2px;
+            transition: width var(--transition-slow);
+        }
+
+        .next-badge-count {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ── All done state ────────────────────────────── */
+        .badges-complete {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            color: var(--clr-surface-a40);
+            text-align: center;
+            padding: var(--space-4);
+            border: 1px dashed var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+        }
+    </style>
 </head>
 
 <body>
 
-    <!--Navigation BAR-->
     <header>
         <div class="nav-bar">
             <a href="../index.html" class="logo">AKA<span>LTYE</span></a>
-
             <input id="menu-toggler" type="checkbox" class="menu-toggler">
-            <label for="menu-toggler" class="show-menu">
-                <span></span>
-            </label>
-
+            <label for="menu-toggler" class="show-menu"><span></span></label>
             <nav class="nav">
                 <ul class="nav__menu">
                     <li class="nav__item"><a href="explore.html" class="nav__link">Explore</a></li>
@@ -52,38 +231,54 @@
 
             <h1 class="profile-heading">Profile</h1>
 
-            <!-- ── Account card ── -->
-            <div class="profile-account-card" id="accountCard">
-                <!-- Populated by inline script below -->
-            </div>
+            <!-- Account card -->
+            <div class="profile-account-card" id="accountCard"></div>
 
-            <!-- ── Stat buttons ── -->
+            <!-- Stat buttons -->
             <div class="profile-stats">
                 <a href="words.html?tag=all" class="stat-btn" id="statSeen">
                     <span class="stat-num" id="seenCount">—</span>
                     <span class="stat-label">words studied</span>
                 </a>
-                <a href="saved.html" class="stat-btn stat-btn--fav" id="statFav">
+                <a href="saved.html" class="stat-btn stat-btn--fav">
                     <span class="stat-num" id="favCount">—</span>
                     <span class="stat-label">favourited</span>
                 </a>
-                <a href="saved.html" class="stat-btn stat-btn--bookmark" id="statBookmark">
+                <a href="saved.html" class="stat-btn stat-btn--bookmark">
                     <span class="stat-num" id="bookmarkCount">—</span>
                     <span class="stat-label">bookmarked</span>
                 </a>
-                <a href="history.html" class="stat-btn stat-btn--practice" id="statPractice">
+                <a href="history.html" class="stat-btn stat-btn--practice">
                     <span class="stat-num" id="practiceCount">—</span>
                     <span class="stat-label">practices done</span>
                 </a>
             </div>
 
-            <!-- ── Last test result card ── -->
+            <!-- ── STREAK ── -->
+            <div class="profile-section-label">Streak</div>
+            <div class="streak-card" id="streakCard">
+                <div class="streak-icon" id="streakIcon">🔥</div>
+                <div class="streak-info">
+                    <div class="streak-count" id="streakCount">0 days</div>
+                    <div class="streak-sub" id="streakSub">start learning to begin your streak</div>
+                </div>
+                <div class="streak-pips" id="streakPips"></div>
+            </div>
+
+            <!-- ── BADGES ── -->
+            <div class="profile-section-label">Badges</div>
+            <div class="badges-grid" id="badgesGrid"></div>
+
+            <!-- ── NEXT BADGE ── -->
+            <div id="nextBadgeWrap"></div>
+
+            <!-- Last practice -->
             <div class="profile-section-label">Last practice</div>
             <div class="profile-last-test" id="lastTestCard">
                 <span class="last-test-empty">no quizzes yet — go to Practice to start one!</span>
             </div>
 
-            <!-- ── About you ── -->
+            <!-- About you -->
             <div class="profile-section-label">About you</div>
             <div class="profile-about-card" id="aboutCard">
                 <span class="about-empty">
@@ -92,7 +287,7 @@
                 </span>
             </div>
 
-            <!-- ── Quick links ── -->
+            <!-- Quick links -->
             <div class="profile-section-label">Go to</div>
             <div class="profile-links">
                 <a href="saved.html" class="profile-link-btn">♥ Favourites</a>
@@ -106,69 +301,175 @@
 
     <script type="module">
         import { auth } from '../js/firebase-config.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
         import { signOut } from '../js/auth.js';
+        import { updateStreak, evaluateBadges, getNextBadgeProgress } from '../js/badges.js';
 
-        /* ── Stats from localStorage (instant, no network) ── */
+        // ── Update streak on every profile visit ──────────────
+        // This means visiting the app counts as activity for the streak.
+        // If you want to only count words.html or practice.html visits,
+        // move this call to those pages and remove it here.
+        const streak = updateStreak();
+
+        // ── Basic stats from localStorage ─────────────────────
         const seenCounts = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
-        document.getElementById('seenCount').textContent = Object.keys(seenCounts).length;
-
         const favourites = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
-        document.getElementById('favCount').textContent = favourites.length;
-
         const bookmarks = JSON.parse(localStorage.getItem('lexicon_bookmarks') || '[]');
-        document.getElementById('bookmarkCount').textContent = bookmarks.length;
-
         const quizLog = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
+
+        document.getElementById('seenCount').textContent = Object.keys(seenCounts).length;
+        document.getElementById('favCount').textContent = Array.isArray(favourites) ? favourites.length : 0;
+        document.getElementById('bookmarkCount').textContent = Array.isArray(bookmarks) ? bookmarks.length : 0;
         document.getElementById('practiceCount').textContent = quizLog.length;
 
-        /* ── Last test card ── */
+        // ── Streak display ────────────────────────────────────
+        const streakCount = document.getElementById('streakCount');
+        const streakSub = document.getElementById('streakSub');
+        const streakIcon = document.getElementById('streakIcon');
+
+        streakCount.textContent = `${streak.current} day${streak.current !== 1 ? 's' : ''}`;
+
+        if (streak.current === 0) {
+            streakSub.textContent = 'start learning to begin your streak';
+            streakIcon.textContent = '💤';
+        } else if (streak.current >= 30) {
+            streakSub.textContent = `best: ${streak.longest} days — extraordinary`;
+            streakIcon.textContent = '🌙';
+        } else if (streak.current >= 7) {
+            streakSub.textContent = `best: ${streak.longest} days — keep it up`;
+            streakIcon.textContent = '⚡';
+        } else {
+            streakSub.textContent = `best streak: ${streak.longest} day${streak.longest !== 1 ? 's' : ''}`;
+            streakIcon.textContent = '🔥';
+        }
+
+        // Week pip row — Mon to Sun, highlight days user was active this week
+        const pipsEl = document.getElementById('streakPips');
+        const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        const today = new Date();
+        const todayDow = (today.getDay() + 6) % 7; // Mon=0 … Sun=6
+
+        // Build a set of ISO date strings the user was active on
+        // We infer from the streak: if current streak is N, the last N days were active
+        const activeDates = new Set();
+        if (streak.current > 0 && streak.lastDate) {
+            for (let i = 0; i < streak.current; i++) {
+                const d = new Date(streak.lastDate);
+                d.setDate(d.getDate() - i);
+                activeDates.add(d.toISOString().slice(0, 10));
+            }
+        }
+
+        dayNames.forEach((name, dow) => {
+            const d = new Date(today);
+            d.setDate(today.getDate() - (todayDow - dow));
+            const iso = d.toISOString().slice(0, 10);
+            const pip = document.createElement('div');
+            pip.className = 'pip';
+            pip.textContent = name;
+            if (dow === todayDow) pip.classList.add('today');
+            if (activeDates.has(iso)) pip.classList.add('done');
+            pipsEl.appendChild(pip);
+        });
+
+        // ── Badges ────────────────────────────────────────────
+        const badges = evaluateBadges();
+        const badgesEl = document.getElementById('badgesGrid');
+
+        // Show earned badges first, then locked
+        const sorted = [
+            ...badges.filter(b => b.earned),
+            ...badges.filter(b => !b.earned),
+        ];
+
+        sorted.forEach(badge => {
+            const tile = document.createElement('div');
+            tile.className = `badge-tile ${badge.earned ? 'earned' : 'locked'}`;
+            tile.title = badge.desc;
+            tile.innerHTML = `
+                <div class="badge-emoji">${badge.emoji}</div>
+                <div class="badge-name">${badge.name}</div>
+                <div class="badge-desc">${badge.desc}</div>
+            `;
+            badgesEl.appendChild(tile);
+        });
+
+        // ── Next badge progress ───────────────────────────────
+        const nextWrap = document.getElementById('nextBadgeWrap');
+        const next = getNextBadgeProgress();
+
+        if (next) {
+            const pct = Math.min(100, Math.round((next.current / next.target) * 100));
+            nextWrap.innerHTML = `
+                <div class="profile-section-label" style="margin-top: var(--space-6);">Next badge</div>
+                <div class="next-badge-card">
+                    <div class="next-badge-emoji">${next.badge.emoji}</div>
+                    <div class="next-badge-info">
+                        <div class="next-badge-label">${next.badge.name} — ${next.badge.desc}</div>
+                        <div class="next-badge-track">
+                            <div class="next-badge-fill" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                    <div class="next-badge-count">${next.current} / ${next.target}</div>
+                </div>
+            `;
+        } else {
+            nextWrap.innerHTML = `
+                <div class="badges-complete" style="margin-top: var(--space-4);">
+                    All badges earned — remarkable work.
+                </div>
+            `;
+        }
+
+        // ── Last test card ─────────────────────────────────────
         const lastTestCard = document.getElementById('lastTestCard');
         if (quizLog.length > 0) {
             const last = quizLog[0];
             const pct = last.pct ?? Math.round(last.score / last.total * 100);
             const barColour = pct >= 80 ? '#22946e' : pct >= 50 ? '#c49a2b' : '#b84040';
             lastTestCard.innerHTML = `
-          <div class="last-test-mode">${last.mode}</div>
-          <div class="last-test-date">${last.date} · ${last.time}</div>
-          <div class="last-test-bar-track">
-            <div class="last-test-bar-fill" style="width:${pct}%; background:${barColour};"></div>
-          </div>
-          <div class="last-test-score">${last.score} / ${last.total} &nbsp;<span class="last-test-pct">${pct}%</span></div>
-        `;
+                <div class="last-test-mode">${last.mode}</div>
+                <div class="last-test-date">${last.date} · ${last.time}</div>
+                <div class="last-test-bar-track">
+                    <div class="last-test-bar-fill" style="width:${pct}%; background:${barColour};"></div>
+                </div>
+                <div class="last-test-score">${last.score} / ${last.total}
+                    &nbsp;<span class="last-test-pct">${pct}%</span>
+                </div>
+            `;
         }
 
-        /* ── Account card ── */
+        // ── Account card ───────────────────────────────────────
         const accountCard = document.getElementById('accountCard');
 
         onAuthStateChanged(auth, user => {
             if (user) {
                 accountCard.innerHTML = `
-            <div class="account-avatar">
-              ${user.photoURL
+                    <div class="account-avatar">
+                        ${user.photoURL
                         ? `<img src="${user.photoURL}" alt="${user.displayName}" class="account-avatar-img">`
                         : `<div class="account-avatar-placeholder">${(user.displayName || user.email || '?')[0].toUpperCase()}</div>`
                     }
-            </div>
-            <div class="account-info">
-              <div class="account-name">${user.displayName || 'Learner'}</div>
-              <div class="account-email">${user.email || ''}</div>
-            </div>
-            <button class="account-signout-btn" id="signOutBtn">Sign out</button>
-          `;
+                    </div>
+                    <div class="account-info">
+                        <div class="account-name">${user.displayName || 'Learner'}</div>
+                        <div class="account-email">${user.email || ''}</div>
+                    </div>
+                    <button class="account-signout-btn" id="signOutBtn">Sign out</button>
+                `;
                 document.getElementById('signOutBtn').addEventListener('click', signOut);
             } else {
                 accountCard.innerHTML = `
-            <div class="account-info">
-              <div class="account-name">Not signed in</div>
-              <div class="account-email">Your progress is saved on this device only.</div>
-            </div>
-            <a href="login.html" class="account-signin-btn">Sign in</a>
-          `;
+                    <div class="account-info">
+                        <div class="account-name">Not signed in</div>
+                        <div class="account-email">Your progress is saved on this device only.</div>
+                    </div>
+                    <a href="login.html" class="account-signin-btn">Sign in</a>
+                `;
             }
         });
 
-        /* ── About you card ── */
+        // ── About you card ─────────────────────────────────────
         const GOAL_LABELS = {
             culture_family: 'Connect with culture and family',
             elders: 'Learn to speak with Elders',
@@ -196,28 +497,28 @@
             if (hasAny) {
                 const aboutCard = document.getElementById('aboutCard');
                 let html = '<div class="about-rows">';
-
                 if (p.goals && p.goals.length) {
                     html += `<div class="about-row">
-              <span class="about-row-label">Why learning</span>
-              <span class="about-row-value">${p.goals.map(g => GOAL_LABELS[g] || g).join(', ')}</span>
-            </div>`;
+                        <span class="about-row-label">Why learning</span>
+                        <span class="about-row-value">${p.goals.map(g => GOAL_LABELS[g] || g).join(', ')}</span>
+                    </div>`;
                 }
                 if (p.level) {
                     html += `<div class="about-row">
-              <span class="about-row-label">Level</span>
-              <span class="about-row-value">${LEVEL_LABELS[p.level] || p.level}</span>
-            </div>`;
+                        <span class="about-row-label">Level</span>
+                        <span class="about-row-value">${LEVEL_LABELS[p.level] || p.level}</span>
+                    </div>`;
                 }
                 if (p.identity) {
                     html += `<div class="about-row">
-              <span class="about-row-label">Background</span>
-              <span class="about-row-value">${IDENTITY_LABELS[p.identity] || p.identity}</span>
-            </div>`;
+                        <span class="about-row-label">Background</span>
+                        <span class="about-row-value">${IDENTITY_LABELS[p.identity] || p.identity}</span>
+                    </div>`;
                 }
-
                 html += `</div>
-            <a href="setup.html" class="about-edit-link" style="margin-top: var(--space-4); display:inline-block;">Edit answers →</a>`;
+                    <a href="setup.html" class="about-edit-link" style="margin-top:var(--space-4);display:inline-block;">
+                        Edit answers →
+                    </a>`;
                 aboutCard.innerHTML = html;
             }
         }

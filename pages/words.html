@@ -13,19 +13,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts — shared across the app -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <!--Font Awesome — same kit used in explore.html-->
     <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
     <title>AKALTYE</title>
 
     <style>
-        /* Icon-only variant for fav + bookmark buttons */
         .btn-icon {
             flex: 0 0 auto;
             width: 44px;
@@ -37,12 +34,43 @@
             font-size: 1.1rem;
             line-height: 1;
         }
+
+        /* ── Slide-and-replace viewport ──────────────────────
+           Clips both card slots so only the one at left:0
+           is visible. The two .card elements slide inside it.
+           min-height matches the card's own min-height so
+           the container never collapses during the slide.
+        ──────────────────────────────────────────────────── */
+        .card-viewport {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+            /* match .card min-height so viewport never collapses */
+            min-height: 280px;
+            margin-bottom: var(--space-4);
+        }
+
+        /* Cards are now absolutely positioned inside the viewport */
+        .card {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            /* left is controlled by JS — active card sits at 0%,
+               inactive card is parked off-screen at ±100% */
+            margin-bottom: 0;
+            /* viewport provides the spacing now */
+        }
+
+        /* Remove the old fade-out class — slide handles transitions */
+        .card.fade-out {
+            opacity: 1;
+            transform: none;
+        }
     </style>
 </head>
 
 <body>
 
-    <!--Navigation BAR-->
     <header>
         <div class="nav-bar">
             <a href="../index.html" class="logo">AKA<span>LTYE</span></a>
@@ -76,35 +104,37 @@
                 <div class="progress-label" id="progressLabel">— / —</div>
             </div>
 
-            <div class="card" id="wordCard">
-                <div class="card-top">
-                    <span class="pos-badge" id="posbadge">—</span>
-                    <span class="seen-badge" id="seenBadge" style="display:none"></span>
+            <!-- Slide viewport — two card slots live inside -->
+            <div class="card-viewport">
+                <!-- Slot A — starts as the active card (left: 0) -->
+                <div class="card" id="wordCardA" style="left: 0%">
+                    <div class="card-top">
+                        <span class="pos-badge" id="posbadge">—</span>
+                        <span class="seen-badge" id="seenBadge" style="display:none"></span>
+                    </div>
+                    <div>
+                        <div class="word" id="wordText">—</div>
+                        <div class="phonetic" id="phonetic"></div>
+                    </div>
+                    <div class="definition" id="definition">—</div>
+                    <div class="examples" id="examples"></div>
+                    <div class="notes" id="notes" style="display:none"></div>
+                    <div class="tags" id="tagsContainer"></div>
                 </div>
-                <div>
-                    <div class="word" id="wordText">—</div>
-                    <div class="phonetic" id="phonetic"></div>
+
+                <!-- Slot B — parked off-screen to the right initially -->
+                <div class="card" id="wordCardB" style="left: 100%">
+                    <!-- content injected by JS before each slide -->
                 </div>
-                <div class="definition" id="definition">—</div>
-
-                <!-- Examples — populated from words-data.js examples[] array -->
-                <div class="examples" id="examples"></div>
-
-                <!-- Notes — shown only when a word has a notes field -->
-                <div class="notes" id="notes" style="display:none"></div>
-
-                <div class="tags" id="tagsContainer"></div>
             </div>
 
             <div class="controls">
                 <button class="btn" id="prevBtn">← prev</button>
 
-                <!-- Favourite — outline heart at rest, solid when active -->
                 <button class="btn btn-fav btn-icon" id="favBtn" title="Favourite">
                     <i class="fa-regular fa-heart"></i>
                 </button>
 
-                <!-- Bookmark — solid bookmark; active state via CSS only -->
                 <button class="btn btn-bookmark btn-icon" id="bookmarkBtn" title="Bookmark">
                     <i class="fa-solid fa-bookmark"></i>
                 </button>
