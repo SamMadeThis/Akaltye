@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -20,387 +19,9 @@
     rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <title>AKALTYE — Arrernte Language</title>
-
-  <style>
-    /* ── Index-page-only styles ── */
-
-    .home-hero {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: calc(100vh - 64px);
-      padding: var(--space-8) var(--space-4);
-      gap: var(--space-8);
-      max-width: 520px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    /* ── Top: country marker ── */
-    .home-country {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .home-country-line {
-      width: 28px;
-      height: 1px;
-      background: var(--clr-primary-a0);
-      opacity: 0.5;
-    }
-
-    .home-country-label {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--clr-primary-a0);
-      opacity: 0.7;
-    }
-
-    /* ── Headline block ── */
-    .home-headline {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4);
-      animation: fadeUp 0.55s ease 0.08s both;
-    }
-
-    .home-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.4rem, 8vw, 3.6rem);
-      font-weight: 500;
-      line-height: 1.15;
-      color: var(--clr-light);
-      letter-spacing: -0.5px;
-    }
-
-    .home-title em {
-      font-style: italic;
-      color: var(--clr-primary-a0);
-    }
-
-    .home-subtitle {
-      font-family: var(--font-body);
-      font-size: var(--text-md);
-      line-height: 1.7;
-      color: var(--clr-surface-a50);
-      max-width: 380px;
-    }
-
-    /* ════════════════════════════════════════════
-       WORD OF THE DAY CARD — scroll animation
-       ════════════════════════════════════════════ */
-
-    .home-word-card {
-      background: var(--clr-surface-tonal-a0);
-      border: 1px solid var(--clr-surface-a20);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5) var(--space-6);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-      position: relative;
-      overflow: hidden;
-
-      /* Start hidden — JS adds .wotd-visible when in view */
-      opacity: 0;
-      transform: translateY(24px);
-      transition:
-        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.4s ease;
-    }
-
-    /* Revealed state — added by IntersectionObserver */
-    .home-word-card.wotd-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Decorative corner glow — animates in after card arrives */
-    .home-word-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 120px;
-      height: 120px;
-      background: radial-gradient(circle at top right, rgba(201, 175, 194, 0.13), transparent 70%);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.8s ease 0.4s;
-    }
-
-    .home-word-card.wotd-visible::before {
-      opacity: 1;
-    }
-
-    /* Left accent bar that draws down */
-    .home-word-card::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 0%;
-      background: linear-gradient(to bottom, var(--clr-primary-a0), var(--clr-ochre));
-      border-radius: 0 0 3px 3px;
-      transition: height 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
-    }
-
-    .home-word-card.wotd-visible::after {
-      height: 100%;
-    }
-
-    /* Subtle border highlight on reveal */
-    .home-word-card.wotd-visible {
-      border-color: var(--clr-primary-a30);
-    }
-
-    /* Label — fades in with slight delay */
-    .home-word-card-label {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--clr-surface-a40);
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: opacity 0.4s ease 0.35s, transform 0.4s ease 0.35s;
-    }
-
-    .home-word-card.wotd-visible .home-word-card-label {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    /* The main word — typewriter cursor blinks while typing */
-    .home-word-card-word {
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      font-weight: 500;
-      color: var(--clr-light);
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-      min-height: 1.2em;
-    }
-
-    /* Blinking cursor during typewriter */
-    .wotd-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 0.85em;
-      background: var(--clr-primary-a0);
-      margin-left: 3px;
-      vertical-align: middle;
-      animation: cursorBlink 0.75s step-end infinite;
-    }
-
-    @keyframes cursorBlink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0;
-      }
-    }
-
-    /* Phonetic — slides up after word */
-    .home-word-card-phonetic {
-      font-family: var(--font-mono);
-      font-size: var(--text-sm);
-      color: var(--clr-primary-a0);
-      opacity: 0;
-      font-weight: 300;
-      transform: translateY(6px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-
-    .home-word-card-phonetic.wotd-phonetic-in {
-      opacity: 0.7;
-      transform: translateY(0);
-    }
-
-    /* Definition — fades in after phonetic */
-    .home-word-card-def {
-      font-family: var(--font-body);
-      font-size: var(--text-md);
-      color: var(--clr-surface-a60);
-      margin-top: var(--space-1);
-      line-height: 1.5;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-
-    .home-word-card-def.wotd-def-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Example — last to arrive */
-    .home-word-card-example {
-      font-family: var(--font-body);
-      font-style: italic;
-      font-size: var(--text-base);
-      color: var(--clr-surface-a40);
-      margin-top: var(--space-1);
-      padding-top: var(--space-3);
-      border-top: 1px solid var(--clr-surface-a20);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .home-word-card-example.wotd-example-in {
-      opacity: 1;
-    }
-
-    /* ── CTA buttons ── */
-    .home-actions {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-      animation: fadeUp 0.55s ease 0.24s both;
-    }
-
-    .home-btn-primary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-3);
-      background: var(--clr-primary-a0);
-      color: var(--clr-dark);
-      font-family: var(--font-body);
-      font-size: var(--text-md);
-      font-weight: 500;
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 16px var(--space-6);
-      text-decoration: none;
-      cursor: pointer;
-      transition: background var(--transition-fast), transform 0.1s ease;
-    }
-
-    .home-btn-primary:hover {
-      background: var(--clr-primary-a10);
-    }
-
-    .home-btn-primary:active {
-      transform: scale(0.98);
-    }
-
-    .home-btn-secondary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-3);
-      background: none;
-      color: var(--clr-surface-a50);
-      font-family: var(--font-body);
-      font-size: var(--text-base);
-      border: 1px solid var(--clr-surface-a20);
-      border-radius: var(--radius-md);
-      padding: 14px var(--space-6);
-      text-decoration: none;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .home-btn-secondary:hover {
-      border-color: var(--clr-primary-a30);
-      color: var(--clr-primary-a40);
-    }
-
-    /* ── Progress strip ── */
-    .home-progress {
-      display: none;
-      flex-direction: column;
-      gap: var(--space-3);
-      animation: fadeUp 0.55s ease 0.3s both;
-    }
-
-    .home-progress.visible {
-      display: flex;
-    }
-
-    .home-progress-label {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--clr-surface-a40);
-    }
-
-    .home-progress-stats {
-      display: flex;
-      gap: var(--space-3);
-    }
-
-    .home-progress-stat {
-      flex: 1;
-      background: var(--clr-surface-tonal-a0);
-      border: 1px solid var(--clr-surface-a20);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-1);
-      transition: border-color var(--transition-fast);
-    }
-
-    .home-progress-stat:hover {
-      border-color: var(--clr-primary-a30);
-    }
-
-    .home-progress-stat-num {
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      font-weight: 600;
-      color: var(--clr-light);
-      line-height: 1;
-    }
-
-    .home-progress-stat-label {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      letter-spacing: 0.08em;
-      color: var(--clr-surface-a40);
-      text-transform: uppercase;
-    }
-
-    /* ── Footer note ── */
-    .home-footer-note {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      color: var(--clr-surface-a30);
-      letter-spacing: 0.05em;
-      line-height: 1.8;
-      animation: fadeUp 0.55s ease 0.32s both;
-      padding-bottom: var(--space-8);
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
 </head>
 
-<body>
+<body class="page-home">
 
   <header>
     <div class="nav-bar">
@@ -436,26 +57,29 @@
       </p>
     </div>
 
-    <!-- Word of the day card -->
+    <!-- Glass word of the day card -->
     <div class="home-word-card" id="wotdCard">
-      <div class="home-word-card-label">Word of the day</div>
-      <div class="home-word-card-word" id="wotdWord"></div>
-      <div class="home-word-card-phonetic" id="wotdPhonetic"></div>
-      <div class="home-word-card-def" id="wotdDef"></div>
+      <div class="home-word-card-top">
+        <div class="home-word-card-label">Word of the day</div>
+        <div class="home-word-card-phonetic" id="wotdPhonetic"></div>
+      </div>
+      <div class="home-word-card-word" id="wotdWord">—</div>
+      <div class="home-word-card-rule"></div>
+      <div class="home-word-card-def" id="wotdDef">—</div>
       <div class="home-word-card-example" id="wotdExample"></div>
     </div>
 
-    <!-- Returning user progress -->
+    <!-- Progress — only shown if user has data -->
     <div class="home-progress" id="homeProgress">
       <div class="home-progress-label">Your progress</div>
       <div class="home-progress-stats">
         <a href="pages/words.html?tag=all" class="home-progress-stat">
           <span class="home-progress-stat-num" id="progressSeen">0</span>
-          <span class="home-progress-stat-label">words studied</span>
+          <span class="home-progress-stat-label">studied</span>
         </a>
         <a href="pages/practice.html" class="home-progress-stat">
           <span class="home-progress-stat-num" id="progressQuizzes">0</span>
-          <span class="home-progress-stat-label">practices done</span>
+          <span class="home-progress-stat-label">quizzes</span>
         </a>
         <a href="pages/saved.html" class="home-progress-stat">
           <span class="home-progress-stat-num" id="progressFavs">0</span>
@@ -474,10 +98,11 @@
       </a>
     </div>
 
+    <!-- Sign-in prompt -->
     <div class="home-signin-prompt" id="homeSigninPrompt" style="display:none;">
       <div class="home-signin-prompt-text">
         <span class="home-signin-prompt-title">Save your progress</span>
-        <span class="home-signin-prompt-sub">Sign in to keep your words and history across all your devices.</span>
+        <span class="home-signin-prompt-sub">Sign in to keep your words across devices.</span>
       </div>
       <a href="pages/login.html" class="home-signin-prompt-btn">Sign in →</a>
     </div>
@@ -493,7 +118,7 @@
     import { auth } from './js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-    /* ── Word of the day data ── */
+    /* ── Word of the day ── */
     const WORDS = [
       { word: "Werte", phonetic: "wer-da", definition: "Greeting — Hello, what's up?", example: "Werte? Inwenheke-ame unte atyenge antangkelhene." },
       { word: "Mwerre", phonetic: "mwa-rra", definition: "Good, right, proper. Healthy, well.", example: "Unte mwerre? — Are you good?" },
@@ -508,96 +133,62 @@
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
     const wotd = WORDS[dayOfYear % WORDS.length];
 
-    /* ── Typewriter helper ── */
-    function typeWriter(el, text, speed, onDone) {
-      el.innerHTML = '';                          // clear
-      const cursor = document.createElement('span');
-      cursor.className = 'wotd-cursor';
-      el.appendChild(cursor);
+    document.getElementById('wotdWord').textContent = wotd.word;
+    document.getElementById('wotdPhonetic').textContent = wotd.phonetic ? `/${wotd.phonetic}/` : '';
+    document.getElementById('wotdDef').textContent = wotd.definition;
+    document.getElementById('wotdExample').textContent = wotd.example || '';
+    if (!wotd.example) document.getElementById('wotdExample').style.display = 'none';
 
-      let i = 0;
-      function tick() {
-        if (i < text.length) {
-          cursor.insertAdjacentText('beforebegin', text[i++]);
-          setTimeout(tick, speed);
-        } else {
-          // Remove cursor after a brief pause
-          setTimeout(() => {
-            cursor.remove();
-            if (onDone) onDone();
-          }, 500);
-        }
-      }
-      tick();
-    }
-
-    /* ── Animate the card content once the card is in view ── */
-    function animateCard() {
-      const card = document.getElementById('wotdCard');
-      const wordEl = document.getElementById('wotdWord');
-      const phoneticEl = document.getElementById('wotdPhonetic');
-      const defEl = document.getElementById('wotdDef');
-      const exampleEl = document.getElementById('wotdExample');
-
-      // Set static content first (hidden via CSS)
-      phoneticEl.textContent = wotd.phonetic ? `/${wotd.phonetic}/` : '';
-      defEl.textContent = wotd.definition;
-      if (wotd.example) {
-        exampleEl.textContent = wotd.example;
-      } else {
-        exampleEl.style.display = 'none';
-      }
-
-      // 1. Slide card in
-      card.classList.add('wotd-visible');
-
-      // 2. Type the word (starts 400ms after card begins sliding)
-      setTimeout(() => {
-        typeWriter(wordEl, wotd.word, 55, () => {
-          // 3. Phonetic slides up after word finishes
-          phoneticEl.classList.add('wotd-phonetic-in');
-
-          // 4. Definition fades in 200ms later
-          setTimeout(() => {
-            defEl.classList.add('wotd-def-in');
-
-            // 5. Example fades in last
-            setTimeout(() => {
-              if (wotd.example) exampleEl.classList.add('wotd-example-in');
-            }, 250);
-          }, 200);
-        });
-      }, 400);
-    }
-
-    /* ── IntersectionObserver — trigger when card scrolls into view ── */
+    /* ── Scroll reveal ── */
     const card = document.getElementById('wotdCard');
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries, obs) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            animateCard();
-            observer.unobserve(card); // only fire once
+            setTimeout(() => card.classList.add('is-visible'), 180);
+            obs.disconnect();
           }
         });
       },
-      { threshold: 0.25 }   // 25% of card must be visible
+      { threshold: 0.15 }
     );
     observer.observe(card);
 
-    /* ── Returning user progress ── */
+    /* ── Progress stats ── */
     const seen = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
     const quizzes = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
     const favs = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
     const seenCount = Object.keys(seen).length;
+
     if (seenCount > 0) {
-      document.getElementById('progressSeen').textContent = seenCount;
-      document.getElementById('progressQuizzes').textContent = quizzes.length;
-      document.getElementById('progressFavs').textContent = favs.length;
+      const seenVal = String(seenCount);
+      const quizVal = String(quizzes.length);
+      const favVal = String(Array.isArray(favs) ? favs.length : 0);
+
+      const seenEl = document.getElementById('progressSeen');
+      const quizEl = document.getElementById('progressQuizzes');
+      const favEl = document.getElementById('progressFavs');
+
+      // Write text and store real value as data attribute for scramble
+      seenEl.textContent = seenVal; seenEl.dataset.real = seenVal;
+      quizEl.textContent = quizVal; quizEl.dataset.real = quizVal;
+      favEl.textContent = favVal; favEl.dataset.real = favVal;
+
       document.getElementById('homeProgress').classList.add('visible');
+
+      // Inject the two corner spans CSS ::before/::after can't cover
+      const statsEl = document.querySelector('.home-progress-stats');
+      if (statsEl) {
+        const tr = document.createElement('span');
+        tr.className = 'corner-tr';
+        const bl = document.createElement('span');
+        bl.className = 'corner-bl';
+        statsEl.appendChild(tr);
+        statsEl.appendChild(bl);
+      }
     }
 
-    /* ── Auth state → nav + sign-in prompt ── */
+    /* ── Auth ── */
     const navAuth = document.getElementById('navAuth');
     const signinPrompt = document.getElementById('homeSigninPrompt');
 
@@ -617,6 +208,55 @@
         signinPrompt.style.display = 'flex';
       }
     });
+
+    /* ── Number scramble hover ───────────────────────────────
+       On mouseenter: rapidly cycles random digits for ~480ms
+       then snaps back to the real value in ochre.
+       Resets to white on mouseleave.
+       data-real on each .home-progress-stat-num holds the
+       true value so it always lands correctly.
+    ── */
+    function scrambleNumber(stat) {
+      const numEl = stat.querySelector('.home-progress-stat-num');
+      const realVal = numEl.dataset.real;
+      if (!realVal || numEl._scrambling) return;
+
+      numEl._scrambling = true;
+      numEl.classList.add('scrambling');
+      numEl.classList.remove('settled');
+
+      const digits = '0123456789';
+      const frames = 14;   // random frames before landing
+      const delay = 35;   // ms per frame
+      let count = 0;
+
+      const tick = setInterval(() => {
+        // Random number matching character length of real value
+        numEl.textContent = Array.from(
+          { length: realVal.length },
+          () => digits[Math.floor(Math.random() * 10)]
+        ).join('');
+
+        count++;
+        if (count >= frames) {
+          clearInterval(tick);
+          numEl.textContent = realVal;
+          numEl.classList.remove('scrambling');
+          numEl.classList.add('settled');
+          numEl._scrambling = false;
+        }
+      }, delay);
+    }
+
+    function resetNumber(stat) {
+      const numEl = stat.querySelector('.home-progress-stat-num');
+      if (numEl) numEl.classList.remove('scrambling', 'settled');
+    }
+
+    document.querySelectorAll('.home-progress-stat').forEach(stat => {
+      stat.addEventListener('mouseenter', () => scrambleNumber(stat));
+      stat.addEventListener('mouseleave', () => resetNumber(stat));
+    });
   </script>
 
   <footer>
@@ -631,6 +271,7 @@
       </p>
     </div>
   </footer>
+
 </body>
 
 </html>
