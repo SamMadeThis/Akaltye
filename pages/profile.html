@@ -465,22 +465,31 @@
                 : 1;
             const offset = (AVG_C * (1 - progress)).toFixed(2);
 
-            const inner = photoURL
-                ? `<img src="${photoURL}" class="profile-avatar-photo" alt="avatar">`
-                : `<div class="profile-avatar-inner">${initial}</div>`;
-
             document.getElementById('avatarRing').innerHTML = `
-                <svg viewBox="0 0 80 80" width="80" height="80">
-                    <circle cx="40" cy="40" r="${AVG_R}"
-                        fill="none" stroke="var(--clr-surface-a10)" stroke-width="1.5"/>
-                    <circle cx="40" cy="40" r="${AVG_R}"
-                        fill="none" stroke="var(--clr-primary-a0)" stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-dasharray="${AVG_C.toFixed(2)}"
-                        stroke-dashoffset="${offset}"
-                        transform="rotate(-90 40 40)"/>
-                </svg>
-                ${inner}`;
+        <svg viewBox="0 0 80 80" width="80" height="80">
+            <!-- Track ring — behind everything -->
+            <circle cx="40" cy="40" r="${AVG_R}"
+                fill="none" stroke="var(--clr-surface-a10)" stroke-width="1.5"/>
+            <!-- Avatar clipped to circle — sits above track, below progress arc -->
+            <clipPath id="avatarClip">
+                <circle cx="40" cy="40" r="${AVG_R - 2}"/>
+            </clipPath>
+            ${photoURL
+                    ? `<image href="${photoURL}" x="7" y="7" width="66" height="66"
+                    clip-path="url(#avatarClip)"
+                    preserveAspectRatio="xMidYMid slice"/>`
+                    : `<text x="40" y="40" text-anchor="middle" dominant-baseline="central"
+                    font-family="Lora, serif" font-size="24" font-weight="600"
+                    fill="var(--clr-primary-a0)">${initial}</text>`
+                }
+            <!-- Progress arc — always on top -->
+            <circle cx="40" cy="40" r="${AVG_R}"
+                fill="none" stroke="var(--clr-primary-a0)" stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-dasharray="${AVG_C.toFixed(2)}"
+                stroke-dashoffset="${offset}"
+                transform="rotate(-90 40 40)"/>
+        </svg>`;
         }
 
         // ── Badge rings ──────────────────────────────────────────
