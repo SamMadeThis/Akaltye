@@ -348,15 +348,21 @@ header {
   background: rgba(0, 0, 0, 0.08);
 }
 
-/* Home page — sign in button appears before hamburger */
+/* Home page — sign in button appears before hamburger
 .page-home .show-menu {
   order: 3;
 }
 
 .page-home .nav-auth {
   order: 2;
+} */
+.show-menu {
+  order: 3;
 }
 
+.nav-auth {
+  order: 2;
+}
 
 /* =============================================================
    6. WORD CARDS
