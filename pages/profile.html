@@ -440,9 +440,9 @@
 
         // ── Level thresholds ─────────────────────────────────────
         const LEVELS = [
-            { min: 251, label: 'Fluent' },
-            { min: 151, label: 'Advanced' },
-            { min: 31, label: 'Intermediate' },
+            { min: 25000, label: 'Fluent' },       // 500 words × 50
+            { min: 10000, label: 'Advanced' },     // 200 words × 50
+            { min: 2500, label: 'Intermediate' }, // 50 words × 50
             { min: 0, label: 'Beginner' },
         ];
         function getLevel(n) {
@@ -454,6 +454,7 @@
         const favourites = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
         const quizLog = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
         const sc = Object.keys(seenCounts).length;
+        const weightedSeen = Object.values(seenCounts).reduce((sum, w) => sum + (w.count || 0), 0);
         const fc = Array.isArray(favourites) ? favourites.length : 0;
         const qc = quizLog.length;
 
@@ -465,15 +466,15 @@
         document.getElementById('streakDisplay').textContent = streak.current;
         document.getElementById('practiceCount').textContent = qc;
         document.getElementById('favCount').textContent = fc;
-        document.getElementById('profileLevel').textContent = getLevel(sc);
+        document.getElementById('profileLevel').textContent = getLevel(weightedSeen);
 
         // ── Avatar ring ──────────────────────────────────────────
         // The ring encodes progress toward the next level threshold.
-        function buildAvatarRing(initial, photoURL) {
-            const nextThreshold = [...LEVELS].reverse().find(l => sc < l.min)?.min ?? LEVELS[0].min;
+        function buildAvatarRing(initial, photoURL, levelScore) {
+            const nextThreshold = [...LEVELS].reverse().find(l => levelScore < l.min)?.min ?? LEVELS[0].min;
             const prevThreshold = LEVELS.find(l => l.min < nextThreshold)?.min ?? 0;
             const progress = nextThreshold > prevThreshold
-                ? Math.min(1, (sc - prevThreshold) / (nextThreshold - prevThreshold))
+                ? Math.min(1, (levelScore - prevThreshold) / (nextThreshold - prevThreshold))
                 : 1;
             const offset = (AVG_C * (1 - progress)).toFixed(2);
 
