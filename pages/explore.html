@@ -588,9 +588,8 @@
             return String(text).replace(regex, '<mark>$1</mark>');
         }
 
-        function getFirstDef(w) {
-            const defs = Array.isArray(w.definition) ? w.definition : [w.definition];
-            return defs[0] || '';
+        function getAllDefs(w) {
+            return Array.isArray(w.definition) ? w.definition : [w.definition];
         }
 
         function doSearch(raw) {
@@ -608,17 +607,17 @@
             const ql = q.toLowerCase();
 
             const matched = WORDS.filter(w => {
-                const def = getFirstDef(w).toLowerCase();
+                const defs = getAllDefs(w).join(' ').toLowerCase();
                 const word = (w.word || '').toLowerCase();
                 const phon = (w.phonetic || '').toLowerCase();
                 const tags = (w.tags || []).join(' ').toLowerCase();
-                return def.includes(ql) || word.includes(ql) || phon.includes(ql) || tags.includes(ql);
+                return defs.includes(ql) || word.includes(ql) || phon.includes(ql) || tags.includes(ql);
             });
 
             /* Sort — definition matches first, then word matches */
             matched.sort((a, b) => {
-                const aDefMatch = getFirstDef(a).toLowerCase().includes(ql);
-                const bDefMatch = getFirstDef(b).toLowerCase().includes(ql);
+                const aDefMatch = getAllDefs(a).join(' ').toLowerCase().includes(ql);
+                const bDefMatch = getAllDefs(b).join(' ').toLowerCase().includes(ql);
                 if (aDefMatch && !bDefMatch) return -1;
                 if (!aDefMatch && bDefMatch) return 1;
                 return 0;
@@ -635,14 +634,15 @@
             }
 
             resultList.innerHTML = matched.slice(0, 30).map(w => {
-                const def = getFirstDef(w);
+                const defs = getAllDefs(w);
+                const matchedDef = defs.find(d => d.toLowerCase().includes(ql)) || defs[0];
                 const href = `words.html?word=${encodeURIComponent(w.word)}`;
                 return `
           <a href="${href}" class="explore-result-item">
             <div class="explore-result-left">
               <span class="explore-result-word">${highlight(w.word, q)}</span>
               ${w.phonetic ? `<span class="explore-result-phonetic">/${w.phonetic}/</span>` : ''}
-              <span class="explore-result-def">${highlight(def, q)}</span>
+              <span class="explore-result-def">${highlight(matchedDef, q)}</span>
             </div>
             <span class="explore-result-arrow">→</span>
           </a>`;
