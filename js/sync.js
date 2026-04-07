@@ -1,13 +1,13 @@
 /* =============================================================
-   sync.js — Firestore ↔ localStorage sync for ALKATYE
+   sync.js — Firestore ↔ localStorage sync for AKALTYE
 
    WHAT: Write-through cache layer. Every user action writes to
          localStorage immediately (fast, works offline) and then
          writes to Firestore in the background if the user is
-         signed in. On first load on a new device, pulls data
-         down from Firestore into localStorage.
+         signed in. On sign-in, always pulls from Firestore and
+         merges with any existing localStorage data.
 
-   HOW:  ES module. Import the write helpers into words.js and
+   HOW:  ES module. Import write helpers into words.js and
          practice.js. Call pullFromFirestore(uid) once on page
          load when auth state is known.
 
@@ -16,14 +16,22 @@
          sync helpers instead of writing localStorage directly.
 
    KEYS SYNCED:
-     lexicon_seen           → users/{uid}/activity/seen
-     lexicon_log            → users/{uid}/activity/log
-     lexicon_favourites     → users/{uid}/activity/favourites
-     lexicon_favourite_log  → users/{uid}/activity/favouriteLog
-     lexicon_bookmarks      → users/{uid}/activity/bookmarks
-     lexicon_bookmark_log   → users/{uid}/activity/bookmarkLog
-     lexicon_quiz_log       → users/{uid}/activity/quizLog
-     lexicon_streak         → users/{uid}/activity/streak   [NEW]
+     lexicon_seen           → users/{uid}/activity/data.seen
+     lexicon_log            → users/{uid}/activity/data.log
+     lexicon_favourites     → users/{uid}/activity/data.favourites
+     lexicon_favourite_log  → users/{uid}/activity/data.favouriteLog
+     lexicon_bookmarks      → users/{uid}/activity/data.bookmarks
+     lexicon_bookmark_log   → users/{uid}/activity/data.bookmarkLog
+     lexicon_quiz_log       → users/{uid}/activity/data.quizLog
+     lexicon_streak         → users/{uid}/activity/data.streak
+
+   MERGE STRATEGY:
+     seen       — union of both sets, keeping higher count per word
+     favourites — union of both arrays, deduplicated by word
+     bookmarks  — union of both arrays, deduplicated by word
+     quiz_log   — merge + deduplicate by iso timestamp, keep newest 50
+     log        — merge + deduplicate by iso timestamp, keep newest 200
+     streak     — take whichever has the higher longest streak value
    ============================================================= */
 
 import { db } from './firebase-config.js';
@@ -33,19 +41,13 @@ import {
 
 
 /* =============================================================
-   INTERNAL HELPERS
+   INTERNAL — write full snapshot to Firestore
+   Non-blocking fire-and-forget. localStorage is always the
+   source of truth locally; Firestore gets a copy.
    ============================================================= */
 
 const activityRef = uid => doc(db, 'users', uid, 'activity', 'data');
 
-/*
- * writeToFirestore — saves the full activity snapshot to Firestore.
- * Non-blocking (fire and forget). If it fails, localStorage still
- * has the data — nothing is lost.
- *
- * [CHANGE] Added lexicon_streak to the snapshot so streak data
- * syncs across devices along with all other activity.
- */
 async function writeToFirestore(uid) {
   try {
     await setDoc(activityRef(uid), {
@@ -56,7 +58,7 @@ async function writeToFirestore(uid) {
       bookmarks:    JSON.parse(localStorage.getItem('lexicon_bookmarks')     || '[]'),
       bookmarkLog:  JSON.parse(localStorage.getItem('lexicon_bookmark_log')  || '[]'),
       quizLog:      JSON.parse(localStorage.getItem('lexicon_quiz_log')      || '[]'),
-      streak:       JSON.parse(localStorage.getItem('lexicon_streak')        || '{}'), // [NEW]
+      streak:       JSON.parse(localStorage.getItem('lexicon_streak')        || '{}'),
       updatedAt:    serverTimestamp()
     });
   } catch (e) {
@@ -66,34 +68,128 @@ async function writeToFirestore(uid) {
 
 
 /* =============================================================
-   PULL FROM FIRESTORE → LOCALSTORAGE
-   Called once on page load when auth state is known.
-   Only runs if localStorage appears empty (new device).
-
-   [CHANGE] Now also restores streak from Firestore so the streak
-   is preserved when the user signs in on a new device.
+   MERGE HELPERS
+   Each takes the local value and remote (Firestore) value and
+   returns a merged result. Always non-destructive — data from
+   either source is never discarded.
    ============================================================= */
-export async function pullFromFirestore(uid) {
-  const alreadyHasData = localStorage.getItem('lexicon_seen');
-  if (alreadyHasData) return;
 
+/* Union of seen objects — keeps the higher count per word */
+function mergeSeen(local, remote) {
+  const merged = { ...remote };
+  for (const [word, data] of Object.entries(local)) {
+    if (!merged[word]) {
+      merged[word] = data;
+    } else {
+      merged[word] = {
+        count:    Math.max(merged[word].count || 0, data.count || 0),
+        lastSeen: (merged[word].lastSeen || '') > (data.lastSeen || '')
+          ? merged[word].lastSeen
+          : data.lastSeen
+      };
+    }
+  }
+  return merged;
+}
+
+/* Union of two word arrays, deduplicated by word string */
+function mergeArrayByWord(local, remote) {
+  const seen = new Set();
+  return [...remote, ...local].filter(item => {
+    const key = typeof item === 'string' ? item : item.word;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/* Merge two log arrays, deduplicate by iso, sort newest first, cap */
+function mergeLogByIso(local, remote, maxItems = 200) {
+  const seen = new Set();
+  return [...remote, ...local]
+    .filter(entry => {
+      if (!entry.iso || seen.has(entry.iso)) return false;
+      seen.add(entry.iso);
+      return true;
+    })
+    .sort((a, b) => (b.iso || '') > (a.iso || '') ? 1 : -1)
+    .slice(0, maxItems);
+}
+
+/* Keep whichever streak has the higher longest value */
+function mergeStreak(local, remote) {
+  if (!remote || typeof remote !== 'object') return local;
+  if (!local  || typeof local  !== 'object') return remote;
+  return (remote.longest || 0) >= (local.longest || 0) ? remote : local;
+}
+
+
+/* =============================================================
+   PULL FROM FIRESTORE → LOCALSTORAGE
+   Always runs on sign-in regardless of whether localStorage
+   already has data. Merges remote and local so no data from
+   either device is ever lost.
+   ============================================================= */
+
+export async function pullFromFirestore(uid) {
   try {
     const snap = await getDoc(activityRef(uid));
-    if (!snap.exists()) return;
 
-    const data = snap.data();
+    if (!snap.exists()) {
+      // First time this user has signed in — push local data up
+      await writeToFirestore(uid);
+      console.log('First sign-in — local data pushed to Firestore ✓');
+      return;
+    }
 
-    if (data.seen)         localStorage.setItem('lexicon_seen',          JSON.stringify(data.seen));
-    if (data.log)          localStorage.setItem('lexicon_log',           JSON.stringify(data.log));
-    if (data.favourites)   localStorage.setItem('lexicon_favourites',    JSON.stringify(data.favourites));
-    if (data.favouriteLog) localStorage.setItem('lexicon_favourite_log', JSON.stringify(data.favouriteLog));
-    if (data.bookmarks)    localStorage.setItem('lexicon_bookmarks',     JSON.stringify(data.bookmarks));
-    if (data.bookmarkLog)  localStorage.setItem('lexicon_bookmark_log',  JSON.stringify(data.bookmarkLog));
-    if (data.quizLog)      localStorage.setItem('lexicon_quiz_log',      JSON.stringify(data.quizLog));
-    if (data.streak)       localStorage.setItem('lexicon_streak',        JSON.stringify(data.streak)); // [NEW]
+    const remote = snap.data();
 
-    console.log('Synced from Firestore ✓');
-    window.location.reload();
+    // Read current local values
+    const localSeen    = JSON.parse(localStorage.getItem('lexicon_seen')          || '{}');
+    const localLog     = JSON.parse(localStorage.getItem('lexicon_log')           || '[]');
+    const localFavs    = JSON.parse(localStorage.getItem('lexicon_favourites')    || '[]');
+    const localFavLog  = JSON.parse(localStorage.getItem('lexicon_favourite_log') || '[]');
+    const localBms     = JSON.parse(localStorage.getItem('lexicon_bookmarks')     || '[]');
+    const localBmLog   = JSON.parse(localStorage.getItem('lexicon_bookmark_log')  || '[]');
+    const localQuizLog = JSON.parse(localStorage.getItem('lexicon_quiz_log')      || '[]');
+    const localStreak  = JSON.parse(localStorage.getItem('lexicon_streak')        || '{}');
+
+    // Merge each data type
+    const mergedSeen    = mergeSeen(localSeen, remote.seen || {});
+    const mergedLog     = mergeLogByIso(localLog, remote.log || [], 200);
+    const mergedFavs    = mergeArrayByWord(localFavs, remote.favourites || []);
+    const mergedFavLog  = mergeLogByIso(localFavLog, remote.favouriteLog || [], 200);
+    const mergedBms     = mergeArrayByWord(localBms, remote.bookmarks || []);
+    const mergedBmLog   = mergeLogByIso(localBmLog, remote.bookmarkLog || [], 200);
+    const mergedQuizLog = mergeLogByIso(localQuizLog, remote.quizLog || [], 50);
+    const mergedStreak  = mergeStreak(localStreak, remote.streak || {});
+
+    // Write merged data back to localStorage
+    localStorage.setItem('lexicon_seen',          JSON.stringify(mergedSeen));
+    localStorage.setItem('lexicon_log',           JSON.stringify(mergedLog));
+    localStorage.setItem('lexicon_favourites',    JSON.stringify(mergedFavs));
+    localStorage.setItem('lexicon_favourite_log', JSON.stringify(mergedFavLog));
+    localStorage.setItem('lexicon_bookmarks',     JSON.stringify(mergedBms));
+    localStorage.setItem('lexicon_bookmark_log',  JSON.stringify(mergedBmLog));
+    localStorage.setItem('lexicon_quiz_log',      JSON.stringify(mergedQuizLog));
+    localStorage.setItem('lexicon_streak',        JSON.stringify(mergedStreak));
+
+    // Push the merged result back to Firestore so both devices
+    // end up with the same unified state
+    await writeToFirestore(uid);
+
+    console.log('Synced and merged from Firestore ✓');
+
+    // Reload only if data actually changed so the UI reflects
+    // the merged state. Compare sizes as a cheap heuristic.
+    const seenChanged = Object.keys(mergedSeen).length    !== Object.keys(localSeen).length;
+    const favsChanged = mergedFavs.length                 !== localFavs.length;
+    const quizChanged = mergedQuizLog.length              !== localQuizLog.length;
+
+    if (seenChanged || favsChanged || quizChanged) {
+      window.location.reload();
+    }
+
   } catch (e) {
     console.warn('Could not pull from Firestore:', e);
   }
@@ -127,10 +223,6 @@ export function syncQuizLog(uid, quizLog) {
   if (uid) writeToFirestore(uid);
 }
 
-/*
- * [NEW] syncStreak — called from badges.js after updateStreak().
- * Keeps streak data in Firestore alongside all other activity.
- */
 export function syncStreak(uid, streak) {
   localStorage.setItem('lexicon_streak', JSON.stringify(streak));
   if (uid) writeToFirestore(uid);

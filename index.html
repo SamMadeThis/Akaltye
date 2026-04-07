@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
@@ -12,6 +12,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Learn Arrernte — a living language of the Alice Springs region. Study words, practise phrases, and connect with Country.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -23,8 +25,7 @@
 
 <body class="page-home">
 
-  <header>
-  </header>
+  <header></header>
 
   <div class="home-hero">
 
@@ -43,7 +44,7 @@
       </p>
     </div>
 
-    <!-- word of the day card -->
+    <!-- Word of the day -->
     <div class="home-word-card" id="wotdCard">
       <div class="home-word-card-top">
         <div class="home-word-card-label">Word of the day</div>
@@ -55,7 +56,7 @@
       <div class="home-word-card-example" id="wotdExample"></div>
     </div>
 
-    <!-- Progress — only shown if user has data -->
+    <!-- Progress stats — shown when signed in with data -->
     <div class="home-progress" id="homeProgress">
       <div class="home-progress-label">Your progress</div>
       <div class="home-progress-stats">
@@ -74,6 +75,17 @@
       </div>
     </div>
 
+    <!-- Save card — shown when signed out, sits in the stats position.
+         Pulses its border to ochre twice on load to draw attention,
+         then settles. Replaced by real stats once signed in. -->
+    <div class="home-signin-prompt" id="homeSigninPrompt" style="display:none;">
+      <div class="home-signin-prompt-text">
+        <span class="home-signin-prompt-title">Save your progress</span>
+        <span class="home-signin-prompt-sub">Sign in to track words, streaks and quizzes.</span>
+      </div>
+      <a href="pages/login.html" class="home-signin-prompt-btn">Sign in →</a>
+    </div>
+
     <!-- CTAs -->
     <div class="home-actions">
       <a href="pages/words.html?tag=beginner" class="home-btn-primary">
@@ -84,166 +96,12 @@
       </a>
     </div>
 
-    <!-- Sign-in prompt -->
-    <div class="home-signin-prompt" id="homeSigninPrompt" style="display:none;">
-      <div class="home-signin-prompt-text">
-        <span class="home-signin-prompt-title">Save your progress</span>
-        <span class="home-signin-prompt-sub">Sign in to keep your words across devices.</span>
-      </div>
-      <a href="pages/login.html" class="home-signin-prompt-btn">Sign in →</a>
-    </div>
-
     <p class="home-footer-note">
       Arrernte is spoken by the Arrernte people of Central Australia.<br>
       This app is a learning tool. Always seek out speakers and elders to deepen your understanding.
     </p>
 
   </div>
-  <script type="module" src="/js/nav.js"></script>
-  <script type="module">
-    import { auth } from './js/firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-
-    /* ── Word of the day ── */
-    const WORDS = [
-      { word: "Werte", phonetic: "wer-da", definition: "Greeting — Hello, what's up?", example: "Werte? Inwenheke-ame unte atyenge antangkelhene." },
-      { word: "Mwerre", phonetic: "mwa-rra", definition: "Good, right, proper. Healthy, well.", example: "Unte mwerre? — Are you good?" },
-      { word: "Kwatye", phonetic: "kwa-dja", definition: "Water, rain.", example: "Kwatye arrangkwe — there is no water." },
-      { word: "Apmere", phonetic: "ap-mara", definition: "Country, land, home, place.", example: "Apmere — the land that holds everything." },
-      { word: "Mparntwe", phonetic: "m'barn-twa", definition: "Alice Springs — the town area.", example: "Mparntwe is Arrernte Country." },
-      { word: "Urreke", phonetic: "oo-ree-ga", definition: "Goodbye, farewell.", example: "Urreke! Nhenhe apetyeke — Goodbye! See you later." },
-      { word: "Inwenhe", phonetic: "in-wan-ya", definition: "What — used to ask about something.", example: "Inwenhe nhenhe? — What is this?" },
-      { word: "Ye", phonetic: "ya", definition: "Yes, yeah.", example: "Ye, ayenge mwerre — Yes, I am good." },
-    ];
-
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-    const wotd = WORDS[dayOfYear % WORDS.length];
-
-    document.getElementById('wotdWord').textContent = wotd.word;
-    document.getElementById('wotdPhonetic').textContent = wotd.phonetic ? `/${wotd.phonetic}/` : '';
-    document.getElementById('wotdDef').textContent = wotd.definition;
-    document.getElementById('wotdExample').textContent = wotd.example || '';
-    if (!wotd.example) document.getElementById('wotdExample').style.display = 'none';
-
-    /* ── Scroll reveal ── */
-    const card = document.getElementById('wotdCard');
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setTimeout(() => card.classList.add('is-visible'), 180);
-            obs.disconnect();
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(card);
-
-    /* ── Progress stats ── */
-    const seen = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
-    const quizzes = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
-    const favs = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
-    const seenCount = Object.keys(seen).length;
-
-    if (seenCount > 0) {
-      const seenVal = String(seenCount);
-      const quizVal = String(quizzes.length);
-      const favVal = String(Array.isArray(favs) ? favs.length : 0);
-
-      const seenEl = document.getElementById('progressSeen');
-      const quizEl = document.getElementById('progressQuizzes');
-      const favEl = document.getElementById('progressFavs');
-
-      // Write text and store real value as data attribute for scramble
-      seenEl.textContent = seenVal; seenEl.dataset.real = seenVal;
-      quizEl.textContent = quizVal; quizEl.dataset.real = quizVal;
-      favEl.textContent = favVal; favEl.dataset.real = favVal;
-
-      document.getElementById('homeProgress').classList.add('visible');
-
-      // Inject the two corner spans CSS ::before/::after can't cover
-      const statsEl = document.querySelector('.home-progress-stats');
-      if (statsEl) {
-        const tr = document.createElement('span');
-        tr.className = 'corner-tr';
-        const bl = document.createElement('span');
-        bl.className = 'corner-bl';
-        statsEl.appendChild(tr);
-        statsEl.appendChild(bl);
-      }
-    }
-
-    /* ── Auth ── */
-    const navAuth = document.getElementById('navAuth');
-    const signinPrompt = document.getElementById('homeSigninPrompt');
-
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        navAuth.innerHTML = `
-          <a href="pages/profile.html" class="nav-auth-user">
-            ${user.photoURL
-            ? `<img src="${user.photoURL}" alt="${user.displayName}" class="nav-auth-avatar">`
-            : `<div class="nav-auth-initial">${(user.displayName || user.email || '?')[0].toUpperCase()}</div>`
-          }
-            <span class="nav-auth-name">${(user.displayName || '').split(' ')[0]}</span>
-          </a>`;
-        signinPrompt.style.display = 'none';
-      } else {
-        navAuth.innerHTML = `<a href="pages/login.html" class="nav-auth-btn">Sign in</a>`;
-        signinPrompt.style.display = 'flex';
-      }
-    });
-
-    /* ── Number scramble hover ───────────────────────────────
-       On mouseenter: rapidly cycles random digits for ~480ms
-       then snaps back to the real value in ochre.
-       Resets to white on mouseleave.
-       data-real on each .home-progress-stat-num holds the
-       true value so it always lands correctly.
-    ── */
-    function scrambleNumber(stat) {
-      const numEl = stat.querySelector('.home-progress-stat-num');
-      const realVal = numEl.dataset.real;
-      if (!realVal || numEl._scrambling) return;
-
-      numEl._scrambling = true;
-      numEl.classList.add('scrambling');
-      numEl.classList.remove('settled');
-
-      const digits = '0123456789';
-      const frames = 14;   // random frames before landing
-      const delay = 35;   // ms per frame
-      let count = 0;
-
-      const tick = setInterval(() => {
-        // Random number matching character length of real value
-        numEl.textContent = Array.from(
-          { length: realVal.length },
-          () => digits[Math.floor(Math.random() * 10)]
-        ).join('');
-
-        count++;
-        if (count >= frames) {
-          clearInterval(tick);
-          numEl.textContent = realVal;
-          numEl.classList.remove('scrambling');
-          numEl.classList.add('settled');
-          numEl._scrambling = false;
-        }
-      }, delay);
-    }
-
-    function resetNumber(stat) {
-      const numEl = stat.querySelector('.home-progress-stat-num');
-      if (numEl) numEl.classList.remove('scrambling', 'settled');
-    }
-
-    document.querySelectorAll('.home-progress-stat').forEach(stat => {
-      stat.addEventListener('mouseenter', () => scrambleNumber(stat));
-      stat.addEventListener('mouseleave', () => resetNumber(stat));
-    });
-  </script>
 
   <footer>
     <div class="site-footer">
@@ -257,6 +115,9 @@
       </p>
     </div>
   </footer>
+
+  <script type="module" src="/js/nav.js"></script>
+  <script type="module" src="/js/home.js"></script>
 
 </body>
 

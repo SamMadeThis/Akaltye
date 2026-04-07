@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -12,6 +12,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Your Arrernte learning profile — track words studied, streaks, quizzes and badges.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -20,6 +22,7 @@
     <link rel="stylesheet" href="../css/styles.css">
     <title>AKALTYE — Profile</title>
     <script>
+        /* showTip — badge tooltip on tap */
         let tipTimer;
         function showTip(el) {
             const tip = document.getElementById('ringTip');
@@ -29,312 +32,11 @@
             tipTimer = setTimeout(() => tip.classList.remove('show'), 2800);
         }
     </script>
-    <style>
-        /* ── Page title ─────────────────────────────────────────── */
-        .profile-page-title {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a20);
-            text-align: center;
-            margin-bottom: var(--space-6);
-        }
-
-        /* ── Identity block ─────────────────────────────────────── */
-        .profile-identity {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-3);
-            margin-bottom: var(--space-6);
-        }
-
-        .profile-avatar-ring {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            flex-shrink: 0;
-        }
-
-        .profile-avatar-ring svg {
-            position: absolute;
-            inset: 0;
-            width: 80px;
-            height: 80px;
-        }
-
-        .profile-avatar-inner {
-            position: absolute;
-            inset: 7px;
-            border-radius: 50%;
-            background: var(--clr-surface-tonal-a0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-size: var(--text-lg);
-            font-weight: 600;
-            color: var(--clr-primary-a0);
-        }
-
-        .profile-avatar-photo {
-            position: absolute;
-            inset: 7px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile-identity-name {
-            font-family: var(--font-display);
-            font-size: var(--text-xl);
-            font-weight: 500;
-            color: var(--clr-light);
-            letter-spacing: -0.3px;
-            text-align: center;
-        }
-
-        .profile-identity-meta {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-        }
-
-        .profile-level-pill {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--clr-primary-a0);
-            border: 0.5px solid var(--clr-primary-a0);
-            border-radius: var(--radius-pill);
-            padding: 3px 10px;
-        }
-
-        .profile-meta-dot {
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: var(--clr-surface-a20);
-        }
-
-        .profile-meta-text {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a40);
-            letter-spacing: 0.04em;
-        }
-
-        /* ── Auth strip ─────────────────────────────────────────── */
-        .profile-auth-strip {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--space-4);
-            padding: var(--space-3) 0;
-            border-top: 0.5px solid var(--clr-surface-a20);
-            border-bottom: 0.5px solid var(--clr-surface-a20);
-            margin-bottom: var(--space-6);
-        }
-
-        .profile-auth-email {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a40);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ── Stats row ──────────────────────────────────────────── */
-        .profile-stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            margin-bottom: var(--space-6);
-        }
-
-        .profile-stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-1);
-            padding: 0 var(--space-2);
-            border-right: 0.5px solid var(--clr-surface-a20);
-            text-decoration: none;
-            transition: opacity var(--transition-fast);
-        }
-
-        .profile-stat-item:last-child {
-            border-right: none;
-        }
-
-        .profile-stat-item:hover {
-            opacity: 0.7;
-        }
-
-        .profile-stat-num {
-            font-family: var(--font-display);
-            font-size: var(--text-lg);
-            font-weight: 600;
-            color: var(--clr-light);
-            line-height: 1;
-        }
-
-        .profile-stat-lbl {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a40);
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        /* ── Badge rings ────────────────────────────────────────── */
-        .profile-rings-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-5) var(--space-3);
-            margin-bottom: var(--space-4);
-        }
-
-        .profile-ring-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-2);
-            width: calc(25% - var(--space-3));
-        }
-
-        .profile-ring-item.locked {
-            opacity: 0.28;
-        }
-
-        .profile-ring-svg {
-            width: 64px;
-            height: 64px;
-            display: block;
-            overflow: visible;
-        }
-
-        .ring-track {
-            fill: none;
-            stroke: var(--clr-surface-a10);
-            stroke-width: 2.5;
-        }
-
-        .ring-fill {
-            fill: none;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            transform: rotate(-90deg);
-            transform-origin: 32px 32px;
-        }
-
-        .ring-fill.earned {
-            stroke: var(--clr-primary-a0);
-        }
-
-        .ring-fill.complete {
-            stroke: var(--clr-ochre);
-        }
-
-        .ring-fill.locked {
-            stroke: var(--clr-surface-a20);
-        }
-
-        .profile-ring-name {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a40);
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        /* ── Next badge strip ───────────────────────────────────── */
-        .profile-next-strip {
-            display: flex;
-            align-items: center;
-            gap: var(--space-4);
-            padding: var(--space-4) 0;
-            border-top: 0.5px solid var(--clr-surface-a20);
-            margin-bottom: var(--space-6);
-        }
-
-        .profile-next-label {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a40);
-            white-space: nowrap;
-        }
-
-        .profile-next-track {
-            flex: 1;
-            height: 1.5px;
-            background: var(--clr-surface-a20);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .profile-next-fill {
-            height: 100%;
-            background: var(--clr-primary-a0);
-            border-radius: 2px;
-            transition: width var(--transition-slow);
-        }
-
-        .profile-next-count {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a40);
-            white-space: nowrap;
-        }
-
-        .profile-badges-complete {
-            font-family: var(--font-mono);
-            font-size: var(--text-sm);
-            color: var(--clr-surface-a40);
-            text-align: center;
-            padding: var(--space-4);
-            border: 1px dashed var(--clr-surface-a20);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-6);
-        }
-
-        /* Tooltip */
-        .ring-tip {
-            position: fixed;
-            bottom: var(--space-8);
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--clr-surface-tonal-a10);
-            border: 1px solid var(--clr-primary-a30);
-            border-radius: var(--radius-pill);
-            padding: var(--space-2) var(--space-5);
-            font-family: var(--font-mono);
-            font-size: var(--text-sm);
-            color: var(--clr-primary-a0);
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 200;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .ring-tip.show {
-            opacity: 1;
-        }
-    </style>
 </head>
 
 <body>
 
-    <header>
-    </header>
+    <header></header>
 
     <div class="page-content">
         <div class="ring-tip" id="ringTip"></div>
@@ -359,8 +61,8 @@
                 <a href="login.html" class="account-signin-btn" id="authAction">Sign in</a>
             </div>
 
-            <!-- Stats row -->
-            <div class="profile-stats-row">
+            <!-- Stats row — corner-tr and corner-bl injected by JS -->
+            <div class="profile-stats-row" id="profileStatsRow">
                 <a href="words.html?tag=all" class="profile-stat-item">
                     <span class="profile-stat-num" id="seenCount">—</span>
                     <span class="profile-stat-lbl">words studied</span>
@@ -419,24 +121,24 @@
         import { signOut } from '../js/auth.js';
         import { updateStreak, evaluateBadges, getNextBadgeProgress } from '../js/badges.js';
 
-        // ── Ring geometry ────────────────────────────────────────
+        /* ── Ring geometry ── */
         const RING_R = 26;
         const RING_C = 2 * Math.PI * RING_R;
         const AVG_R = 33;
         const AVG_C = 2 * Math.PI * AVG_R;
 
-        // ── Level thresholds ─────────────────────────────────────
+        /* ── Level thresholds ── */
         const LEVELS = [
-            { min: 25000, label: 'Fluent' },       // 500 words × 50
-            { min: 10000, label: 'Advanced' },     // 200 words × 50
-            { min: 2500, label: 'Intermediate' }, // 50 words × 50
+            { min: 25000, label: 'Fluent' },
+            { min: 10000, label: 'Advanced' },
+            { min: 2500, label: 'Intermediate' },
             { min: 0, label: 'Beginner' },
         ];
         function getLevel(n) {
             return (LEVELS.find(l => n >= l.min) || LEVELS[LEVELS.length - 1]).label;
         }
 
-        // ── Read localStorage ────────────────────────────────────
+        /* ── Read localStorage ── */
         const seenCounts = JSON.parse(localStorage.getItem('lexicon_seen') || '{}');
         const favourites = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
         const quizLog = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
@@ -445,18 +147,29 @@
         const fc = Array.isArray(favourites) ? favourites.length : 0;
         const qc = quizLog.length;
 
-        // ── Streak ───────────────────────────────────────────────
+        /* ── Streak ── */
         const streak = updateStreak();
 
-        // ── Populate stats ───────────────────────────────────────
+        /* ── Populate stats ── */
         document.getElementById('seenCount').textContent = sc;
         document.getElementById('streakDisplay').textContent = streak.current;
         document.getElementById('practiceCount').textContent = qc;
         document.getElementById('favCount').textContent = fc;
         document.getElementById('profileLevel').textContent = getLevel(weightedSeen);
 
-        // ── Avatar ring ──────────────────────────────────────────
-        // The ring encodes progress toward the next level threshold.
+        /* ── Corner bracket spans for stats row ──────────────────
+           CSS ::before/::after covers top-left and bottom-right.
+           JS injects top-right and bottom-left.
+        ── */
+        const statsRow = document.getElementById('profileStatsRow');
+        if (statsRow) {
+            const tr = document.createElement('span'); tr.className = 'corner-tr';
+            const bl = document.createElement('span'); bl.className = 'corner-bl';
+            statsRow.appendChild(tr);
+            statsRow.appendChild(bl);
+        }
+
+        /* ── Avatar ring ── */
         function buildAvatarRing(initial, photoURL, levelScore) {
             const nextThreshold = [...LEVELS].reverse().find(l => levelScore < l.min)?.min ?? LEVELS[0].min;
             const prevThreshold = LEVELS.find(l => l.min < nextThreshold)?.min ?? 0;
@@ -467,75 +180,52 @@
 
             document.getElementById('avatarRing').innerHTML = `
         <svg viewBox="0 0 80 80" width="80" height="80">
-            <!-- Track ring — behind everything -->
-            <circle cx="40" cy="40" r="${AVG_R}"
-                fill="none" stroke="var(--clr-surface-a10)" stroke-width="1.5"/>
-            <!-- Avatar clipped to circle — sits above track, below progress arc -->
-            <clipPath id="avatarClip">
-                <circle cx="40" cy="40" r="${AVG_R - 2}"/>
-            </clipPath>
-            ${photoURL
+          <circle cx="40" cy="40" r="${AVG_R}"
+            fill="none" stroke="var(--clr-surface-a10)" stroke-width="1.5"/>
+          <clipPath id="avatarClip">
+            <circle cx="40" cy="40" r="${AVG_R - 2}"/>
+          </clipPath>
+          ${photoURL
                     ? `<image href="${photoURL}" x="7" y="7" width="66" height="66"
-                    clip-path="url(#avatarClip)"
-                    preserveAspectRatio="xMidYMid slice"/>`
+                clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice"/>`
                     : `<text x="40" y="40" text-anchor="middle" dominant-baseline="central"
-                    font-family="Lora, serif" font-size="24" font-weight="600"
-                    fill="var(--clr-primary-a0)">${initial}</text>`
+                font-family="Lora, serif" font-size="24" font-weight="600"
+                fill="var(--clr-primary-a0)">${initial}</text>`
                 }
-            <!-- Progress arc — always on top -->
-            <circle cx="40" cy="40" r="${AVG_R}"
-                fill="none" stroke="var(--clr-primary-a0)" stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-dasharray="${AVG_C.toFixed(2)}"
-                stroke-dashoffset="${offset}"
-                transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="${AVG_R}"
+            fill="none" stroke="var(--clr-primary-a0)" stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-dasharray="${AVG_C.toFixed(2)}"
+            stroke-dashoffset="${offset}"
+            transform="rotate(-90 40 40)"/>
         </svg>`;
         }
 
-        // ── Badge rings ──────────────────────────────────────────
+        /* ── Badge rings ── */
         function buildRings() {
             const badges = evaluateBadges();
             const sl = streak.longest;
 
-            // Progress ratio (0–1) for each badge's ring fill
             const progressMap = {
-                words_10: Math.min(1, sc / 10),
-                words_25: Math.min(1, sc / 25),
-                words_50: Math.min(1, sc / 50),
-                words_100: Math.min(1, sc / 100),
-                words_250: Math.min(1, sc / 250),
-                streak_3: Math.min(1, sl / 3),
-                streak_7: Math.min(1, sl / 7),
-                streak_30: Math.min(1, sl / 30),
-                quiz_first: Math.min(1, qc),
-                quiz_10: Math.min(1, qc / 10),
-                quiz_score_80: 0,
-                quiz_perfect: 0,
+                words_10: Math.min(1, sc / 10), words_25: Math.min(1, sc / 25),
+                words_50: Math.min(1, sc / 50), words_100: Math.min(1, sc / 100),
+                words_250: Math.min(1, sc / 250), streak_3: Math.min(1, sl / 3),
+                streak_7: Math.min(1, sl / 7), streak_30: Math.min(1, sl / 30),
+                quiz_first: Math.min(1, qc), quiz_10: Math.min(1, qc / 10),
+                quiz_score_80: 0, quiz_perfect: 0,
                 explore_first_fav: Math.min(1, fc),
                 explore_fav_10: Math.min(1, fc / 10),
                 explore_first_word: Math.min(1, sc),
             };
 
-            // Number shown inside each ring
             const labelMap = {
-                words_10: sc,
-                words_25: sc,
-                words_50: sc,
-                words_100: sc,
-                words_250: sc,
-                streak_3: `${sl}d`,
-                streak_7: `${sl}d`,
-                streak_30: `${sl}d`,
-                quiz_first: qc,
-                quiz_10: qc,
-                quiz_score_80: '80%',
-                quiz_perfect: '100%',
-                explore_first_fav: fc,
-                explore_fav_10: fc,
-                explore_first_word: sc,
+                words_10: sc, words_25: sc, words_50: sc, words_100: sc, words_250: sc,
+                streak_3: `${sl}d`, streak_7: `${sl}d`, streak_30: `${sl}d`,
+                quiz_first: qc, quiz_10: qc,
+                quiz_score_80: '80%', quiz_perfect: '100%',
+                explore_first_fav: fc, explore_fav_10: fc, explore_first_word: sc,
             };
 
-            // Earned badges first, locked after
             const sorted = [
                 ...badges.filter(b => b.earned),
                 ...badges.filter(b => !b.earned),
@@ -546,63 +236,57 @@
                 const offset = (RING_C * (1 - pct)).toFixed(2);
                 const state = !badge.earned ? 'locked' : pct >= 1 ? 'complete' : 'earned';
                 const lbl = labelMap[badge.id] ?? '—';
-
                 return `
-    <div class="profile-ring-item${!badge.earned ? ' locked' : ''}"
-         data-tip="${badge.desc}"
-         onclick="showTip(this)">
-        <svg class="profile-ring-svg" viewBox="0 0 64 64">
-            <circle class="ring-track" cx="32" cy="32" r="${RING_R}"/>
-            <circle class="ring-fill ${state}"
-                cx="32" cy="32" r="${RING_R}"
-                stroke-dasharray="${RING_C.toFixed(2)}"
-                stroke-dashoffset="${offset}"/>
-            <text x="32" y="32"
-                text-anchor="middle" dominant-baseline="central"
-                font-family="Roboto Mono, monospace"
-                font-size="10"
+          <div class="profile-ring-item${!badge.earned ? ' locked' : ''}"
+               data-tip="${badge.desc}" onclick="showTip(this)">
+            <svg class="profile-ring-svg" viewBox="0 0 64 64">
+              <circle class="ring-track" cx="32" cy="32" r="${RING_R}"/>
+              <circle class="ring-fill ${state}" cx="32" cy="32" r="${RING_R}"
+                stroke-dasharray="${RING_C.toFixed(2)}" stroke-dashoffset="${offset}"/>
+              <text x="32" y="32" text-anchor="middle" dominant-baseline="central"
+                font-family="Roboto Mono, monospace" font-size="10"
                 fill="var(--clr-light)">${lbl}</text>
-        </svg>
-        <div class="profile-ring-name">${badge.name}</div>
-    </div>`;
+            </svg>
+            <div class="profile-ring-name">${badge.name}</div>
+          </div>`;
             }).join('');
         }
 
         buildRings();
 
-        // ── Next badge strip ─────────────────────────────────────
+        /* ── Next badge strip ── */
         const next = getNextBadgeProgress();
         document.getElementById('nextBadgeWrap').innerHTML = next ? `
-            <div class="profile-next-strip">
-                <div class="profile-next-label">next — ${next.badge.name}</div>
-                <div class="profile-next-track">
-                    <div class="profile-next-fill"
-                        style="width:${Math.min(100, Math.round(next.current / next.target * 100))}%">
-                    </div>
-                </div>
-                <div class="profile-next-count">${next.current} / ${next.target}</div>
-            </div>` : `
-            <div class="profile-badges-complete">
-                All badges earned — remarkable work.
-            </div>`;
+      <div class="profile-next-strip">
+        <div class="profile-next-label">next — ${next.badge.name}</div>
+        <div class="profile-next-track">
+          <div class="profile-next-fill"
+            style="width:${Math.min(100, Math.round(next.current / next.target * 100))}%">
+          </div>
+        </div>
+        <div class="profile-next-count">${next.current} / ${next.target}</div>
+      </div>` : `
+      <div class="profile-badges-complete">
+        All badges earned — remarkable work.
+      </div>`;
 
-        // ── Last practice card ───────────────────────────────────
+        /* ── Last practice ── */
         if (qc > 0) {
             const last = quizLog[0];
             const pct = last.pct ?? Math.round(last.score / last.total * 100);
             const barColour = pct >= 80 ? '#22946e' : pct >= 50 ? '#c49a2b' : '#b84040';
             document.getElementById('lastTestCard').innerHTML = `
-                <div class="last-test-mode">${last.mode}</div>
-                <div class="last-test-date">${last.date} · ${last.time}</div>
-                <div class="last-test-bar-track">
-                    <div class="last-test-bar-fill" style="width:${pct}%;background:${barColour};"></div>
-                </div>
-                <div class="last-test-score">${last.score} / ${last.total}
-                    &nbsp;<span class="last-test-pct">${pct}%</span>
-                </div>`;
+        <div class="last-test-mode">${last.mode}</div>
+        <div class="last-test-date">${last.date} · ${last.time}</div>
+        <div class="last-test-bar-track">
+          <div class="last-test-bar-fill" style="width:${pct}%;background:${barColour};"></div>
+        </div>
+        <div class="last-test-score">${last.score} / ${last.total}
+          &nbsp;<span class="last-test-pct">${pct}%</span>
+        </div>`;
         }
 
-        // ── About you ────────────────────────────────────────────
+        /* ── About you ── */
         const GOAL_LABELS = {
             culture_family: 'Connect with culture and family',
             elders: 'Learn to speak with Elders',
@@ -629,30 +313,30 @@
             if ((p.goals?.length) || p.level || p.identity) {
                 let html = '<div class="about-rows">';
                 if (p.goals?.length) html += `
-                    <div class="about-row">
-                        <span class="about-row-label">Why learning</span>
-                        <span class="about-row-value">${p.goals.map(g => GOAL_LABELS[g] || g).join(', ')}</span>
-                    </div>`;
+          <div class="about-row">
+            <span class="about-row-label">Why learning</span>
+            <span class="about-row-value">${p.goals.map(g => GOAL_LABELS[g] || g).join(', ')}</span>
+          </div>`;
                 if (p.level) html += `
-                    <div class="about-row">
-                        <span class="about-row-label">Level</span>
-                        <span class="about-row-value">${LEVEL_LABELS[p.level] || p.level}</span>
-                    </div>`;
+          <div class="about-row">
+            <span class="about-row-label">Level</span>
+            <span class="about-row-value">${LEVEL_LABELS[p.level] || p.level}</span>
+          </div>`;
                 if (p.identity) html += `
-                    <div class="about-row">
-                        <span class="about-row-label">Background</span>
-                        <span class="about-row-value">${IDENTITY_LABELS[p.identity] || p.identity}</span>
-                    </div>`;
+          <div class="about-row">
+            <span class="about-row-label">Background</span>
+            <span class="about-row-value">${IDENTITY_LABELS[p.identity] || p.identity}</span>
+          </div>`;
                 html += `</div>
-                    <a href="setup.html" class="about-edit-link"
-                        style="margin-top:var(--space-4);display:inline-block;">
-                        Edit answers →
-                    </a>`;
+          <a href="setup.html" class="about-edit-link"
+            style="margin-top:var(--space-4);display:inline-block;">
+            Edit answers →
+          </a>`;
                 document.getElementById('aboutCard').innerHTML = html;
             }
         }
 
-        // ── Auth state ───────────────────────────────────────────
+        /* ── Auth state ── */
         onAuthStateChanged(auth, user => {
             if (user) {
                 const name = user.displayName || 'Learner';
@@ -672,16 +356,18 @@
                     `<button class="account-signout-btn" id="signOutBtn">Sign out</button>`;
                 document.getElementById('signOutBtn').addEventListener('click', signOut);
 
-                buildAvatarRing(initial, user.photoURL || null);
+                buildAvatarRing(initial, user.photoURL || null, weightedSeen);
             } else {
                 document.getElementById('profileName').textContent = 'Learner';
                 document.getElementById('authEmail').textContent =
                     'Not signed in — progress saved on this device only.';
-                buildAvatarRing('?', null);
+                buildAvatarRing('?', null, 0);
             }
         });
     </script>
+
     <script type="module" src="/js/nav.js"></script>
+
 </body>
 
 </html>

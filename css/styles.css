@@ -201,7 +201,6 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 /* Home page overrides — tighter top, no bottom padding */
@@ -349,21 +348,15 @@ header {
   background: rgba(0, 0, 0, 0.08);
 }
 
-/* Home page — sign in button appears before hamburger
+/* Home page — sign in button appears before hamburger */
 .page-home .show-menu {
   order: 3;
 }
 
 .page-home .nav-auth {
   order: 2;
-} */
-.show-menu {
-  order: 3;
 }
 
-.nav-auth {
-  order: 2;
-}
 
 /* =============================================================
    6. WORD CARDS
@@ -1013,8 +1006,9 @@ a.pos-badge:hover {
 }
 
 .chip:hover {
-  border-color: var(--clr-primary-a30);
-  color: var(--clr-primary-a40);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
+  background: rgba(184, 115, 51, 0.08);
 }
 
 .chip.on {
@@ -1063,9 +1057,13 @@ a.pos-badge:hover {
 }
 
 .mode-card:hover {
-  border-color: var(--clr-primary-a30);
-  background: rgba(201, 175, 194, 0.05);
+  border-color: var(--clr-ochre);
+  background: rgba(184, 115, 51, 0.08);
   transform: translateY(-1px);
+}
+
+.mode-card:hover .mode-name {
+  color: var(--clr-ochre);
 }
 
 .mode-card:active {
@@ -1111,8 +1109,12 @@ a.pos-badge:hover {
 }
 
 .shuffle-card:hover {
-  background: rgba(201, 175, 194, 0.12);
-  border-color: var(--clr-primary-a0);
+  background: rgba(184, 115, 51, 0.12);
+  border-color: var(--clr-ochre);
+}
+
+.shuffle-card:hover .mode-name {
+  color: var(--clr-ochre);
 }
 
 .also-row {
@@ -1135,8 +1137,9 @@ a.pos-badge:hover {
 }
 
 .also-link:hover {
-  border-color: var(--clr-primary-a30);
-  color: var(--clr-primary-a40);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
+  background: rgba(184, 115, 51, 0.08);
 }
 
 .quiz-topbar {
@@ -1447,7 +1450,9 @@ a.pos-badge:hover {
 }
 
 .btn-next:hover {
-  background: rgba(201, 175, 194, 0.08);
+  background: rgba(184, 115, 51, 0.08);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
 }
 
 .btn-next:active {
@@ -1550,8 +1555,9 @@ a.pos-badge:hover {
 }
 
 .btn-ghost:hover {
-  border-color: var(--clr-primary-a30);
-  color: var(--clr-primary-a40);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
+  background: rgba(184, 115, 51, 0.08);
 }
 
 .quiz-log-header {
@@ -1743,6 +1749,9 @@ a.pos-badge:hover {
 
 /* =============================================================
    14. PROFILE PAGE
+   All profile styles live here — extracted from profile.html.
+   Stats row uses corner bracket closure (Gestalt, matches home).
+   Last practice and About you use editorial corner style.
    ============================================================= */
 
 .profile-wrap {
@@ -1878,6 +1887,373 @@ a.pos-badge:hover {
   color: var(--clr-surface-a50);
 }
 
+/* ── Page title ── */
+.profile-page-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a20);
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+/* ── Identity block ── */
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.profile-avatar-ring {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.profile-avatar-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 80px;
+  height: 80px;
+}
+
+.profile-avatar-inner {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: var(--clr-surface-tonal-a0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--clr-primary-a0);
+}
+
+.profile-avatar-photo {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-identity-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--clr-light);
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.profile-identity-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.profile-level-pill {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-primary-a0);
+  border: 0.5px solid var(--clr-primary-a0);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+}
+
+.profile-meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--clr-surface-a20);
+}
+
+.profile-meta-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  letter-spacing: 0.04em;
+}
+
+/* ── Auth strip ── */
+.profile-auth-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 0.5px solid var(--clr-surface-a20);
+  border-bottom: 0.5px solid var(--clr-surface-a20);
+  margin-bottom: var(--space-6);
+}
+
+.profile-auth-email {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Stats row — corner bracket closure (matches home page) ──
+   Four mauve corner marks imply a container without a full border.
+   corner-tr and corner-bl spans are injected by JS.
+── */
+.profile-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  position: relative;
+  padding: var(--space-4) var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.profile-stats-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--clr-primary-a0);
+  border-left: 1px solid var(--clr-primary-a0);
+}
+
+.profile-stats-row::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--clr-primary-a0);
+  border-right: 1px solid var(--clr-primary-a0);
+}
+
+.profile-stats-row .corner-tr {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--clr-primary-a0);
+  border-right: 1px solid var(--clr-primary-a0);
+  pointer-events: none;
+}
+
+.profile-stats-row .corner-bl {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--clr-primary-a0);
+  border-left: 1px solid var(--clr-primary-a0);
+  pointer-events: none;
+}
+
+.profile-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-right: 0.5px solid var(--clr-surface-a20);
+  border-radius: 0;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.profile-stat-item:last-child {
+  border-right: none;
+}
+
+.profile-stat-item:hover {
+  opacity: 1;
+}
+
+.profile-stat-item:hover .profile-stat-num {
+  color: var(--clr-ochre);
+}
+
+.profile-stat-item:hover .profile-stat-lbl {
+  color: var(--clr-ochre);
+  opacity: 0.7;
+}
+
+.profile-stat-num {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--clr-light);
+  line-height: 1;
+}
+
+.profile-stat-lbl {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Badge rings ── */
+.profile-rings-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5) var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.profile-ring-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: calc(25% - var(--space-3));
+}
+
+.profile-ring-item.locked {
+  opacity: 0.28;
+}
+
+.profile-ring-item:not(.locked) {
+  cursor: pointer;
+}
+
+.profile-ring-item:not(.locked):hover .profile-ring-name {
+  color: var(--clr-ochre);
+}
+
+.profile-ring-svg {
+  width: 64px;
+  height: 64px;
+  display: block;
+  overflow: visible;
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--clr-surface-a10);
+  stroke-width: 2.5;
+}
+
+.ring-fill {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 32px 32px;
+}
+
+.ring-fill.earned {
+  stroke: var(--clr-primary-a0);
+}
+
+.ring-fill.complete {
+  stroke: var(--clr-ochre);
+}
+
+.ring-fill.locked {
+  stroke: var(--clr-surface-a20);
+}
+
+.profile-ring-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Next badge strip ── */
+.profile-next-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-top: 0.5px solid var(--clr-surface-a20);
+  margin-bottom: var(--space-6);
+}
+
+.profile-next-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--clr-surface-a40);
+  white-space: nowrap;
+}
+
+.profile-next-track {
+  flex: 1;
+  height: 1.5px;
+  background: var(--clr-surface-a20);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.profile-next-fill {
+  height: 100%;
+  background: var(--clr-primary-a0);
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+.profile-next-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  white-space: nowrap;
+}
+
+.profile-badges-complete {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-surface-a40);
+  text-align: center;
+  padding: var(--space-4);
+  border: 1px dashed var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-6);
+}
+
+/* ── Tooltip ── */
+.ring-tip {
+  position: fixed;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--clr-surface-tonal-a10);
+  border: 1px solid var(--clr-primary-a30);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--clr-primary-a0);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ring-tip.show {
+  opacity: 1;
+}
+
+/* ── Section label ── */
 .profile-section-label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1887,6 +2263,7 @@ a.pos-badge:hover {
   margin-bottom: calc(-1 * var(--space-3));
 }
 
+/* ── Quick links ── */
 .profile-links {
   display: flex;
   flex-wrap: wrap;
@@ -1908,15 +2285,50 @@ a.pos-badge:hover {
 }
 
 .profile-link-btn:hover {
-  border-color: var(--clr-primary-a30);
-  color: var(--clr-primary-a40);
+  border-color: var(--clr-ochre);
+  color: var(--clr-ochre);
+  background: rgba(184, 115, 51, 0.08);
 }
 
+/* ── Last practice & About you — editorial style ──────────────
+   No filled background. Corner brackets give structure without
+   a heavy card. Consistent with the WOTD section on the home page.
+── */
+.profile-last-test,
 .profile-about-card {
-  background: var(--clr-surface-tonal-a0);
-  border: 1px solid var(--clr-surface-a20);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-5) var(--space-2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.profile-last-test::before,
+.profile-about-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 0.5px solid var(--clr-surface-a20);
+  border-left: 0.5px solid var(--clr-surface-a20);
+}
+
+.profile-last-test::after,
+.profile-about-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 0.5px solid var(--clr-surface-a20);
+  border-right: 0.5px solid var(--clr-surface-a20);
 }
 
 .about-empty {
@@ -2581,7 +2993,7 @@ a.pos-badge:hover {
   gap: var(--space-6);
   max-width: 520px;
   width: 100%;
-  margin: 4rem auto auto;
+  margin: 0 auto;
   position: relative;
 }
 
@@ -2931,7 +3343,9 @@ a.pos-badge:hover {
   text-align: center;
 }
 
-/* Sign-in prompt */
+/* Sign-in prompt — shown when signed out in place of stats.
+   Pulses border to ochre twice on load then settles.
+   Replaced by real stats with corner brackets once signed in. */
 .home-signin-prompt {
   display: flex;
   align-items: center;
@@ -2940,7 +3354,25 @@ a.pos-badge:hover {
   padding: var(--space-5);
   border: 1px solid var(--clr-surface-a20);
   border-radius: var(--radius-md);
-  animation: fadeUp 0.55s ease 0.28s both;
+  animation: fadeUp 0.55s ease 0.28s both, promptPulse 2.5s ease 1.5s 2;
+}
+
+@keyframes promptPulse {
+  0% {
+    border-color: var(--clr-surface-a20);
+  }
+
+  40% {
+    border-color: var(--clr-ochre);
+  }
+
+  60% {
+    border-color: var(--clr-ochre);
+  }
+
+  100% {
+    border-color: var(--clr-surface-a20);
+  }
 }
 
 .home-signin-prompt-text {
