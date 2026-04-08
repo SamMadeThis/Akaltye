@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <!--
-  practice.html — Practice & Quiz page for ALKATYE
-
-  WHAT: Single page combining the practice hub and all quiz modes.
-  HOW:  Three screens toggled by JS (.active class):
-          #modeScreen  — mode picker with filters + recent log
-          #quizScreen  — active question with progress bar
-          #scoreScreen — final result with replay actions
-  WHY:  Merging practice + quiz removes a navigation step.
-
-  FILES NEEDED:
-    styles.css   — global tokens, nav, layout
-    practice.js  — all quiz logic (imports WORDS from words-service.js)
+  practice.html — Practice & Quiz page for AKALTYE
+  Redesigned using NN/G visual design principles:
+    Scale       — Game Shuffle is visually primary (ochre CTA)
+    Hierarchy   — heading → word count → filters → action
+    Balance     — inline filter labels balance chips on right
+    Contrast    — ochre shuffle button anchors the action zone
+    Gestalt     — filters grouped inline, modes in editorial list
 -->
 <html lang="en">
 
@@ -33,6 +28,176 @@
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <title>AKALTYE — Practice</title>
+    <style>
+        /* ── Filter rows — inline label + chips ── */
+        .filter-row {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+        }
+
+        .filter-row-label {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--clr-surface-a40);
+            width: 52px;
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+
+        .filter-row-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            flex: 1;
+        }
+
+        /* ── Mode list — editorial rows ── */
+        .mode-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mode-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            padding: var(--space-3) 0;
+            border-bottom: 0.5px solid var(--clr-surface-a10);
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity var(--transition-fast);
+        }
+
+        .mode-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .mode-list-item:hover {
+            opacity: 1;
+        }
+
+        .mode-list-item:hover .mode-list-name {
+            color: var(--clr-ochre);
+        }
+
+        .mode-list-item:hover .mode-list-arrow {
+            color: var(--clr-ochre);
+        }
+
+        .mode-list-item:hover .mode-list-icon-wrap {
+            border-color: var(--clr-ochre);
+        }
+
+        .mode-list-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .mode-list-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 0.5px solid var(--clr-surface-a20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: border-color var(--transition-fast);
+        }
+
+        .mode-list-name {
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 500;
+            color: var(--clr-light);
+            margin-bottom: 2px;
+            transition: color var(--transition-fast);
+        }
+
+        .mode-list-desc {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            letter-spacing: 0.02em;
+        }
+
+        .mode-list-arrow {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a30);
+            flex-shrink: 0;
+            transition: color var(--transition-fast);
+        }
+
+        /* ── Shuffle CTA ── */
+        .shuffle-cta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
+            background: var(--clr-ochre);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: background var(--transition-fast), transform 0.1s ease;
+        }
+
+        .shuffle-cta:hover {
+            background: #c97d38;
+        }
+
+        .shuffle-cta:active {
+            transform: scale(0.98);
+        }
+
+        .shuffle-cta-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .shuffle-cta-name {
+            font-family: var(--font-display);
+            font-size: var(--text-md);
+            font-weight: 600;
+            color: #1a0a00;
+        }
+
+        .shuffle-cta-desc {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: rgba(26, 10, 0, 0.6);
+            letter-spacing: 0.04em;
+        }
+
+        .shuffle-cta-arr {
+            font-size: var(--text-md);
+            color: #1a0a00;
+            flex-shrink: 0;
+        }
+
+        /* ── Word count summary ── */
+        .practice-summary {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            letter-spacing: 0.06em;
+        }
+
+        .practice-summary strong {
+            color: var(--clr-primary-a0);
+            font-weight: 400;
+        }
+    </style>
 </head>
 
 <body>
@@ -43,100 +208,122 @@
         <div class="practice-wrap">
 
             <!-- ═══════════════════════════════════════════
-                 SCREEN 1 — MODE PICKER
-                 ═══════════════════════════════════════════ -->
+           SCREEN 1 — MODE PICKER
+           ═══════════════════════════════════════════ -->
             <div class="screen active" id="modeScreen">
 
+                <!-- Heading -->
                 <div>
                     <div class="practice-heading">Practice.<span> ✦</span></div>
-                    <div class="practice-sub">choose a quiz mode to begin</div>
+                    <div class="practice-summary" id="practiceSummary">choose your filters then pick a mode</div>
                 </div>
 
-                <!-- Filter row 1 — Lexicon group -->
-                <div>
-                    <div class="filter-label">
-                        Lexicon group
-                        <span class="filter-count" id="filterCount"></span>
-                    </div>
-                    <div class="chip-row" id="groupChips">
-                        <div class="chip on" data-group="all">All</div>
-                        <div class="chip" data-group="people">People</div>
-                        <div class="chip" data-group="country">Country</div>
-                        <div class="chip" data-group="emotions">Emotions</div>
-                        <div class="chip" data-group="body">Body</div>
-                        <div class="chip" data-group="language">Language</div>
-                        <div class="chip" data-group="daily life">Daily Life</div>
-                        <div class="chip" data-group="culture">Culture</div>
-                        <div class="chip" data-group="cheeky">Cheeky</div>
-                    </div>
-                    <div class="chip-row chip-row--sub" id="subtagChips" style="display:none; margin-top:6px">
-                        <div class="chip chip--sub on" data-tag="all-sub" id="allSubChip">All in group</div>
-                    </div>
-                </div>
+                <!-- ── Filter rows — compact inline layout ── -->
+                <div style="display:flex;flex-direction:column;gap:var(--space-4);">
 
-                <!-- Filter row 2 — Level -->
-                <div>
-                    <div class="filter-label">Level</div>
-                    <div class="chip-row" id="levelChips">
-                        <div class="chip on" data-level="all">All levels</div>
-                        <div class="chip" data-level="beginner">Beginner</div>
-                        <div class="chip" data-level="intermediate">Intermediate</div>
-                        <div class="chip" data-level="advanced">Advanced</div>
-                    </div>
-                </div>
-
-                <!-- Filter row 3 — Part of speech -->
-                <div>
-                    <div class="filter-label">Part of speech</div>
-                    <div class="chip-row" id="posChips">
-                        <div class="chip on" data-pos="all">All</div>
-                        <div class="chip" data-pos="noun">Noun</div>
-                        <div class="chip" data-pos="verb">Verb</div>
-                        <div class="chip" data-pos="adjective">Adjective</div>
-                        <div class="chip" data-pos="interjection">Interjection</div>
-                    </div>
-                </div>
-
-                <!-- Filter row 4 — Seen / unseen -->
-                <div>
-                    <div class="filter-label">Study set</div>
-                    <div class="chip-row">
-                        <div class="chip seen-chip" id="seenOnlyChip">Seen words only</div>
-                        <div class="chip" id="unseenOnlyChip">Unseen words only</div>
-                    </div>
-                </div>
-
-                <!-- Quiz mode cards -->
-                <div class="mode-grid">
-                    <div class="mode-card" data-mode="guess">
-                        <i class="fa-solid fa-question"></i>
-                        <div class="mode-name">Guess the Word</div>
-                        <div class="mode-desc">See the English meaning — pick the Arrernte word</div>
-                    </div>
-                    <div class="mode-card" data-mode="meaning">
-                        <i class="fa-solid fa-book-open"></i>
-                        <div class="mode-name">Meaning Match</div>
-                        <div class="mode-desc">See the Arrernte word — pick the correct meaning</div>
-                    </div>
-                    <div class="mode-card" data-mode="gap">
-                        <i class="fa-solid fa-pencil"></i>
-                        <div class="mode-name">Fill the Gap</div>
-                        <div class="mode-desc">Complete the sentence with the missing word</div>
-                    </div>
-                    <div class="mode-card" data-mode="match">
-                        <i class="fa-solid fa-link"></i>
-                        <div class="mode-name">Match Synonym</div>
-                        <div class="mode-desc">Tap to pair Arrernte words with their meanings</div>
-                    </div>
-                    <div class="mode-card shuffle-card" data-mode="shuffle">
-                        <i class="fa-solid fa-dice"></i>
-                        <div>
-                            <div class="mode-name">Try Game Shuffle</div>
-                            <div class="mode-desc">A mix of all four quiz types in one session</div>
+                    <!-- Group -->
+                    <div class="filter-row">
+                        <div class="filter-row-label">Group</div>
+                        <div class="filter-row-chips" id="groupChips">
+                            <div class="chip on" data-group="all">All</div>
+                            <div class="chip" data-group="people">People</div>
+                            <div class="chip" data-group="country">Country</div>
+                            <div class="chip" data-group="emotions">Emotions</div>
+                            <div class="chip" data-group="body">Body</div>
+                            <div class="chip" data-group="language">Language</div>
+                            <div class="chip" data-group="daily life">Daily life</div>
+                            <div class="chip" data-group="culture">Culture</div>
+                            <div class="chip" data-group="cheeky">Cheeky</div>
                         </div>
                     </div>
+
+                    <!-- Level -->
+                    <div class="filter-row">
+                        <div class="filter-row-label">Level</div>
+                        <div class="filter-row-chips" id="levelChips">
+                            <div class="chip on" data-level="all">All</div>
+                            <div class="chip" data-level="beginner">Beginner</div>
+                            <div class="chip" data-level="intermediate">Intermediate</div>
+                            <div class="chip" data-level="advanced">Advanced</div>
+                        </div>
+                    </div>
+
+                    <!-- Study set -->
+                    <div class="filter-row">
+                        <div class="filter-row-label">Study</div>
+                        <div class="filter-row-chips">
+                            <div class="chip" id="seenOnlyChip">Seen only</div>
+                            <div class="chip" id="unseenOnlyChip">Unseen only</div>
+                        </div>
+                    </div>
+
                 </div>
 
+                <!-- Word count -->
+                <div class="practice-summary" id="filterCount"></div>
+
+                <!-- ── Game Shuffle — primary CTA (scale + contrast) ── -->
+                <button class="shuffle-cta" id="shuffleBtn">
+                    <div class="shuffle-cta-left">
+                        <span class="shuffle-cta-name">Try Game Shuffle</span>
+                        <span class="shuffle-cta-desc">A mix of all four quiz types in one session</span>
+                    </div>
+                    <span class="shuffle-cta-arr">→</span>
+                </button>
+
+                <!-- ── Mode list — editorial rows ── -->
+                <div class="mode-list">
+                    <div class="mode-list-item" data-mode="guess">
+                        <div class="mode-list-left">
+                            <div class="mode-list-icon-wrap">
+                                <i class="fa-solid fa-question"></i>
+                            </div>
+                            <div>
+                                <div class="mode-list-name">Guess the Word</div>
+                                <div class="mode-list-desc">See the English meaning — pick the Arrernte word</div>
+                            </div>
+                        </div>
+                        <span class="mode-list-arrow">→</span>
+                    </div>
+                    <div class="mode-list-item" data-mode="meaning">
+                        <div class="mode-list-left">
+                            <div class="mode-list-icon-wrap">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div>
+                                <div class="mode-list-name">Meaning Match</div>
+                                <div class="mode-list-desc">See the Arrernte word — pick the correct meaning</div>
+                            </div>
+                        </div>
+                        <span class="mode-list-arrow">→</span>
+                    </div>
+                    <div class="mode-list-item" data-mode="gap">
+                        <div class="mode-list-left">
+                            <div class="mode-list-icon-wrap">
+                                <i class="fa-solid fa-pencil"></i>
+                            </div>
+                            <div>
+                                <div class="mode-list-name">Fill the Gap</div>
+                                <div class="mode-list-desc">Complete the sentence with the missing word</div>
+                            </div>
+                        </div>
+                        <span class="mode-list-arrow">→</span>
+                    </div>
+                    <div class="mode-list-item" data-mode="match">
+                        <div class="mode-list-left">
+                            <div class="mode-list-icon-wrap">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                            <div>
+                                <div class="mode-list-name">Match Synonym</div>
+                                <div class="mode-list-desc">Tap to pair Arrernte words with their meanings</div>
+                            </div>
+                        </div>
+                        <span class="mode-list-arrow">→</span>
+                    </div>
+                </div>
+
+                <!-- Also -->
                 <div>
                     <div class="filter-label">Also</div>
                     <div class="also-row">
@@ -149,6 +336,7 @@
                     </div>
                 </div>
 
+                <!-- Recent quizzes -->
                 <div>
                     <div class="quiz-log-header">Recent quizzes</div>
                     <div id="quizLogContainer"></div>
@@ -158,8 +346,8 @@
 
 
             <!-- ═══════════════════════════════════════════
-                 SCREEN 2 — ACTIVE QUIZ
-                 ═══════════════════════════════════════════ -->
+           SCREEN 2 — ACTIVE QUIZ
+           ═══════════════════════════════════════════ -->
             <div class="screen" id="quizScreen">
 
                 <div class="quiz-topbar">
@@ -213,8 +401,8 @@
 
 
             <!-- ═══════════════════════════════════════════
-                 SCREEN 3 — SCORE
-                 ═══════════════════════════════════════════ -->
+           SCREEN 3 — SCORE
+           ═══════════════════════════════════════════ -->
             <div class="screen" id="scoreScreen">
                 <div class="score-wrap">
                     <div class="score-big" id="scoreBig">0 <span>/ 0</span></div>
@@ -236,67 +424,63 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const GROUP_SUBTAGS = {
-            'people': ['family', 'people', 'interaction', 'communication', 'classroom', 'command'],
-            'country': ['nature', 'animals', 'plants', 'weather', 'country', 'place names', 'travel'],
-            'emotions': ['emotion', 'states', 'thinking'],
-            'body': ['body'],
-            'language': ['verb', 'grammar', 'pronoun', 'describing', 'quantity', 'location', 'movement', 'colour'],
-            'daily life': ['food', 'objects', 'time'],
-            'culture': ['culture', 'spiritual'],
-            'cheeky': ['cheeky', 'fun'],
-        };
+        /* ── Filter chip wiring ── */
+        let selGroup = 'all';
+        let selLevel = 'all';
+        let seenOnly = false;
+        let unseenOnly = false;
 
-        const TAG_LABELS = {
-            'family': 'Family', 'people': 'People', 'interaction': 'Interaction',
-            'communication': 'Communication', 'classroom': 'Classroom', 'command': 'Commands',
-            'nature': 'Nature', 'animals': 'Animals', 'plants': 'Plants',
-            'weather': 'Weather', 'country': 'Country', 'place names': 'Place Names', 'travel': 'Travel',
-            'emotion': 'Emotion', 'states': 'States', 'thinking': 'Thinking',
-            'body': 'Body',
-            'verb': 'Verbs', 'grammar': 'Grammar', 'pronoun': 'Pronouns',
-            'describing': 'Describing', 'quantity': 'Quantity', 'location': 'Location',
-            'movement': 'Movement', 'colour': 'Colour',
-            'food': 'Food', 'objects': 'Objects', 'time': 'Time',
-            'culture': 'Culture', 'spiritual': 'Spiritual',
-            'cheeky': 'Cheeky', 'fun': 'Fun',
-        };
+        function setActive(row, el) {
+            row.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+            el.classList.add('on');
+        }
 
-        const subtagRow = document.getElementById('subtagChips');
-        const allSubChip = document.getElementById('allSubChip');
-
-        document.querySelectorAll('#groupChips .chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const group = chip.dataset.group;
-                document.querySelectorAll('#groupChips .chip').forEach(c => c.classList.remove('on'));
-                chip.classList.add('on');
-
-                if (group === 'all') {
-                    subtagRow.style.display = 'none';
-                    return;
-                }
-
-                const tags = GROUP_SUBTAGS[group] || [];
-                subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.remove());
-                tags.forEach(tag => {
-                    const c = document.createElement('div');
-                    c.className = 'chip chip--sub';
-                    c.dataset.tag = tag;
-                    c.textContent = TAG_LABELS[tag] || tag;
-                    subtagRow.appendChild(c);
-                });
-
-                allSubChip.classList.add('on');
-                subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.classList.remove('on'));
-                subtagRow.style.display = 'flex';
-            });
+        document.getElementById('groupChips').addEventListener('click', e => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            selGroup = chip.dataset.group;
+            setActive(document.getElementById('groupChips'), chip);
+            if (window.updateFilterCount) window.updateFilterCount();
         });
 
-        subtagRow.addEventListener('click', e => {
-            const chip = e.target.closest('.chip--sub');
+        document.getElementById('levelChips').addEventListener('click', e => {
+            const chip = e.target.closest('.chip');
             if (!chip) return;
-            subtagRow.querySelectorAll('.chip--sub').forEach(c => c.classList.remove('on'));
-            chip.classList.add('on');
+            selLevel = chip.dataset.level;
+            setActive(document.getElementById('levelChips'), chip);
+            if (window.updateFilterCount) window.updateFilterCount();
+        });
+
+        document.getElementById('seenOnlyChip').addEventListener('click', function () {
+            seenOnly = !seenOnly;
+            if (seenOnly) { unseenOnly = false; document.getElementById('unseenOnlyChip').classList.remove('on'); }
+            this.classList.toggle('on', seenOnly);
+            if (window.updateFilterCount) window.updateFilterCount();
+        });
+
+        document.getElementById('unseenOnlyChip').addEventListener('click', function () {
+            unseenOnly = !unseenOnly;
+            if (unseenOnly) { seenOnly = false; document.getElementById('seenOnlyChip').classList.remove('on'); }
+            this.classList.toggle('on', unseenOnly);
+            if (window.updateFilterCount) window.updateFilterCount();
+        });
+
+        /* Expose filter state to practice.js */
+        window.getSelGroup = () => selGroup;
+        window.getSelLevel = () => selLevel;
+        window.getSeenOnly = () => seenOnly;
+        window.getUnseenOnly = () => unseenOnly;
+
+        /* Shuffle button */
+        document.getElementById('shuffleBtn').addEventListener('click', () => {
+            if (window.startQuiz) window.startQuiz('shuffle');
+        });
+
+        /* Mode list items */
+        document.querySelectorAll('.mode-list-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.startQuiz) window.startQuiz(item.dataset.mode);
+            });
         });
     </script>
 

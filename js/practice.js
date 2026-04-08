@@ -102,81 +102,42 @@ function renderQuizLog() {
 
 /* =============================================================
    FILTER STATE
+   Reads from globals set by practice.html's inline script.
+   Simplified to group, level, seen/unseen only.
    ============================================================= */
 
-let selGroup   = 'all';
-let selTag     = 'all-sub';
-let selLevel   = 'all';
-let selPos     = 'all';
-let seenOnly   = false;
-let unseenOnly = false;
-
 function getFiltered() {
-  const seen = getSeenCounts();
+  const seen       = getSeenCounts();
+  const selGroup   = window.getSelGroup   ? window.getSelGroup()   : 'all';
+  const selLevel   = window.getSelLevel   ? window.getSelLevel()   : 'all';
+  const seenOnly   = window.getSeenOnly   ? window.getSeenOnly()   : false;
+  const unseenOnly = window.getUnseenOnly ? window.getUnseenOnly() : false;
+
   return WORDS.filter(w => {
     const groupOk  = selGroup === 'all' || (w.groups && w.groups.includes(selGroup));
-    const tagOk    = selTag === 'all-sub' || (w.tags && w.tags.includes(selTag));
-    const levelOk  = selLevel === 'all' || (w.tags && w.tags.includes(selLevel));
-    const posOk    = selPos === 'all' || w.pos === selPos;
+    const levelOk  = selLevel === 'all' || (w.tags   && w.tags.includes(selLevel));
     const seenOk   = !seenOnly   || !!seen[w.word];
     const unseenOk = !unseenOnly || !seen[w.word];
-    return groupOk && tagOk && levelOk && posOk && seenOk && unseenOk;
+    return groupOk && levelOk && seenOk && unseenOk;
   });
 }
 
 function updateFilterCount() {
-  const count = getFiltered().length;
-  const el    = $('filterCount');
-  if (el) el.textContent = `· ${count} word${count !== 1 ? 's' : ''}`;
+  const count    = getFiltered().length;
+  const selGroup = window.getSelGroup ? window.getSelGroup() : 'all';
+  const selLevel = window.getSelLevel ? window.getSelLevel() : 'all';
+  const el       = document.getElementById('filterCount');
+  if (el) {
+    const parts = [];
+    if (selGroup !== 'all') parts.push(selGroup);
+    if (selLevel !== 'all') parts.push(selLevel);
+    el.textContent = parts.length
+      ? `${parts.join(' · ')} · ${count} words`
+      : `${count} words — choose a mode to begin`;
+  }
 }
 
-
-/* =============================================================
-   FILTER CHIP WIRING
-   ============================================================= */
-
-document.querySelectorAll('#groupChips .chip').forEach(c => c.addEventListener('click', () => {
-  selGroup = c.dataset.group;
-  selTag   = 'all-sub';
-  updateFilterCount();
-}));
-
-document.getElementById('subtagChips').addEventListener('click', e => {
-  const chip = e.target.closest('.chip--sub');
-  if (!chip) return;
-  selTag = chip.id === 'allSubChip' ? 'all-sub' : (chip.dataset.tag || 'all-sub');
-  updateFilterCount();
-});
-
-document.querySelectorAll('#levelChips .chip').forEach(c => c.addEventListener('click', () => {
-  document.querySelectorAll('#levelChips .chip').forEach(x => x.classList.remove('on'));
-  c.classList.add('on');
-  selLevel = c.dataset.level;
-  updateFilterCount();
-}));
-
-document.querySelectorAll('#posChips .chip').forEach(c => c.addEventListener('click', () => {
-  document.querySelectorAll('#posChips .chip').forEach(x => x.classList.remove('on'));
-  c.classList.add('on');
-  selPos = c.dataset.pos;
-  updateFilterCount();
-}));
-
-$('seenOnlyChip').addEventListener('click', () => {
-  seenOnly = !seenOnly;
-  if (seenOnly) unseenOnly = false;
-  $('seenOnlyChip').classList.toggle('on', seenOnly);
-  $('unseenOnlyChip').classList.remove('on');
-  updateFilterCount();
-});
-
-$('unseenOnlyChip').addEventListener('click', () => {
-  unseenOnly = !unseenOnly;
-  if (unseenOnly) seenOnly = false;
-  $('unseenOnlyChip').classList.toggle('on', unseenOnly);
-  $('seenOnlyChip').classList.remove('on');
-  updateFilterCount();
-});
+window.updateFilterCount = updateFilterCount;
 
 
 /* =============================================================
@@ -298,6 +259,7 @@ function buildQuestions(pool, mode) {
    ============================================================= */
 
 function startQuiz(mode) {
+  window.startQuiz = startQuiz; /* ensure exposed before first call */
   const pool = getFiltered();
   if (pool.length < 2) {
     showToast('Need at least 2 words — adjust filters');
@@ -548,6 +510,8 @@ $('backToModeBtn').addEventListener('click', goHome);
     console.error('practice.js: no words loaded — check Firestore connection');
     return;
   }
+  /* Expose startQuiz so practice.html inline script can call it */
+  window.startQuiz = startQuiz;
   renderQuizLog();
   updateFilterCount();
 })();
