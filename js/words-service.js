@@ -27,7 +27,7 @@
 
 import { db } from './firebase-config.js';
 import {
-  collection, getDocs, query, where, orderBy
+  collection, getDocs, query, where
 } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 
 const CACHE_KEY = 'akaltye_words_cache';
@@ -57,21 +57,21 @@ export async function getWords() {
   try {
     const q    = query(
       collection(db, 'words'),
-      where('published', '==', true),
-      orderBy('word', 'asc')
+      where('published', '==', true)
     );
     const snap = await getDocs(q);
     const words = snap.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      /* Ensure arrays are always arrays even if Firestore
-         returns a missing field as undefined */
       definition: doc.data().definition || [],
       tags:       doc.data().tags       || [],
       groups:     doc.data().groups     || [],
       examples:   doc.data().examples   || [],
       notes:      doc.data().notes      || '',
     }));
+
+    /* Sort client-side — avoids needing a Firestore composite index */
+    words.sort((a, b) => a.word.localeCompare(b.word));
 
     /* Cache in sessionStorage */
     try {
