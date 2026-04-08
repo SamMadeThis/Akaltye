@@ -723,7 +723,6 @@
                             <option value="daily life">Daily life</option>
                             <option value="culture">Culture</option>
                             <option value="cheeky">Cheeky</option>
-                            <option value="rude">Rude</option>
                         </select>
                         <select class="admin-select" id="wordFilterLevel">
                             <option value="">All levels</option>
@@ -934,7 +933,7 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
         import {
-            getFirestore, collection, getDocs, addDoc, updateDoc,
+            getFirestore, collection, getDocs, getDoc, addDoc, updateDoc,
             deleteDoc, doc, query, orderBy, serverTimestamp, where
         } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 
@@ -1187,13 +1186,11 @@
 
             for (const userDoc of snap.docs) {
                 const uid = userDoc.id;
-                /* Activity data lives at users/{uid}/activity/data */
                 let activity = {};
                 try {
-                    const actSnap = await getDocs(collection(db, 'users', uid, 'activity'));
-                    actSnap.docs.forEach(d => {
-                        if (d.id === 'data') activity = d.data();
-                    });
+                    const actRef = doc(db, 'users', uid, 'activity', 'data');
+                    const actSnap = await getDoc(actRef);
+                    if (actSnap.exists()) activity = actSnap.data();
                 } catch { }
 
                 const seen = activity.seen || {};
