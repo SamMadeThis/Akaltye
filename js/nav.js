@@ -6,6 +6,8 @@
 import { auth }               from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { getAllNotifications, markAllRead, clearNotification, clearAllNotifications, getUnreadCount } from './notifications.js';
+import { db } from './firebase-config.js';
+import { doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 
 /* ── Load Font Awesome if not already present ── */
 if (!document.querySelector('script[src*="fontawesome"]')) {
@@ -357,6 +359,21 @@ onAuthStateChanged(auth, user => {
         }
         <span class="nav-auth-name">${(user.displayName || '').split(' ')[0]}</span>
       </a>`;
+
+    /* Mirror basic profile to Firestore so admin panel can show
+       name and email. Uses setDoc with merge:true so it never
+       overwrites activity data — only updates profile fields. */
+    setDoc(
+      doc(db, 'users', user.uid),
+      {
+        displayName: user.displayName || '',
+        email:       user.email       || '',
+        photoURL:    user.photoURL    || '',
+        lastSeen:    serverTimestamp(),
+      },
+      { merge: true }
+    ).catch(() => {}); /* Silent fail — non-critical */
+
   } else {
     navAuth.innerHTML = `<a href="/pages/login.html" class="nav-auth-btn">Sign in</a>`;
   }

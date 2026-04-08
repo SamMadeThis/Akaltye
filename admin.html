@@ -1186,6 +1186,7 @@
 
             for (const userDoc of snap.docs) {
                 const uid = userDoc.id;
+                const profile = userDoc.data();
                 let activity = {};
                 try {
                     const actRef = doc(db, 'users', uid, 'activity', 'data');
@@ -1200,6 +1201,8 @@
 
                 allUsers.push({
                     uid,
+                    displayName: profile.displayName || '—',
+                    email: profile.email || '—',
                     seen: Object.keys(seen).length,
                     quizzes: quiz.length,
                     favs: Array.isArray(favs) ? favs.length : 0,
@@ -1220,8 +1223,8 @@
             }
             tbody.innerHTML = users.map(u => `
       <tr>
-        <td class="mono" style="font-size:10px;">${u.uid.slice(0, 8)}…</td>
-        <td class="muted">—</td>
+        <td>${u.displayName}</td>
+        <td class="muted">${u.email}</td>
         <td class="muted">—</td>
         <td><strong>${u.seen}</strong></td>
         <td><strong>${u.quizzes}</strong></td>
@@ -1234,7 +1237,11 @@
 
         document.getElementById('userSearch').addEventListener('input', e => {
             const q = e.target.value.toLowerCase();
-            renderUsersTable(allUsers.filter(u => u.uid.toLowerCase().includes(q)));
+            renderUsersTable(allUsers.filter(u =>
+                u.displayName.toLowerCase().includes(q) ||
+                u.email.toLowerCase().includes(q) ||
+                u.uid.toLowerCase().includes(q)
+            ));
         });
 
         /* ══════════════════════════════════════════════════════════
