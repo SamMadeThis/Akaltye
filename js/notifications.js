@@ -2,55 +2,25 @@
    notifications.js — Notification system for AKALTYE
 
    WHAT: Manages two types of notifications:
-     1. ANNOUNCEMENTS — manually authored, shown to all users.
-        Add new ones to the ANNOUNCEMENTS array below.
-     2. MILESTONES — auto-generated from user progress data.
-        Fire once per threshold, visible until manually cleared.
+     1. ANNOUNCEMENTS — fetched from the Firestore 'announcements'
+        collection. Add new ones via the admin panel at /admin.html.
+     2. MILESTONES — auto-generated from user progress in localStorage.
 
    HOW:  Read notification IDs are stored in localStorage under
          'akaltye_read_notifications'. Notifications stay visible
          in the panel after being read — they just lose their
          unread status. The badge count only shows unread ones.
-         Clearing removes them from the panel permanently.
-
-   ADMIN: To post a new announcement, add an entry to the
-         ANNOUNCEMENTS array with a unique id, title, body
-         and date. That's it — it will appear for all users
-         as unread until they open the panel.
+         Clearing permanently removes them from the panel.
    ============================================================= */
 
-
-/* =============================================================
-   ANNOUNCEMENTS
-   Add new entries here to notify all users.
-   Each needs a unique id — use announce_XXX format.
-   ============================================================= */
-
-const ANNOUNCEMENTS = [
-  {
-    id:    'announce_001',
-    type:  'announcement',
-    icon:  'fa-solid fa-bullhorn',
-    title: 'Welcome to Akaltye',
-    body:  'Start with beginner words to build your foundation. Werte!',
-    date:  '2026-04-07',
-  },
-  // ── Add new announcements below this line ──────────────────
-  // {
-  //   id:    'announce_002',
-  //   type:  'announcement',
-  //   icon:  'fa-solid fa-bullhorn',
-  //   title: 'New words added',
-  //   body:  '150 new words from Chapter 6 are now in the lexicon.',
-  //   date:  '2026-04-08',
-  // },
-];
+import { db } from './firebase-config.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 
 
 /* =============================================================
    MILESTONE DEFINITIONS
-   Thresholds that generate a notification when reached.
-   id must be unique and stable.
+   Thresholds that auto-generate a notification when reached.
+   id must be unique and stable — used to track read/cleared state.
    ============================================================= */
 
 const MILESTONE_NOTIFICATIONS = [
@@ -69,67 +39,97 @@ const MILESTONE_NOTIFICATIONS = [
 
 /* =============================================================
    STORAGE KEYS
-   READ  — notifications the user has opened/seen
-   CLEARED — notifications permanently removed from the panel
    ============================================================= */
 
 const READ_KEY    = 'akaltye_read_notifications';
 const CLEARED_KEY = 'akaltye_cleared_notifications';
+const CACHE_KEY   = 'akaltye_announcements_cache';
 
-function getRead() {
-  try { return new Set(JSON.parse(localStorage.getItem(READ_KEY)    || '[]')); } catch { return new Set(); }
-}
-
-function getCleared() {
-  try { return new Set(JSON.parse(localStorage.getItem(CLEARED_KEY) || '[]')); } catch { return new Set(); }
-}
+function getRead()    { try { return new Set(JSON.parse(localStorage.getItem(READ_KEY)    || '[]')); } catch { return new Set(); } }
+function getCleared() { try { return new Set(JSON.parse(localStorage.getItem(CLEARED_KEY) || '[]')); } catch { return new Set(); } }
 
 function markRead(id) {
-  const read = getRead();
-  read.add(id);
+  const read = getRead(); read.add(id);
   localStorage.setItem(READ_KEY, JSON.stringify([...read]));
 }
 
 function markCleared(id) {
-  const cleared = getCleared();
-  cleared.add(id);
+  const cleared = getCleared(); cleared.add(id);
   localStorage.setItem(CLEARED_KEY, JSON.stringify([...cleared]));
 }
 
 
 /* =============================================================
-   GET ALL NOTIFICATIONS
-   Returns all eligible notifications (threshold met, not cleared),
-   each with a `read` boolean.
-   Unread milestones first, then unread announcements,
-   then read items (oldest achievements last).
+   FETCH ANNOUNCEMENTS FROM FIRESTORE
+   Cached in sessionStorage for the session — new announcements
+   appear after the user opens a fresh tab.
    ============================================================= */
 
-export function getAllNotifications() {
+let _announcementsCache = null;
+
+async function fetchAnnouncements() {
+  if (_announcementsCache) return _announcementsCache;
+
+  try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (cached) {
+      _announcementsCache = JSON.parse(cached);
+      return _announcementsCache;
+    }
+  } catch {}
+
+  try {
+    const snap = await getDocs(collection(db, 'announcements'));
+    const announcements = snap.docs.map(d => ({
+      id:   d.data().id || d.id,
+      type: 'announcement',
+      icon: d.data().icon  || 'fa-solid fa-bullhorn',
+      title: d.data().title || '',
+      body:  d.data().body  || '',
+      date:  d.data().date  || '',
+    }));
+    _announcementsCache = announcements;
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(announcements)); } catch {}
+    return announcements;
+  } catch (e) {
+    console.warn('notifications: could not fetch announcements', e);
+    return [];
+  }
+}
+
+
+/* =============================================================
+   GET ALL NOTIFICATIONS — async
+   Returns all eligible notifications each with a `read` boolean.
+   Unread first, read after.
+   ============================================================= */
+
+export async function getAllNotifications() {
   const read    = getRead();
   const cleared = getCleared();
 
-  /* Read user progress */
-  const seen      = JSON.parse(localStorage.getItem('lexicon_seen')     || '{}');
-  const quizLog   = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
-  const streak    = JSON.parse(localStorage.getItem('lexicon_streak')   || '{}');
-  const seenCount = Object.keys(seen).length;
-  const quizCount = quizLog.length;
+  /* User progress from localStorage */
+  const seen        = JSON.parse(localStorage.getItem('lexicon_seen')     || '{}');
+  const quizLog     = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
+  const streak      = JSON.parse(localStorage.getItem('lexicon_streak')   || '{}');
+  const seenCount   = Object.keys(seen).length;
+  const quizCount   = quizLog.length;
   const streakCount = streak.current || 0;
 
-  /* Milestones — include if threshold met and not cleared */
+  /* Milestones */
   const milestones = MILESTONE_NOTIFICATIONS
     .filter(m => !cleared.has(m.id) && m.check(seenCount, quizCount, streakCount))
     .map(m => ({ ...m, type: 'milestone', read: read.has(m.id) }));
 
-  /* Announcements — include if not cleared */
-  const announcements = ANNOUNCEMENTS
+  /* Announcements from Firestore */
+  const firestoreAnnouncements = await fetchAnnouncements();
+  const announcements = firestoreAnnouncements
     .filter(a => !cleared.has(a.id))
     .map(a => ({ ...a, read: read.has(a.id) }));
 
   const all = [...milestones, ...announcements];
 
-  /* Sort: unread first, read after */
+  /* Unread first, read after */
   return all.sort((a, b) => {
     if (a.read === b.read) return 0;
     return a.read ? 1 : -1;
@@ -138,38 +138,37 @@ export function getAllNotifications() {
 
 
 /* =============================================================
-   MARK ALL VISIBLE AS READ
-   Called when the panel is opened.
+   MARK ALL VISIBLE AS READ — async
    ============================================================= */
 
-export function markAllRead() {
-  getAllNotifications().forEach(n => markRead(n.id));
+export async function markAllRead() {
+  const notifs = await getAllNotifications();
+  notifs.forEach(n => markRead(n.id));
 }
 
 
 /* =============================================================
    CLEAR A SINGLE NOTIFICATION
-   Permanently removes it from the panel.
    ============================================================= */
 
-export function clearNotification(id) {
-  markCleared(id);
+export function clearNotification(id) { markCleared(id); }
+
+
+/* =============================================================
+   CLEAR ALL NOTIFICATIONS — async
+   ============================================================= */
+
+export async function clearAllNotifications() {
+  const notifs = await getAllNotifications();
+  notifs.forEach(n => markCleared(n.id));
 }
 
 
 /* =============================================================
-   CLEAR ALL NOTIFICATIONS
+   UNREAD COUNT — async, for the badge
    ============================================================= */
 
-export function clearAllNotifications() {
-  getAllNotifications().forEach(n => markCleared(n.id));
-}
-
-
-/* =============================================================
-   UNREAD COUNT — for the badge
-   ============================================================= */
-
-export function getUnreadCount() {
-  return getAllNotifications().filter(n => !n.read).length;
+export async function getUnreadCount() {
+  const notifs = await getAllNotifications();
+  return notifs.filter(n => !n.read).length;
 }

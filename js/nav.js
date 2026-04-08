@@ -19,6 +19,13 @@ if (!document.querySelector('script[src*="fontawesome"]')) {
 document.querySelector('header').innerHTML = `
   <div class="nav-bar">
     <a href="/index.html" class="logo">AKA<span>LTYE</span></a>
+    <div class="nav-bell-wrap" id="navBellWrap">
+      <button class="nav-bell" id="navBell" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <span class="nav-bell-badge" id="navBellBadge" style="display:none"></span>
+      </button>
+    </div>
+    <div id="navAuth" class="nav-auth"></div>
     <input id="menu-toggler" type="checkbox" class="menu-toggler">
     <label for="menu-toggler" class="show-menu"><span></span></label>
     <nav class="nav">
@@ -29,13 +36,6 @@ document.querySelector('header').innerHTML = `
         <li class="nav__item"><a href="/pages/resources.html" class="nav__link">Resources</a></li>
       </ul>
     </nav>
-    <div class="nav-bell-wrap" id="navBellWrap">
-      <button class="nav-bell" id="navBell" aria-label="Notifications">
-        <i class="fa-regular fa-bell"></i>
-        <span class="nav-bell-badge" id="navBellBadge" style="display:none"></span>
-      </button>
-    </div>
-    <div id="navAuth" class="nav-auth"></div>
   </div>
 `;
 
@@ -235,8 +235,8 @@ style.textContent = `
 document.head.appendChild(style);
 
 /* ── Render notification panel ── */
-function renderPanel() {
-  const notifications = getAllNotifications();
+async function renderPanel() {
+  const notifications = await getAllNotifications();
   const inner = document.getElementById('navNotifInner');
 
   if (notifications.length === 0) {
@@ -296,8 +296,8 @@ function renderPanel() {
 }
 
 /* ── Update badge count ── */
-function updateBadge() {
-  const count = getUnreadCount();
+async function updateBadge() {
+  const count = await getUnreadCount();
   const badge = document.getElementById('navBellBadge');
   if (!badge) return;
   if (count === 0) {
@@ -311,15 +311,15 @@ function updateBadge() {
 /* ── Bell toggle ── */
 let panelOpen = false;
 
-document.getElementById('navBell').addEventListener('click', e => {
+document.getElementById('navBell').addEventListener('click', async e => {
   e.stopPropagation();
   panelOpen = !panelOpen;
   dropdown.classList.toggle('open', panelOpen);
   document.getElementById('navBell').classList.toggle('active', panelOpen);
   if (panelOpen) {
-    renderPanel();
-    markAllRead();
-    updateBadge();
+    await renderPanel();
+    await markAllRead();
+    await updateBadge();
   }
 });
 
@@ -343,13 +343,6 @@ document.addEventListener('keydown', e => {
 
 /* ── Initial badge render ── */
 updateBadge();
-
-/* ── Home page — swap sign-in before hamburger ── */
-const isHome = window.location.pathname === '/' || window.location.pathname.endsWith('index.html');
-if (isHome) {
-  document.querySelector('.show-menu').style.order = '3';
-  document.querySelector('.nav-auth').style.order  = '2';
-}
 
 /* ── Auth state — populate #navAuth on every page ── */
 const navAuth = document.getElementById('navAuth');

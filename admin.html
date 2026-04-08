@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-17ZB632V40');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <title>AKALTYE — Admin</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --font-display: 'Lora', serif;
+            --font-body: 'Vollkorn', serif;
+            --font-mono: 'Roboto Mono', monospace;
+            --clr-dark: #121010;
+            --clr-light: #ffffff;
+            --clr-ochre: #B87333;
+            --clr-primary: #c9afc2;
+            --clr-surface: #2b2627;
+            --clr-border: #312e2e;
+            --clr-muted: #474444;
+            --clr-success: #22946e;
+            --clr-danger: #9c2121;
+            --clr-danger-light: #e85f5f;
+            --radius: 8px;
+            --radius-lg: 14px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--clr-dark);
+            color: var(--clr-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top bar ── */
+        .admin-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            height: 56px;
+            background: #1a1717;
+            border-bottom: 0.5px solid var(--clr-border);
+            flex-shrink: 0;
+        }
+
+        .admin-logo {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--clr-light);
+            text-decoration: none;
+        }
+
+        .admin-logo span {
+            color: var(--clr-primary);
+        }
+
+        .admin-badge {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--clr-ochre);
+            border: 0.5px solid var(--clr-ochre);
+            border-radius: 99px;
+            padding: 3px 10px;
+        }
+
+        .admin-user {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-muted);
+        }
+
+        /* ── Layout ── */
+        .admin-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ── Sidebar ── */
+        .admin-sidebar {
+            width: 200px;
+            flex-shrink: 0;
+            background: #1a1717;
+            border-right: 0.5px solid var(--clr-border);
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--clr-muted);
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .admin-nav-item:hover {
+            color: var(--clr-ochre);
+            background: rgba(184, 115, 51, 0.06);
+        }
+
+        .admin-nav-item.active {
+            color: var(--clr-ochre);
+            border-left-color: var(--clr-ochre);
+            background: rgba(184, 115, 51, 0.08);
+        }
+
+        /* ── Main content ── */
+        .admin-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        /* ── Section header ── */
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 0.5px solid var(--clr-border);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--clr-light);
+        }
+
+        /* ── Stat cards ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--clr-surface);
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+        }
+
+        .stat-card-num {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--clr-light);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-card-lbl {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--clr-muted);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            border: 0.5px solid var(--clr-border);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: none;
+            color: var(--clr-primary);
+        }
+
+        .btn:hover {
+            border-color: var(--clr-ochre);
+            color: var(--clr-ochre);
+            background: rgba(184, 115, 51, 0.08);
+        }
+
+        .btn-primary {
+            background: var(--clr-ochre);
+            color: #1a0a00;
+            border-color: var(--clr-ochre);
+        }
+
+        .btn-primary:hover {
+            background: #c97d38;
+            color: #1a0a00;
+        }
+
+        .btn-danger {
+            color: var(--clr-danger-light);
+            border-color: var(--clr-danger);
+        }
+
+        .btn-danger:hover {
+            background: rgba(156, 33, 33, 0.15);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 10px;
+        }
+
+        .btn-ghost {
+            background: none;
+            border-color: var(--clr-border);
+            color: var(--clr-muted);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--clr-muted);
+            color: var(--clr-light);
+            background: none;
+        }
+
+        /* ── Search/filter bar ── */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .admin-search {
+            flex: 1;
+            background: var(--clr-surface);
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            color: var(--clr-light);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .admin-search::placeholder {
+            color: var(--clr-muted);
+        }
+
+        .admin-search:focus {
+            border-color: var(--clr-ochre);
+        }
+
+        .admin-select {
+            background: var(--clr-surface);
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            color: var(--clr-light);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 8px 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ── Table ── */
+        .admin-table-wrap {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .admin-table th {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--clr-muted);
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 0.5px solid var(--clr-border);
+            white-space: nowrap;
+        }
+
+        .admin-table td {
+            padding: 10px 12px;
+            border-bottom: 0.5px solid var(--clr-border);
+            color: var(--clr-light);
+            vertical-align: top;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(184, 115, 51, 0.04);
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-primary);
+        }
+
+        .muted {
+            color: var(--clr-muted);
+            font-size: 12px;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.06em;
+            color: var(--clr-primary);
+            border: 0.5px solid #474444;
+            border-radius: 99px;
+            padding: 2px 7px;
+            margin: 1px;
+        }
+
+        .pill-published {
+            color: #47d5a6;
+            border-color: #22946e;
+        }
+
+        .pill-draft {
+            color: #d7ac61;
+            border-color: #a87a2a;
+        }
+
+        /* ── Modal/form overlay ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 400;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #1e1b1b;
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--clr-light);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 0.5px solid var(--clr-border);
+        }
+
+        /* ── Form fields ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--clr-muted);
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            background: var(--clr-surface);
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            color: var(--clr-light);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 9px 12px;
+            outline: none;
+            transition: border-color 0.15s ease;
+            width: 100%;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: var(--clr-ochre);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: var(--font-body);
+            font-size: 13px;
+        }
+
+        .form-hint {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-muted);
+        }
+
+        .form-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .form-toggle input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--clr-ochre);
+            cursor: pointer;
+        }
+
+        .form-toggle-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-primary);
+        }
+
+        /* ── Toast ── */
+        .admin-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--clr-surface);
+            border: 0.5px solid var(--clr-ochre);
+            border-radius: 99px;
+            padding: 10px 20px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--clr-ochre);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 500;
+            white-space: nowrap;
+        }
+
+        .admin-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Loading ── */
+        .loading {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-muted);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-muted);
+            padding: 2rem;
+            text-align: center;
+            border: 0.5px dashed var(--clr-border);
+            border-radius: var(--radius);
+        }
+
+        /* ── User row expand ── */
+        .user-stats-row td {
+            background: rgba(201, 175, 194, 0.04);
+            font-size: 12px;
+        }
+
+        .user-stat-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .user-stat-chip {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--clr-muted);
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            padding: 4px 10px;
+        }
+
+        .user-stat-chip strong {
+            color: var(--clr-light);
+        }
+
+        /* ── Confirm dialog ── */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-overlay.open {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: #1e1b1b;
+            border: 0.5px solid var(--clr-danger);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 360px;
+            width: 90%;
+        }
+
+        .confirm-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .confirm-body {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--clr-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* ── Access denied ── */
+        #accessDenied {
+            display: none;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            color: var(--clr-muted);
+        }
+
+        #adminContent {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top bar -->
+    <div class="admin-topbar">
+        <a href="/index.html" class="admin-logo">AKA<span>LTYE</span></a>
+        <span class="admin-badge">Admin</span>
+        <span class="admin-user" id="adminUserEmail">—</span>
+    </div>
+
+    <!-- Access denied -->
+    <div id="accessDenied" style="display:flex;">
+        <div style="text-align:center;">
+            <div style="font-size:2rem;margin-bottom:1rem;">🔒</div>
+            <div style="color:#c9afc2;margin-bottom:0.5rem;">Access restricted</div>
+            <div style="font-size:11px;margin-bottom:1.5rem;">Sign in as admin to continue.</div>
+            <a href="/pages/login.html"
+                style="font-family:var(--font-mono);font-size:11px;color:var(--clr-ochre);border:0.5px solid var(--clr-ochre);padding:8px 16px;border-radius:8px;">Sign
+                in →</a>
+        </div>
+    </div>
+
+    <!-- Admin content -->
+    <div id="adminContent">
+        <div class="admin-layout">
+
+            <!-- Sidebar -->
+            <nav class="admin-sidebar">
+                <div class="admin-nav-item active" data-section="overview">
+                    <span>◎</span> Overview
+                </div>
+                <div class="admin-nav-item" data-section="words">
+                    <span>◈</span> Words
+                </div>
+                <div class="admin-nav-item" data-section="users">
+                    <span>◉</span> Users
+                </div>
+                <div class="admin-nav-item" data-section="notifications">
+                    <span>◇</span> Notifications
+                </div>
+            </nav>
+
+            <!-- Main -->
+            <main class="admin-main">
+
+                <!-- ── OVERVIEW ── -->
+                <section class="admin-section active" id="section-overview">
+                    <div class="section-header">
+                        <div class="section-title">Overview</div>
+                    </div>
+                    <div class="stat-grid" id="overviewStats">
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-words">—</div>
+                            <div class="stat-card-lbl">Total words</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-users">—</div>
+                            <div class="stat-card-lbl">Registered users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-notifs">—</div>
+                            <div class="stat-card-lbl">Announcements</div>
+                        </div>
+                    </div>
+                    <div class="section-header" style="margin-top:2rem;">
+                        <div
+                            style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--clr-muted);">
+                            Most studied words</div>
+                    </div>
+                    <div id="topWordsTable">
+                        <div class="loading">Loading…</div>
+                    </div>
+                </section>
+
+                <!-- ── WORDS ── -->
+                <section class="admin-section" id="section-words">
+                    <div class="section-header">
+                        <div class="section-title">Words</div>
+                        <button class="btn btn-primary" id="addWordBtn">+ Add word</button>
+                    </div>
+                    <div class="filter-bar">
+                        <input class="admin-search" id="wordSearch" placeholder="Search words or definitions…"
+                            autocomplete="off">
+                        <select class="admin-select" id="wordFilterGroup">
+                            <option value="">All groups</option>
+                            <option value="people">People</option>
+                            <option value="country">Country</option>
+                            <option value="emotions">Emotions</option>
+                            <option value="body">Body</option>
+                            <option value="language">Language</option>
+                            <option value="daily life">Daily life</option>
+                            <option value="culture">Culture</option>
+                            <option value="cheeky">Cheeky</option>
+                            <option value="rude">Rude</option>
+                        </select>
+                        <select class="admin-select" id="wordFilterLevel">
+                            <option value="">All levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Word</th>
+                                    <th>Phonetic</th>
+                                    <th>POS</th>
+                                    <th>Definition</th>
+                                    <th>Level</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="wordsTableBody">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="loading">Loading words…</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="wordsCount"
+                        style="font-family:var(--font-mono);font-size:10px;color:var(--clr-muted);margin-top:1rem;">
+                    </div>
+                </section>
+
+                <!-- ── USERS ── -->
+                <section class="admin-section" id="section-users">
+                    <div class="section-header">
+                        <div class="section-title">Users</div>
+                    </div>
+                    <div class="filter-bar">
+                        <input class="admin-search" id="userSearch" placeholder="Search by name or email…"
+                            autocomplete="off">
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                    <th>Words studied</th>
+                                    <th>Quizzes</th>
+                                    <th>Streak</th>
+                                    <th>Favourites</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="loading">Loading users…</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ── NOTIFICATIONS ── -->
+                <section class="admin-section" id="section-notifications">
+                    <div class="section-header">
+                        <div class="section-title">Notifications</div>
+                        <button class="btn btn-primary" id="addNotifBtn">+ Add announcement</button>
+                    </div>
+                    <div id="notifList">
+                        <div class="loading">Loading…</div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="admin-toast" id="adminToast"></div>
+
+    <!-- Confirm dialog -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+            <div class="confirm-body" id="confirmBody"></div>
+            <div class="confirm-actions">
+                <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+                <button class="btn btn-danger" id="confirmOk">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word modal -->
+    <div class="modal-overlay" id="wordModal">
+        <div class="modal">
+            <div class="modal-title" id="wordModalTitle">Add word</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Word *</label>
+                    <input class="form-input" id="wf-word" placeholder="Kwatye">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phonetic</label>
+                    <input class="form-input" id="wf-phonetic" placeholder="kwa-dja">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Part of speech</label>
+                    <select class="form-select" id="wf-pos">
+                        <option value="">— select —</option>
+                        <option value="noun">noun</option>
+                        <option value="verb">verb</option>
+                        <option value="adjective">adjective</option>
+                        <option value="adverb">adverb</option>
+                        <option value="pronoun">pronoun</option>
+                        <option value="interjection">interjection</option>
+                        <option value="determiner">determiner</option>
+                        <option value="interrogative">interrogative</option>
+                        <option value="demonstrative">demonstrative</option>
+                        <option value="phrase">phrase</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Level *</label>
+                    <select class="form-select" id="wf-level">
+                        <option value="">— select —</option>
+                        <option value="beginner">beginner</option>
+                        <option value="intermediate">intermediate</option>
+                        <option value="advanced">advanced</option>
+                    </select>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Definitions * (one per line)</label>
+                    <textarea class="form-textarea" id="wf-definition"
+                        placeholder="water, rain&#10;Rain&#10;Ice, vapour, rain clouds"></textarea>
+                    <span class="form-hint">Each line becomes a separate definition entry</span>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Groups (one per line)</label>
+                    <input class="form-input" id="wf-groups" placeholder="country, level">
+                    <span class="form-hint">Comma-separated: country, level</span>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Tags (one per line)</label>
+                    <input class="form-input" id="wf-tags" placeholder="beginner, weather">
+                    <span class="form-hint">Comma-separated: beginner, weather</span>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Examples (one per line)</label>
+                    <textarea class="form-textarea" id="wf-examples"
+                        placeholder="Kwatye arrangkwe — there is no water."></textarea>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Notes</label>
+                    <input class="form-input" id="wf-notes" placeholder="Optional note about usage or dialect">
+                </div>
+                <div class="form-group full">
+                    <label class="form-toggle">
+                        <input type="checkbox" id="wf-published" checked>
+                        <span class="form-toggle-label">Published — visible to users</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="wordModalCancel">Cancel</button>
+                <button class="btn btn-primary" id="wordModalSave">Save word</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification modal -->
+    <div class="modal-overlay" id="notifModal">
+        <div class="modal">
+            <div class="modal-title">Add announcement</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label class="form-label">Title *</label>
+                    <input class="form-input" id="nf-title" placeholder="New words added">
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Body *</label>
+                    <textarea class="form-textarea" id="nf-body"
+                        placeholder="150 new words from the latest session are now in the lexicon."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input class="form-input" id="nf-date" type="date">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon (Font Awesome class)</label>
+                    <input class="form-input" id="nf-icon" placeholder="fa-solid fa-bullhorn">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="notifModalCancel">Cancel</button>
+                <button class="btn btn-primary" id="notifModalSave">Publish announcement</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+        import {
+            getFirestore, collection, getDocs, addDoc, updateDoc,
+            deleteDoc, doc, query, orderBy, serverTimestamp, where
+        } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+
+        const ADMIN_UID = '6RL0JDFJHkYyci7CHxDhL833Z3Y2';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyCvEdCqAuwgtJ-02R9xs7nbeBlfn55lYUk',
+            authDomain: 'lexicon-69642.firebaseapp.com',
+            projectId: 'lexicon-69642',
+            storageBucket: 'lexicon-69642.firebasestorage.app',
+            messagingSenderId: '40542416693',
+            appId: '1:40542416693:web:ce930dbe96c7d5b3ebe67c',
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        /* ── Helpers ── */
+        function toast(msg) {
+            const el = document.getElementById('adminToast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        function splitLines(str) {
+            return str.split('\n').map(s => s.trim()).filter(Boolean);
+        }
+
+        function splitCommas(str) {
+            return str.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function levelFromTags(tags) {
+            if (!tags) return '—';
+            if (tags.includes('beginner')) return 'beginner';
+            if (tags.includes('intermediate')) return 'intermediate';
+            if (tags.includes('advanced')) return 'advanced';
+            return '—';
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '—';
+            const d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        /* ── Auth guard ── */
+        onAuthStateChanged(auth, user => {
+            if (user && user.uid === ADMIN_UID) {
+                document.getElementById('accessDenied').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'flex';
+                document.getElementById('adminUserEmail').textContent = user.email || '';
+                initAdmin();
+            } else {
+                document.getElementById('accessDenied').style.display = 'flex';
+                document.getElementById('adminContent').style.display = 'none';
+            }
+        });
+
+        /* ── Nav ── */
+        document.querySelectorAll('.admin-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById('section-' + item.dataset.section).classList.add('active');
+            });
+        });
+
+        /* ══════════════════════════════════════════════════════════
+           INIT
+           ══════════════════════════════════════════════════════════ */
+
+        let allWords = [];
+        let allUsers = [];
+        let allNotifs = [];
+
+        async function initAdmin() {
+            await Promise.all([loadWords(), loadUsers(), loadNotifications()]);
+            renderOverview();
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           WORDS
+           ══════════════════════════════════════════════════════════ */
+
+        async function loadWords() {
+            const snap = await getDocs(collection(db, 'words'));
+            allWords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            allWords.sort((a, b) => a.word.localeCompare(b.word));
+            renderWordsTable(allWords);
+            document.getElementById('stat-words').textContent = allWords.length;
+        }
+
+        function renderWordsTable(words) {
+            const tbody = document.getElementById('wordsTableBody');
+            document.getElementById('wordsCount').textContent =
+                `Showing ${words.length} of ${allWords.length} words`;
+
+            if (!words.length) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">No words match your filter.</div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = words.map(w => {
+                const defs = Array.isArray(w.definition) ? w.definition : [w.definition];
+                const level = levelFromTags(w.tags);
+                const pub = w.published !== false;
+                return `
+        <tr>
+          <td><strong>${w.word}</strong></td>
+          <td class="mono">${w.phonetic || '—'}</td>
+          <td class="muted">${w.pos || '—'}</td>
+          <td class="muted" style="max-width:240px;">${defs[0] || '—'}${defs.length > 1 ? ` <span style="color:#474444">+${defs.length - 1}</span>` : ''}</td>
+          <td class="muted">${level}</td>
+          <td><span class="tag-pill ${pub ? 'pill-published' : 'pill-draft'}">${pub ? 'published' : 'draft'}</span></td>
+          <td style="white-space:nowrap;">
+            <button class="btn btn-sm" onclick="editWord('${w.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteWord('${w.id}', '${w.word.replace(/'/g, "\\'")}')">Delete</button>
+          </td>
+        </tr>`;
+            }).join('');
+        }
+
+        /* Word search + filter */
+        function filterWords() {
+            const q = document.getElementById('wordSearch').value.toLowerCase();
+            const group = document.getElementById('wordFilterGroup').value;
+            const level = document.getElementById('wordFilterLevel').value;
+
+            const filtered = allWords.filter(w => {
+                const defs = (Array.isArray(w.definition) ? w.definition : [w.definition]).join(' ').toLowerCase();
+                const matchQ = !q || w.word.toLowerCase().includes(q) || defs.includes(q);
+                const matchG = !group || (w.groups || []).includes(group);
+                const matchL = !level || (w.tags || []).includes(level);
+                return matchQ && matchG && matchL;
+            });
+            renderWordsTable(filtered);
+        }
+
+        document.getElementById('wordSearch').addEventListener('input', filterWords);
+        document.getElementById('wordFilterGroup').addEventListener('change', filterWords);
+        document.getElementById('wordFilterLevel').addEventListener('change', filterWords);
+
+        /* Add word button */
+        document.getElementById('addWordBtn').addEventListener('click', () => openWordModal(null));
+
+        /* Word modal */
+        let editingWordId = null;
+
+        window.editWord = function (id) {
+            const w = allWords.find(w => w.id === id);
+            if (w) openWordModal(w);
+        };
+
+        function openWordModal(word) {
+            editingWordId = word ? word.id : null;
+            document.getElementById('wordModalTitle').textContent = word ? 'Edit word' : 'Add word';
+
+            const defs = Array.isArray(word?.definition) ? word.definition : [word?.definition || ''];
+
+            document.getElementById('wf-word').value = word?.word || '';
+            document.getElementById('wf-phonetic').value = word?.phonetic || '';
+            document.getElementById('wf-pos').value = word?.pos || '';
+            document.getElementById('wf-level').value = levelFromTags(word?.tags) !== '—' ? levelFromTags(word?.tags) : '';
+            document.getElementById('wf-definition').value = defs.filter(Boolean).join('\n');
+            document.getElementById('wf-groups').value = (word?.groups || []).filter(g => g !== 'level').join(', ');
+            document.getElementById('wf-tags').value = (word?.tags || []).filter(t => !['beginner', 'intermediate', 'advanced'].includes(t)).join(', ');
+            document.getElementById('wf-examples').value = (word?.examples || []).join('\n');
+            document.getElementById('wf-notes').value = word?.notes || '';
+            document.getElementById('wf-published').checked = word?.published !== false;
+
+            document.getElementById('wordModal').classList.add('open');
+        }
+
+        document.getElementById('wordModalCancel').addEventListener('click', () => {
+            document.getElementById('wordModal').classList.remove('open');
+        });
+
+        document.getElementById('wordModalSave').addEventListener('click', async () => {
+            const wordVal = document.getElementById('wf-word').value.trim();
+            const defVal = document.getElementById('wf-definition').value.trim();
+            const level = document.getElementById('wf-level').value;
+
+            if (!wordVal || !defVal || !level) {
+                toast('Word, definition and level are required');
+                return;
+            }
+
+            const otherTags = splitCommas(document.getElementById('wf-tags').value);
+            const otherGroups = splitCommas(document.getElementById('wf-groups').value);
+            const tags = [level, ...otherTags];
+            const groups = [...otherGroups, 'level'];
+
+            const data = {
+                word: wordVal,
+                phonetic: document.getElementById('wf-phonetic').value.trim(),
+                pos: document.getElementById('wf-pos').value,
+                definition: splitLines(document.getElementById('wf-definition').value),
+                tags,
+                groups: [...new Set(groups)],
+                examples: splitLines(document.getElementById('wf-examples').value),
+                notes: document.getElementById('wf-notes').value.trim(),
+                published: document.getElementById('wf-published').checked,
+                updatedAt: serverTimestamp(),
+            };
+
+            try {
+                if (editingWordId) {
+                    await updateDoc(doc(db, 'words', editingWordId), data);
+                    toast(`✓ "${wordVal}" updated`);
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'words'), data);
+                    toast(`✓ "${wordVal}" added`);
+                }
+                document.getElementById('wordModal').classList.remove('open');
+                /* Clear sessionStorage cache so words-service fetches fresh */
+                sessionStorage.removeItem('akaltye_words_cache');
+                await loadWords();
+            } catch (e) {
+                toast('Error saving word — see console');
+                console.error(e);
+            }
+        });
+
+        /* Delete word */
+        window.deleteWord = function (id, word) {
+            openConfirm(
+                `Delete "${word}"?`,
+                'This word will be permanently removed from the lexicon. This cannot be undone.',
+                async () => {
+                    await deleteDoc(doc(db, 'words', id));
+                    sessionStorage.removeItem('akaltye_words_cache');
+                    toast(`"${word}" deleted`);
+                    await loadWords();
+                }
+            );
+        };
+
+        /* ══════════════════════════════════════════════════════════
+           USERS
+           ══════════════════════════════════════════════════════════ */
+
+        async function loadUsers() {
+            const snap = await getDocs(collection(db, 'users'));
+            allUsers = [];
+
+            for (const userDoc of snap.docs) {
+                const uid = userDoc.id;
+                /* Activity data lives at users/{uid}/activity/data */
+                let activity = {};
+                try {
+                    const actSnap = await getDocs(collection(db, 'users', uid, 'activity'));
+                    actSnap.docs.forEach(d => {
+                        if (d.id === 'data') activity = d.data();
+                    });
+                } catch { }
+
+                const seen = activity.seen || {};
+                const quiz = activity.quizLog || [];
+                const favs = activity.favourites || [];
+                const streak = activity.streak || {};
+
+                allUsers.push({
+                    uid,
+                    seen: Object.keys(seen).length,
+                    quizzes: quiz.length,
+                    favs: Array.isArray(favs) ? favs.length : 0,
+                    streak: streak.current || 0,
+                    longest: streak.longest || 0,
+                });
+            }
+
+            document.getElementById('stat-users').textContent = allUsers.length;
+            renderUsersTable(allUsers);
+        }
+
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('usersTableBody');
+            if (!users.length) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">No users found.</div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = users.map(u => `
+      <tr>
+        <td class="mono" style="font-size:10px;">${u.uid.slice(0, 8)}…</td>
+        <td class="muted">—</td>
+        <td class="muted">—</td>
+        <td><strong>${u.seen}</strong></td>
+        <td><strong>${u.quizzes}</strong></td>
+        <td><strong>${u.streak}</strong> <span class="muted">(best ${u.longest})</span></td>
+        <td><strong>${u.favs}</strong></td>
+        <td></td>
+      </tr>`
+            ).join('');
+        }
+
+        document.getElementById('userSearch').addEventListener('input', e => {
+            const q = e.target.value.toLowerCase();
+            renderUsersTable(allUsers.filter(u => u.uid.toLowerCase().includes(q)));
+        });
+
+        /* ══════════════════════════════════════════════════════════
+           NOTIFICATIONS
+           ══════════════════════════════════════════════════════════ */
+
+        async function loadNotifications() {
+            const snap = await getDocs(collection(db, 'announcements'));
+            allNotifs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            allNotifs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            document.getElementById('stat-notifs').textContent = allNotifs.length;
+            renderNotifList();
+        }
+
+        function renderNotifList() {
+            const el = document.getElementById('notifList');
+            if (!allNotifs.length) {
+                el.innerHTML = `<div class="empty-state">No announcements yet. Add one above.</div>`;
+                return;
+            }
+            el.innerHTML = allNotifs.map(n => `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem 0;border-bottom:0.5px solid var(--clr-border);">
+        <div style="flex:1;">
+          <div style="font-family:var(--font-body);font-size:1rem;color:var(--clr-light);margin-bottom:4px;">${n.title}</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--clr-muted);margin-bottom:6px;">${n.body}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:#474444;">${n.date || ''} · ${n.icon || 'fa-solid fa-bullhorn'}</div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="deleteNotif('${n.id}', '${n.title.replace(/'/g, "\\'")}')">Delete</button>
+      </div>`
+            ).join('');
+        }
+
+        document.getElementById('addNotifBtn').addEventListener('click', () => {
+            document.getElementById('nf-title').value = '';
+            document.getElementById('nf-body').value = '';
+            document.getElementById('nf-date').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('nf-icon').value = 'fa-solid fa-bullhorn';
+            document.getElementById('notifModal').classList.add('open');
+        });
+
+        document.getElementById('notifModalCancel').addEventListener('click', () => {
+            document.getElementById('notifModal').classList.remove('open');
+        });
+
+        document.getElementById('notifModalSave').addEventListener('click', async () => {
+            const title = document.getElementById('nf-title').value.trim();
+            const body = document.getElementById('nf-body').value.trim();
+            if (!title || !body) { toast('Title and body are required'); return; }
+
+            const id = 'announce_' + Date.now();
+            await addDoc(collection(db, 'announcements'), {
+                id,
+                type: 'announcement',
+                icon: document.getElementById('nf-icon').value.trim() || 'fa-solid fa-bullhorn',
+                title,
+                body,
+                date: document.getElementById('nf-date').value,
+                createdAt: serverTimestamp(),
+            });
+            toast('✓ Announcement published');
+            document.getElementById('notifModal').classList.remove('open');
+            await loadNotifications();
+        });
+
+        window.deleteNotif = function (id, title) {
+            openConfirm(
+                `Delete "${title}"?`,
+                'This announcement will be permanently removed.',
+                async () => {
+                    await deleteDoc(doc(db, 'announcements', id));
+                    toast('Announcement deleted');
+                    await loadNotifications();
+                }
+            );
+        };
+
+        /* ══════════════════════════════════════════════════════════
+           OVERVIEW — top words
+           ══════════════════════════════════════════════════════════ */
+
+        async function renderOverview() {
+            /* Aggregate seen counts across all users */
+            const wordCounts = {};
+            for (const u of allUsers) {
+                /* We already loaded activity — but we only have the count not per-word.
+                   Re-fetch seen maps for top words calculation */
+            }
+
+            /* Just show total word count breakdown by level for now */
+            const byLevel = { beginner: 0, intermediate: 0, advanced: 0, other: 0 };
+            allWords.forEach(w => {
+                const l = levelFromTags(w.tags);
+                if (byLevel[l] !== undefined) byLevel[l]++;
+                else byLevel.other++;
+            });
+
+            document.getElementById('topWordsTable').innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-num">${byLevel.beginner}</div>
+          <div class="stat-card-lbl">Beginner words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num">${byLevel.intermediate}</div>
+          <div class="stat-card-lbl">Intermediate words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num">${byLevel.advanced}</div>
+          <div class="stat-card-lbl">Advanced words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num">${allUsers.reduce((s, u) => s + u.seen, 0)}</div>
+          <div class="stat-card-lbl">Total words studied (all users)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num">${allUsers.reduce((s, u) => s + u.quizzes, 0)}</div>
+          <div class="stat-card-lbl">Total quizzes (all users)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num">${allUsers.length ? Math.round(allUsers.reduce((s, u) => s + u.seen, 0) / allUsers.length) : 0}</div>
+          <div class="stat-card-lbl">Avg words per user</div>
+        </div>
+      </div>`;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CONFIRM DIALOG
+           ══════════════════════════════════════════════════════════ */
+
+        let confirmCallback = null;
+
+        function openConfirm(title, body, onOk) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmBody').textContent = body;
+            confirmCallback = onOk;
+            document.getElementById('confirmOverlay').classList.add('open');
+        }
+
+        document.getElementById('confirmCancel').addEventListener('click', () => {
+            document.getElementById('confirmOverlay').classList.remove('open');
+            confirmCallback = null;
+        });
+
+        document.getElementById('confirmOk').addEventListener('click', async () => {
+            document.getElementById('confirmOverlay').classList.remove('open');
+            if (confirmCallback) await confirmCallback();
+            confirmCallback = null;
+        });
+
+    </script>
+</body>
+
+</html>

@@ -11,12 +11,12 @@
 
   FILES NEEDED:
     styles.css   — global tokens, nav, layout
-    practice.js  — all quiz logic (imports WORDS from words-data.js)
+    practice.js  — all quiz logic (imports WORDS from words-service.js)
 -->
 <html lang="en">
 
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -37,12 +37,10 @@
 
 <body>
 
-    <header>
-    </header>
+    <header></header>
 
     <div class="page-content">
         <div class="practice-wrap">
-
 
             <!-- ═══════════════════════════════════════════
                  SCREEN 1 — MODE PICKER
@@ -54,12 +52,7 @@
                     <div class="practice-sub">choose a quiz mode to begin</div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     FILTER ROW 1 — Lexicon group
-                     Two-tier: selecting a group chip reveals
-                     sub-tag chips beneath it.
-                     data-group read by practice.js getFiltered()
-                     ───────────────────────────────────────── -->
+                <!-- Filter row 1 — Lexicon group -->
                 <div>
                     <div class="filter-label">
                         Lexicon group
@@ -75,22 +68,13 @@
                         <div class="chip" data-group="daily life">Daily Life</div>
                         <div class="chip" data-group="culture">Culture</div>
                         <div class="chip" data-group="cheeky">Cheeky</div>
-                        <div class="chip" data-group="rude">Rude</div>
                     </div>
-
-                    <!--
-                        Sub-tag chips — hidden until a group chip is selected.
-                        Populated by inline JS below; read by practice.js.
-                    -->
                     <div class="chip-row chip-row--sub" id="subtagChips" style="display:none; margin-top:6px">
                         <div class="chip chip--sub on" data-tag="all-sub" id="allSubChip">All in group</div>
                     </div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     FILTER ROW 2 — Level
-                     Separate from Lexicon groups per design
-                     ───────────────────────────────────────── -->
+                <!-- Filter row 2 — Level -->
                 <div>
                     <div class="filter-label">Level</div>
                     <div class="chip-row" id="levelChips">
@@ -101,9 +85,7 @@
                     </div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     FILTER ROW 3 — Part of speech
-                     ───────────────────────────────────────── -->
+                <!-- Filter row 3 — Part of speech -->
                 <div>
                     <div class="filter-label">Part of speech</div>
                     <div class="chip-row" id="posChips">
@@ -115,9 +97,7 @@
                     </div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     FILTER ROW 4 — Seen / unseen
-                     ───────────────────────────────────────── -->
+                <!-- Filter row 4 — Seen / unseen -->
                 <div>
                     <div class="filter-label">Study set</div>
                     <div class="chip-row">
@@ -126,35 +106,28 @@
                     </div>
                 </div>
 
-                <!-- ─────────────────────────────────────────
-                     QUIZ MODE CARDS
-                     ───────────────────────────────────────── -->
+                <!-- Quiz mode cards -->
                 <div class="mode-grid">
-
                     <div class="mode-card" data-mode="guess">
                         <i class="fa-solid fa-question"></i>
                         <div class="mode-name">Guess the Word</div>
                         <div class="mode-desc">See the English meaning — pick the Arrernte word</div>
                     </div>
-
                     <div class="mode-card" data-mode="meaning">
                         <i class="fa-solid fa-book-open"></i>
                         <div class="mode-name">Meaning Match</div>
                         <div class="mode-desc">See the Arrernte word — pick the correct meaning</div>
                     </div>
-
                     <div class="mode-card" data-mode="gap">
                         <i class="fa-solid fa-pencil"></i>
                         <div class="mode-name">Fill the Gap</div>
                         <div class="mode-desc">Complete the sentence with the missing word</div>
                     </div>
-
                     <div class="mode-card" data-mode="match">
                         <i class="fa-solid fa-link"></i>
                         <div class="mode-name">Match Synonym</div>
                         <div class="mode-desc">Tap to pair Arrernte words with their meanings</div>
                     </div>
-
                     <div class="mode-card shuffle-card" data-mode="shuffle">
                         <i class="fa-solid fa-dice"></i>
                         <div>
@@ -162,7 +135,6 @@
                             <div class="mode-desc">A mix of all four quiz types in one session</div>
                         </div>
                     </div>
-
                 </div>
 
                 <div>
@@ -258,18 +230,11 @@
                 </div>
             </div><!-- /scoreScreen -->
 
-
         </div><!-- /practice-wrap -->
     </div><!-- /page-content -->
 
     <div class="toast" id="toast"></div>
-    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
 
-    <!--
-        Sub-tag chip population for the group filter.
-        Runs before practice.js so the chips are in the DOM
-        when practice.js wires up its event listeners.
-    -->
     <script>
         const GROUP_SUBTAGS = {
             'people': ['family', 'people', 'interaction', 'communication', 'classroom', 'command'],
@@ -280,7 +245,6 @@
             'daily life': ['food', 'objects', 'time'],
             'culture': ['culture', 'spiritual'],
             'cheeky': ['cheeky', 'fun'],
-            'rude': ['rude', 'curses'],
         };
 
         const TAG_LABELS = {
@@ -296,7 +260,6 @@
             'food': 'Food', 'objects': 'Objects', 'time': 'Time',
             'culture': 'Culture', 'spiritual': 'Spiritual',
             'cheeky': 'Cheeky', 'fun': 'Fun',
-            'rude': 'Rude', 'curses': 'Curses',
         };
 
         const subtagRow = document.getElementById('subtagChips');
@@ -305,8 +268,6 @@
         document.querySelectorAll('#groupChips .chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 const group = chip.dataset.group;
-
-                // Deselect siblings
                 document.querySelectorAll('#groupChips .chip').forEach(c => c.classList.remove('on'));
                 chip.classList.add('on');
 
@@ -315,9 +276,7 @@
                     return;
                 }
 
-                // Build sub-tag chips
                 const tags = GROUP_SUBTAGS[group] || [];
-                // Keep "All in group" chip, rebuild the rest
                 subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.remove());
                 tags.forEach(tag => {
                     const c = document.createElement('div');
@@ -327,14 +286,12 @@
                     subtagRow.appendChild(c);
                 });
 
-                // Reset sub-selection to "all in group"
                 allSubChip.classList.add('on');
                 subtagRow.querySelectorAll('.chip--sub:not(#allSubChip)').forEach(c => c.classList.remove('on'));
                 subtagRow.style.display = 'flex';
             });
         });
 
-        // Sub-tag single-select
         subtagRow.addEventListener('click', e => {
             const chip = e.target.closest('.chip--sub');
             if (!chip) return;
@@ -342,6 +299,7 @@
             chip.classList.add('on');
         });
     </script>
+
     <script type="module" src="/js/nav.js"></script>
     <script type="module" src="../js/practice.js"></script>
 
