@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Akaltye — Word Migration</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #121010;
+            color: #c9afc2;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            color: #474444;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+        }
+
+        button {
+            background: #B87333;
+            color: #1a0a00;
+            border: none;
+            padding: 12px 28px;
+            font-family: monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        #log {
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .ok {
+            color: #22946e;
+        }
+
+        .err {
+            color: #b84040;
+        }
+
+        .info {
+            color: #c9afc2;
+        }
+
+        .warn {
+            color: #B87333;
+        }
+
+        #summary {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Akaltye — Word Migration</h1>
+    <p class="sub">
+        Run this once while signed in as admin.<br>
+        Reads words-data.js and writes every word to Firestore at words/{auto-id}.<br>
+        Safe to run multiple times — existing words are skipped if already present.
+    </p>
+
+    <button id="startBtn">Run migration →</button>
+    <div id="log"></div>
+    <div id="summary"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+        import {
+            getFirestore, collection, getDocs, addDoc, query, where, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+        import { WORDS } from './js/words-data.js';
+
+        const ADMIN_UID = '6RL0JDFJHkYyci7CHxDhL833Z3Y2';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyCvEdCqAuwgtJ-02R9xs7nbeBlfn55lYUk',
+            authDomain: 'lexicon-69642.firebaseapp.com',
+            projectId: 'lexicon-69642',
+            storageBucket: 'lexicon-69642.firebasestorage.app',
+            messagingSenderId: '40542416693',
+            appId: '1:40542416693:web:ce930dbe96c7d5b3ebe67c',
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const logEl = document.getElementById('log');
+        const summaryEl = document.getElementById('summary');
+        const startBtn = document.getElementById('startBtn');
+
+        function log(msg, cls = 'info') {
+            const line = document.createElement('div');
+            line.className = cls;
+            line.textContent = msg;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                log('⚠ Not signed in — please sign in to the app first then reload this page.', 'warn');
+                startBtn.disabled = true;
+                return;
+            }
+            if (user.uid !== ADMIN_UID) {
+                log('⚠ Signed in but not as admin. Sign in with the admin account.', 'warn');
+                startBtn.disabled = true;
+                return;
+            }
+            log(`✓ Signed in as admin (${user.email})`, 'ok');
+        });
+
+        startBtn.addEventListener('click', async () => {
+            startBtn.disabled = true;
+            log('── Starting migration ──────────────────────────', 'info');
+
+            /* Fetch existing words so we can skip duplicates */
+            log('Fetching existing words from Firestore…', 'info');
+            const wordsCol = collection(db, 'words');
+            const existing = await getDocs(wordsCol);
+            const existingWords = new Set(existing.docs.map(d => d.data().word));
+            log(`Found ${existingWords.size} existing word(s) in Firestore.`, 'info');
+
+            let added = 0;
+            let skipped = 0;
+            let errors = 0;
+
+            for (const w of WORDS) {
+                if (existingWords.has(w.word)) {
+                    log(`  skip  "${w.word}" — already exists`, 'warn');
+                    skipped++;
+                    continue;
+                }
+
+                try {
+                    await addDoc(wordsCol, {
+                        word: w.word || '',
+                        phonetic: w.phonetic || '',
+                        pos: w.pos || '',
+                        definition: Array.isArray(w.definition) ? w.definition : [w.definition],
+                        tags: w.tags || [],
+                        groups: w.groups || [],
+                        examples: w.examples || [],
+                        notes: w.notes || '',
+                        published: true,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                    });
+                    log(`  added "${w.word}"`, 'ok');
+                    added++;
+                } catch (e) {
+                    log(`  ERROR "${w.word}": ${e.message}`, 'err');
+                    errors++;
+                }
+            }
+
+            log('── Migration complete ──────────────────────────', 'info');
+            summaryEl.innerHTML = `
+      <span class="ok">✓ Added: ${added}</span> &nbsp;
+      <span class="warn">⊘ Skipped: ${skipped}</span> &nbsp;
+      <span class="err">✗ Errors: ${errors}</span>
+    `;
+        });
+    </script>
+</body>
+
+</html>

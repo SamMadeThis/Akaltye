@@ -21,7 +21,7 @@
 //    [4] 105% inStart gap — small visual gap between cards as they slide
 // ═══════════════════════════════════════════════════
 
-import { WORDS }                                          from './words-data.js';
+import { getWords }                                        from './words-service.js';
 import { auth }                                           from './firebase-config.js';
 import { onAuthStateChanged }                             from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore, syncSeen, syncFavourites, syncBookmarks } from './sync.js';
@@ -47,7 +47,9 @@ function shuffle(arr) {
   return a;
 }
 
-let words      = shuffle(WORDS);
+/* WORDS is populated by the async init below */
+let WORDS = [];
+let words      = [];
 let current    = 0;
 let seenCounts = JSON.parse(localStorage.getItem('lexicon_seen')  || '{}');
 let viewLog    = JSON.parse(localStorage.getItem('lexicon_log')   || '[]');
@@ -503,31 +505,41 @@ function applyFilter(group, tag, pos) {
 
 
 // ═══════════════════════════════════════════════════
-//  INIT
+//  INIT — async wrapper so we can await getWords()
 // ═══════════════════════════════════════════════════
 
-document.getElementById('prevBtn').addEventListener('click', () => navigate(-1));
-document.getElementById('nextBtn').addEventListener('click', () => navigate(1));
-document.getElementById('favBtn').addEventListener('click', toggleFavourite);
-document.getElementById('bookmarkBtn')?.addEventListener('click', toggleBookmark);
+(async () => {
+  /* Load words from Firestore (cached after first load) */
+  WORDS = await getWords();
+  words = shuffle(WORDS);
+  if (!WORDS.length) {
+    console.error('words.js: no words loaded — check Firestore connection');
+    return;
+  }
 
-// Keyboard navigation — left/right arrow keys
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight') navigate(1);
-  if (e.key === 'ArrowLeft')  navigate(-1);
-});
+  document.getElementById('prevBtn').addEventListener('click', () => navigate(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => navigate(1));
+  document.getElementById('favBtn').addEventListener('click', toggleFavourite);
+  document.getElementById('bookmarkBtn')?.addEventListener('click', toggleBookmark);
 
-// Read URL params and apply filter on load
-const params     = new URLSearchParams(window.location.search);
-const startGroup = params.get('group') || null;
-const startTag   = params.get('tag')   || null;
-const startPos   = params.get('pos')   || null;
-const startWord  = params.get('word')  || null;
+  // Keyboard navigation — left/right arrow keys
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') navigate(1);
+    if (e.key === 'ArrowLeft')  navigate(-1);
+  });
 
-applyFilter(startGroup, startTag, startPos);
+  // Read URL params and apply filter on load
+  const params     = new URLSearchParams(window.location.search);
+  const startGroup = params.get('group') || null;
+  const startTag   = params.get('tag')   || null;
+  const startPos   = params.get('pos')   || null;
+  const startWord  = params.get('word')  || null;
 
-// If a specific word was requested via ?word=Kwatye, jump to it
-if (startWord) {
-  const idx = words.findIndex(w => w.word === startWord);
-  if (idx !== -1) { current = idx; renderCard(null); }
-}
+  applyFilter(startGroup, startTag, startPos);
+
+  // If a specific word was requested via ?word=Kwatye, jump to it
+  if (startWord) {
+    const idx = words.findIndex(w => w.word === startWord);
+    if (idx !== -1) { current = idx; renderCard(null); }
+  }
+})();

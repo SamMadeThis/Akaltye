@@ -6,18 +6,24 @@
          seen/unseen), question generation for all four quiz
          types, answer evaluation, screen transitions, score
          tracking and Firestore/localStorage persistence.
+
+   CHANGE: WORDS now loaded from Firestore via words-service.js
+           instead of the static words-data.js import.
    ============================================================= */
 
 import { auth }                           from './firebase-config.js';
 import { onAuthStateChanged }             from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore, syncQuizLog } from './sync.js';
-import { WORDS }                          from './words-data.js';
+import { getWords }                       from './words-service.js';
 
 let currentUid = null;
 onAuthStateChanged(auth, user => {
   currentUid = user ? user.uid : null;
   if (currentUid) pullFromFirestore(currentUid);
 });
+
+/* WORDS populated by async init */
+let WORDS = [];
 
 
 /* =============================================================
@@ -96,11 +102,6 @@ function renderQuizLog() {
 
 /* =============================================================
    FILTER STATE
-   - selGroup   : top-level lexicon group ('all' or e.g. 'people')
-   - selTag     : sub-tag within the group ('all-sub' or e.g. 'family')
-   - selLevel   : difficulty level ('all', 'beginner', etc.)
-   - selPos     : part of speech ('all', 'noun', etc.)
-   - seenOnly / unseenOnly : localStorage-based study set filters
    ============================================================= */
 
 let selGroup   = 'all';
@@ -113,22 +114,12 @@ let unseenOnly = false;
 function getFiltered() {
   const seen = getSeenCounts();
   return WORDS.filter(w => {
-    // Group filter — uses the groups[] array on each word
-    const groupOk = selGroup === 'all' || (w.groups && w.groups.includes(selGroup));
-
-    // Sub-tag filter — uses the tags[] array
-    const tagOk = selTag === 'all-sub' || (w.tags && w.tags.includes(selTag));
-
-    // Level filter — beginner/intermediate/advanced are tags
-    const levelOk = selLevel === 'all' || (w.tags && w.tags.includes(selLevel));
-
-    // Part of speech filter
-    const posOk = selPos === 'all' || w.pos === selPos;
-
-    // Seen / unseen
+    const groupOk  = selGroup === 'all' || (w.groups && w.groups.includes(selGroup));
+    const tagOk    = selTag === 'all-sub' || (w.tags && w.tags.includes(selTag));
+    const levelOk  = selLevel === 'all' || (w.tags && w.tags.includes(selLevel));
+    const posOk    = selPos === 'all' || w.pos === selPos;
     const seenOk   = !seenOnly   || !!seen[w.word];
     const unseenOk = !unseenOnly || !seen[w.word];
-
     return groupOk && tagOk && levelOk && posOk && seenOk && unseenOk;
   });
 }
@@ -144,14 +135,12 @@ function updateFilterCount() {
    FILTER CHIP WIRING
    ============================================================= */
 
-// Group chips
 document.querySelectorAll('#groupChips .chip').forEach(c => c.addEventListener('click', () => {
   selGroup = c.dataset.group;
-  selTag   = 'all-sub'; // reset sub-tag when group changes
+  selTag   = 'all-sub';
   updateFilterCount();
 }));
 
-// Sub-tag chips (rendered by inline script in practice.html)
 document.getElementById('subtagChips').addEventListener('click', e => {
   const chip = e.target.closest('.chip--sub');
   if (!chip) return;
@@ -159,7 +148,6 @@ document.getElementById('subtagChips').addEventListener('click', e => {
   updateFilterCount();
 });
 
-// Level chips
 document.querySelectorAll('#levelChips .chip').forEach(c => c.addEventListener('click', () => {
   document.querySelectorAll('#levelChips .chip').forEach(x => x.classList.remove('on'));
   c.classList.add('on');
@@ -167,7 +155,6 @@ document.querySelectorAll('#levelChips .chip').forEach(c => c.addEventListener('
   updateFilterCount();
 }));
 
-// POS chips
 document.querySelectorAll('#posChips .chip').forEach(c => c.addEventListener('click', () => {
   document.querySelectorAll('#posChips .chip').forEach(x => x.classList.remove('on'));
   c.classList.add('on');
@@ -175,7 +162,6 @@ document.querySelectorAll('#posChips .chip').forEach(c => c.addEventListener('cl
   updateFilterCount();
 }));
 
-// Seen / unseen
 $('seenOnlyChip').addEventListener('click', () => {
   seenOnly = !seenOnly;
   if (seenOnly) unseenOnly = false;
@@ -273,7 +259,6 @@ function buildGap(word, pool) {
       correct: word.word
     };
   }
-  // No example sentence — fall back to meaning MC
   return buildMC(word, 'meaning', pool);
 }
 
@@ -554,8 +539,15 @@ $('backToModeBtn').addEventListener('click', goHome);
 
 
 /* =============================================================
-   INIT
+   INIT — async so we can await getWords()
    ============================================================= */
 
-renderQuizLog();
-updateFilterCount();
+(async () => {
+  WORDS = await getWords();
+  if (!WORDS.length) {
+    console.error('practice.js: no words loaded — check Firestore connection');
+    return;
+  }
+  renderQuizLog();
+  updateFilterCount();
+})();
