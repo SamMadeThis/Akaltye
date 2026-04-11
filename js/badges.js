@@ -40,7 +40,7 @@ function yesterdayStr() {
 
 /*
  * updateStreak — call once on any page where the user is active.
- * If the user was last active yesterday → extend streak.
+ * If the user was last active yesterday → extend streak.@Todo what date/time is this set to count a new day
  * If the user was last active today → no change (already counted).
  * If the user missed a day → reset streak to 1.
  * Returns the current streak object.
@@ -85,6 +85,9 @@ export function getStreak() {
      name      — short display name
      desc      — what earns it (shown under badge)
      check(data) — function that returns true if earned
+
+  @Todo - Define milestones vs achievements - milestones should be a collection of small achievements
+
    ============================================================= */
 
 export const BADGE_DEFINITIONS = [
@@ -224,6 +227,8 @@ export const BADGE_DEFINITIONS = [
    Reads all relevant localStorage keys and runs each badge's
    check() function. Returns an array of badge objects with an
    `earned` boolean added.
+
+   
    ============================================================= */
 
 export function evaluateBadges() {

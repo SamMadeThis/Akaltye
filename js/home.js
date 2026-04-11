@@ -1,16 +1,17 @@
 /* =============================================================
    home.js — Logic for index.html (home page)
 
-   WHAT: Word of the day, scroll reveal, progress stats,
-         sign-in prompt visibility, number scramble hover.
-         Auth is handled by nav.js — no duplication here.
+   Word of the day, scroll reveal, progress stats, sign-in prompt visibility, number scramble hover.
+   
    ============================================================= */
 
 import { auth }             from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore }  from './sync.js';
 
-/* ── Word of the day ────────────────────────────────────────── */
+/* ── Word of the day ────────────────────────────────────────── 
+@todo add this section to the admin page so I dont have to hard code this window later.
+*/
 const WORDS = [
   { word: 'Werte',    phonetic: 'wer-da',     definition: "Greeting — Hello, what's up?",        example: 'Werte? Inwenheke-ame unte atyenge antangkelhene.' },
   { word: 'Mwerre',   phonetic: 'mwa-rra',    definition: 'Good, right, proper. Healthy, well.',  example: 'Unte mwerre? — Are you good?' },
@@ -18,7 +19,7 @@ const WORDS = [
   { word: 'Apmere',   phonetic: 'ap-mara',    definition: 'Country, land, home, place.',           example: 'Apmere — the land that holds everything.' },
   { word: 'Mparntwe', phonetic: "m'barn-twa", definition: 'Alice Springs — the town area.',        example: 'Mparntwe is Arrernte Country.' },
   { word: 'Urreke',   phonetic: 'oo-ree-ga',  definition: 'Goodbye, farewell.',                    example: 'Urreke! Nhenhe apetyeke — Goodbye! See you later.' },
-  { word: 'Inwenhe',  phonetic: 'in-wan-ya',  definition: 'What — used to ask about something.',   example: 'Inwenhe nhenhe? — What is this?' },
+  { word: 'Inwenhe',  phonetic: 'in-wan-ha',  definition: 'What — used to ask about something.',   example: 'Inwenhe nhenhe? — What is this?' },
   { word: 'Ye',       phonetic: 'ya',          definition: 'Yes, yeah.',                            example: 'Ye, ayenge mwerre — Yes, I am good.' },
 ];
 
@@ -85,9 +86,9 @@ renderProgress();
 
 
 /* ── Auth state ─────────────────────────────────────────────────
-   Signed out → show pulsing save card, hide stats.
-   Signed in  → hide save card, show stats with real data.
-   nav.js handles #navAuth — no duplication here.
+  There are two different states: 
+   -  If user is signed out this will show pulsing save card and hide stats. This is to prompt the user to sign in. 
+   -  If the user is signed in it will hide the save card and show stats with real data.
 ── */
 const signinPrompt = document.getElementById('homeSigninPrompt');
 const homeProgress = document.getElementById('homeProgress');
@@ -104,7 +105,12 @@ onAuthStateChanged(auth, user => {
 });
 
 
-/* ── Number scramble hover ───────────────────────────────────── */
+/* ── Number scramble hover ─────────────────────────────────────
+  Hover animation over the stats - number scrambles and then shows the actual numbers 
+  This only shows if the user is signed in (state is determined in Auth state above)
+
+*/
+ 
 function scrambleNumber(stat) {
   const numEl   = stat.querySelector('.home-progress-stat-num');
   const realVal = numEl.dataset.real;

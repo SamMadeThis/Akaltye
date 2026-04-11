@@ -1,13 +1,12 @@
 /* =============================================================
    firebase-config.js — Shared Firebase initialisation
 
-   WHAT: Single source of truth for Firebase config and shared
-         service instances (app, db, auth).
-   HOW:  ES module — import what you need in each page script.
-         Every page that needs Firebase imports from here so the
-         config is never duplicated.
-   WHY:  One place to update if config changes; avoids
-         initialising Firebase multiple times across pages.
+   Single source of truth for Firebase config and shared service instances (app, db, auth).
+   
+   ES module — import what you need in each page script.
+   Every page that needs Firebase imports from here so the config is never duplicated.
+   
+   One place to update if config changes; avoids initialising Firebase multiple times across pages.
    ============================================================= */
 
 import { initializeApp }           from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";

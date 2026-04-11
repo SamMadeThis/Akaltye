@@ -34,17 +34,19 @@
       <span class="home-country-label">Arrernte Country · Mparntwe</span>
     </div>
 
+    <!-- I dont know if I like this heading..... -->
     <div class="home-headline">
       <h1 class="home-title">
         Learn the language<br>of <em>this Country.</em>
       </h1>
       <p class="home-subtitle">
-        Arrernte is a living language of the Alice Springs region.
+        Arrernte is a living language spoken in Central Australia.
         This is a place to learn at your own pace, word by word.
       </p>
     </div>
 
     <!-- Word of the day -->
+    <!-- @TODO I would like to experiment with some kind of hover or scroll animation here.-->
     <div class="home-word-card" id="wotdCard">
       <div class="home-word-card-top">
         <div class="home-word-card-label">Word of the day</div>
@@ -56,7 +58,11 @@
       <div class="home-word-card-example" id="wotdExample"></div>
     </div>
 
-    <!-- Progress stats — shown when signed in with data -->
+    <!-- Progress stats — shown when signed in with data 
+    State is determined in home.js 
+    - if user is signed in it will show stats 
+    - if not signed it will show sign in card 
+    -->
     <div class="home-progress" id="homeProgress">
       <div class="home-progress-label">Your progress</div>
       <div class="home-progress-stats">
@@ -115,7 +121,10 @@
       </p>
     </div>
   </footer>
-
+  <!--Javascript files
+      - Nav.js is the navigation bar JS
+      - Home.js is the javascript for index.html (word of the day and authentication) 
+      -->
   <script type="module" src="/js/nav.js"></script>
   <script type="module" src="/js/home.js"></script>
 

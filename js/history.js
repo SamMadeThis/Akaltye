@@ -1,12 +1,8 @@
 /* =============================================================
    history.js — History page logic for ALKATYE
 
-   WHY:  Separating JS from HTML keeps behaviour independent
-         of structure; the HTML file only describes layout.
-   HOW:  Loaded as a plain <script> in history.html (no modules
-         needed — reads localStorage only, no Firebase imports).
-   WHAT: Renders the word view log and quiz results log from
-         localStorage; handles clear actions for each section.
+   Loads as a plain <script> in history.html to renders the word view log and quiz results log from localStorage; handles clear actions for each section.
+   
    ============================================================= */
 
 
