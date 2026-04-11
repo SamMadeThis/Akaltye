@@ -611,6 +611,254 @@
             justify-content: flex-end;
         }
 
+        /* ── Units section ── */
+        .unit-card {
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .unit-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: #1a1717;
+            transition: background 0.15s ease;
+        }
+
+        .unit-card-header:hover {
+            background: #1f1c1c;
+        }
+
+        .unit-card-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .unit-order-badge {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-muted);
+            border: 0.5px solid var(--clr-border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            flex-shrink: 0;
+        }
+
+        .unit-name {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--clr-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .unit-meta {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-muted);
+            margin-top: 2px;
+        }
+
+        .unit-card-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .unit-toggle {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 99px;
+            padding: 3px 10px;
+            border: 0.5px solid var(--clr-border);
+            cursor: pointer;
+            background: none;
+            color: var(--clr-muted);
+            transition: all 0.15s ease;
+        }
+
+        .unit-toggle.released {
+            border-color: var(--clr-success);
+            color: #47d5a6;
+            background: rgba(34, 148, 110, 0.1);
+        }
+
+        .unit-toggle:hover {
+            border-color: var(--clr-ochre);
+            color: var(--clr-ochre);
+        }
+
+        .unit-body {
+            display: none;
+            padding: 12px 16px;
+            border-top: 0.5px solid var(--clr-border);
+            background: #161414;
+        }
+
+        .unit-body.open {
+            display: block;
+        }
+
+        .unit-words-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .unit-word-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--clr-primary);
+            border: 0.5px solid var(--clr-border);
+            border-radius: 99px;
+            padding: 3px 10px;
+        }
+
+        .unit-word-chip button {
+            background: none;
+            border: none;
+            color: var(--clr-muted);
+            cursor: pointer;
+            font-size: 10px;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.15s ease;
+        }
+
+        .unit-word-chip button:hover {
+            color: var(--clr-danger-light);
+        }
+
+        .unit-word-search-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .unit-word-results {
+            background: #1a1717;
+            border: 0.5px solid var(--clr-border);
+            border-radius: var(--radius);
+            margin-top: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .unit-word-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 12px;
+            border-bottom: 0.5px solid var(--clr-border);
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.15s ease;
+        }
+
+        .unit-word-result:last-child {
+            border-bottom: none;
+        }
+
+        .unit-word-result:hover {
+            background: rgba(184, 115, 51, 0.06);
+        }
+
+        .unit-word-result.already {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .unit-word-result-word {
+            font-family: var(--font-display);
+            font-size: 13px;
+            color: var(--clr-light);
+        }
+
+        .unit-word-result-def {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-muted);
+        }
+
+        .unit-word-result-add {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-ochre);
+        }
+
+        /* ── Unit level filter tabs ── */
+        .level-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .level-tab {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            padding: 5px 14px;
+            border-radius: 99px;
+            border: 0.5px solid var(--clr-border);
+            color: var(--clr-muted);
+            cursor: pointer;
+            background: none;
+            transition: all 0.15s ease;
+        }
+
+        .level-tab.active {
+            border-color: var(--clr-ochre);
+            color: var(--clr-ochre);
+            background: rgba(184, 115, 51, 0.08);
+        }
+
+        /* ── Unit word count bar ── */
+        .unit-count-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .unit-count-track {
+            flex: 1;
+            height: 3px;
+            background: var(--clr-border);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .unit-count-fill {
+            height: 100%;
+            background: var(--clr-ochre);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        .unit-count-lbl {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--clr-muted);
+            white-space: nowrap;
+        }
+
         /* ── Access denied ── */
         #accessDenied {
             display: none;
@@ -661,6 +909,9 @@
                 <div class="admin-nav-item active" data-section="overview">
                     <span>◎</span> Overview
                 </div>
+                <div class="admin-nav-item" data-section="units">
+                    <span>◫</span> Units
+                </div>
                 <div class="admin-nav-item" data-section="words">
                     <span>◈</span> Words
                 </div>
@@ -686,6 +937,10 @@
                             <div class="stat-card-lbl">Total words</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-card-num" id="stat-units">—</div>
+                            <div class="stat-card-lbl">Units</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-card-num" id="stat-users">—</div>
                             <div class="stat-card-lbl">Registered users</div>
                         </div>
@@ -701,6 +956,46 @@
                     </div>
                     <div id="topWordsTable">
                         <div class="loading">Loading…</div>
+                    </div>
+                </section>
+
+                <!-- ── UNITS ── -->
+                <section class="admin-section" id="section-units">
+                    <div class="section-header">
+                        <div class="section-title">Units</div>
+                        <button class="btn btn-primary" id="addUnitBtn">+ New unit</button>
+                    </div>
+
+                    <!-- Level filter tabs -->
+                    <div class="level-tabs">
+                        <button class="level-tab active" data-level="all">All</button>
+                        <button class="level-tab" data-level="beginner">Beginner</button>
+                        <button class="level-tab" data-level="intermediate">Intermediate</button>
+                        <button class="level-tab" data-level="advanced">Advanced</button>
+                    </div>
+
+                    <!-- Stats row -->
+                    <div class="stat-grid" style="margin-bottom:1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-units-total">—</div>
+                            <div class="stat-card-lbl">Total units</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-units-released">—</div>
+                            <div class="stat-card-lbl">Released</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-units-words">—</div>
+                            <div class="stat-card-lbl">Words assigned</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-num" id="stat-units-unassigned">—</div>
+                            <div class="stat-card-lbl">Words unassigned</div>
+                        </div>
+                    </div>
+
+                    <div id="unitsList">
+                        <div class="loading">Loading units…</div>
                     </div>
                 </section>
 
@@ -899,7 +1194,46 @@
         </div>
     </div>
 
-    <!-- Notification modal -->
+    <!-- Unit modal -->
+    <div class="modal-overlay" id="unitModal">
+        <div class="modal">
+            <div class="modal-title" id="unitModalTitle">New unit</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label class="form-label">Unit name *</label>
+                    <input class="form-input" id="uf-name" placeholder="e.g. Greetings, Family, Country">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Level *</label>
+                    <select class="form-select" id="uf-level">
+                        <option value="">— select —</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Order (position in sequence)</label>
+                    <input class="form-input" id="uf-order" type="number" min="1" placeholder="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pass mark (%)</label>
+                    <input class="form-input" id="uf-passmark" type="number" min="50" max="100" value="80"
+                        placeholder="80">
+                </div>
+                <div class="form-group">
+                    <label class="form-toggle">
+                        <input type="checkbox" id="uf-released">
+                        <span class="form-toggle-label">Released — visible to users</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="unitModalCancel">Cancel</button>
+                <button class="btn btn-primary" id="unitModalSave">Save unit</button>
+            </div>
+        </div>
+    </div>
     <div class="modal-overlay" id="notifModal">
         <div class="modal">
             <div class="modal-title">Add announcement</div>
@@ -1012,9 +1346,10 @@
         let allWords = [];
         let allUsers = [];
         let allNotifs = [];
+        let allUnits = [];
 
         async function initAdmin() {
-            await Promise.all([loadWords(), loadUsers(), loadNotifications()]);
+            await Promise.all([loadWords(), loadUsers(), loadNotifications(), loadUnits()]);
             renderOverview();
         }
 
@@ -1330,7 +1665,7 @@
                    Re-fetch seen maps for top words calculation */
             }
 
-            /* Just show total word count breakdown by level for now */
+            document.getElementById('stat-units').textContent = allUnits.length;
             const byLevel = { beginner: 0, intermediate: 0, advanced: 0, other: 0 };
             allWords.forEach(w => {
                 const l = levelFromTags(w.tags);
@@ -1366,6 +1701,259 @@
         </div>
       </div>`;
         }
+
+        /* ══════════════════════════════════════════════════════════
+           UNITS
+           ══════════════════════════════════════════════════════════ */
+
+        let unitsLevelFilter = 'all';
+
+        async function loadUnits() {
+            const snap = await getDocs(collection(db, 'units'));
+            allUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            allUnits.sort((a, b) => (a.order || 0) - (b.order || 0));
+            renderUnitsStats();
+            renderUnitsList();
+        }
+
+        function renderUnitsStats() {
+            const assigned = new Set(allUnits.flatMap(u => u.wordIds || []));
+            document.getElementById('stat-units-total').textContent = allUnits.length;
+            document.getElementById('stat-units-released').textContent = allUnits.filter(u => u.released).length;
+            document.getElementById('stat-units-words').textContent = assigned.size;
+            document.getElementById('stat-units-unassigned').textContent = allWords.filter(w => !assigned.has(w.id)).length;
+        }
+
+        function renderUnitsList() {
+            const el = document.getElementById('unitsList');
+            const filtered = unitsLevelFilter === 'all'
+                ? allUnits
+                : allUnits.filter(u => u.level === unitsLevelFilter);
+
+            if (!filtered.length) {
+                el.innerHTML = `<div class="empty-state">No units yet — create one above.</div>`;
+                return;
+            }
+
+            el.innerHTML = filtered.map(u => {
+                const wordIds = u.wordIds || [];
+                const pct = Math.round(wordIds.length / 12 * 100);
+                const relClass = u.released ? 'released' : '';
+                const relLabel = u.released ? 'Released' : 'Locked';
+                const words = wordIds.map(id => allWords.find(w => w.id === id)).filter(Boolean);
+
+                return `
+        <div class="unit-card" id="unit-card-${u.id}">
+          <div class="unit-card-header" onclick="toggleUnitBody('${u.id}')">
+            <div class="unit-card-left">
+              <span class="unit-order-badge">${u.order || '—'}</span>
+              <div>
+                <div class="unit-name">${u.name || 'Unnamed unit'}</div>
+                <div class="unit-meta">${u.level || '—'} · ${wordIds.length} word${wordIds.length !== 1 ? 's' : ''} · passmark ${u.passmark || 80}%</div>
+              </div>
+            </div>
+            <div class="unit-card-right">
+              <button class="unit-toggle ${relClass}"
+                onclick="event.stopPropagation(); toggleUnitReleased('${u.id}', ${!u.released})">
+                ${relLabel}
+              </button>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); editUnit('${u.id}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteUnit('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">Delete</button>
+            </div>
+          </div>
+          <div class="unit-body" id="unit-body-${u.id}">
+            <div class="unit-count-bar">
+              <div class="unit-count-track">
+                <div class="unit-count-fill" style="width:${Math.min(pct, 100)}%"></div>
+              </div>
+              <span class="unit-count-lbl">${wordIds.length} / 12 words</span>
+            </div>
+            <div class="unit-words-grid" id="unit-words-${u.id}">
+              ${words.map(w => `
+                <div class="unit-word-chip">
+                  ${w.word}
+                  <button onclick="removeWordFromUnit('${u.id}', '${w.id}')" title="Remove">✕</button>
+                </div>`).join('')}
+              ${!words.length ? '<span style="font-family:var(--font-mono);font-size:10px;color:var(--clr-muted);">No words assigned yet</span>' : ''}
+            </div>
+            <div class="unit-word-search-wrap">
+              <div style="flex:1;">
+                <input class="admin-search" placeholder="Search words to add…"
+                  id="unit-search-${u.id}"
+                  oninput="searchWordsForUnit('${u.id}', this.value)"
+                  autocomplete="off">
+                <div class="unit-word-results" id="unit-results-${u.id}" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+            }).join('');
+        }
+
+        /* Toggle unit body open/closed */
+        window.toggleUnitBody = function (id) {
+            const body = document.getElementById('unit-body-' + id);
+            if (body) body.classList.toggle('open');
+        };
+
+        /* Search words to add to a unit */
+        window.searchWordsForUnit = function (unitId, q) {
+            const resultsEl = document.getElementById('unit-results-' + unitId);
+            const unit = allUnits.find(u => u.id === unitId);
+            if (!unit) return;
+            if (!q.trim()) { resultsEl.style.display = 'none'; return; }
+
+            const alreadyIn = new Set(unit.wordIds || []);
+            const matches = allWords
+                .filter(w => w.word.toLowerCase().includes(q.toLowerCase()) ||
+                    (Array.isArray(w.definition) ? w.definition : [w.definition]).join(' ').toLowerCase().includes(q.toLowerCase()))
+                .slice(0, 12);
+
+            if (!matches.length) { resultsEl.style.display = 'none'; return; }
+
+            resultsEl.style.display = 'block';
+            resultsEl.innerHTML = matches.map(w => {
+                const inUnit = alreadyIn.has(w.id);
+                const def = Array.isArray(w.definition) ? w.definition[0] : w.definition;
+                return `<div class="unit-word-result ${inUnit ? 'already' : ''}"
+        onclick="${inUnit ? '' : `addWordToUnit('${unitId}','${w.id}')`}">
+        <div>
+          <div class="unit-word-result-word">${w.word}</div>
+          <div class="unit-word-result-def">${def || ''}</div>
+        </div>
+        <span class="unit-word-result-add">${inUnit ? 'Added' : '+ Add'}</span>
+      </div>`;
+            }).join('');
+        };
+
+        /* Add word to unit */
+        window.addWordToUnit = async function (unitId, wordId) {
+            const unit = allUnits.find(u => u.id === unitId);
+            if (!unit) return;
+            const wordIds = [...new Set([...(unit.wordIds || []), wordId])];
+            await updateDoc(doc(db, 'units', unitId), { wordIds, updatedAt: serverTimestamp() });
+            /* Also tag the word with unitId */
+            await updateDoc(doc(db, 'words', wordId), { unitId, updatedAt: serverTimestamp() });
+            sessionStorage.removeItem('akaltye_words_cache');
+            toast('✓ Word added to unit');
+            await loadUnits();
+            /* Re-open the body and clear search */
+            setTimeout(() => {
+                const body = document.getElementById('unit-body-' + unitId);
+                if (body) body.classList.add('open');
+                const inp = document.getElementById('unit-search-' + unitId);
+                const res = document.getElementById('unit-results-' + unitId);
+                if (inp) inp.value = '';
+                if (res) res.style.display = 'none';
+            }, 50);
+        };
+
+        /* Remove word from unit */
+        window.removeWordFromUnit = async function (unitId, wordId) {
+            const unit = allUnits.find(u => u.id === unitId);
+            if (!unit) return;
+            const wordIds = (unit.wordIds || []).filter(id => id !== wordId);
+            await updateDoc(doc(db, 'units', unitId), { wordIds, updatedAt: serverTimestamp() });
+            await updateDoc(doc(db, 'words', wordId), { unitId: null, updatedAt: serverTimestamp() });
+            sessionStorage.removeItem('akaltye_words_cache');
+            toast('Word removed from unit');
+            await loadUnits();
+            setTimeout(() => {
+                const body = document.getElementById('unit-body-' + unitId);
+                if (body) body.classList.add('open');
+            }, 50);
+        };
+
+        /* Toggle released/locked */
+        window.toggleUnitReleased = async function (unitId, released) {
+            await updateDoc(doc(db, 'units', unitId), { released, updatedAt: serverTimestamp() });
+            toast(released ? '✓ Unit released' : 'Unit locked');
+            await loadUnits();
+        };
+
+        /* Level filter tabs */
+        document.querySelectorAll('.level-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                unitsLevelFilter = tab.dataset.level;
+                renderUnitsList();
+            });
+        });
+
+        /* Add unit button */
+        document.getElementById('addUnitBtn').addEventListener('click', () => openUnitModal(null));
+
+        /* Edit unit */
+        window.editUnit = function (id) {
+            const u = allUnits.find(u => u.id === id);
+            if (u) openUnitModal(u);
+        };
+
+        let editingUnitId = null;
+
+        function openUnitModal(unit) {
+            editingUnitId = unit ? unit.id : null;
+            document.getElementById('unitModalTitle').textContent = unit ? 'Edit unit' : 'New unit';
+            document.getElementById('uf-name').value = unit?.name || '';
+            document.getElementById('uf-level').value = unit?.level || '';
+            document.getElementById('uf-order').value = unit?.order || (allUnits.length + 1);
+            document.getElementById('uf-passmark').value = unit?.passmark || 80;
+            document.getElementById('uf-released').checked = unit?.released || false;
+            document.getElementById('unitModal').classList.add('open');
+        }
+
+        document.getElementById('unitModalCancel').addEventListener('click', () => {
+            document.getElementById('unitModal').classList.remove('open');
+        });
+
+        document.getElementById('unitModalSave').addEventListener('click', async () => {
+            const name = document.getElementById('uf-name').value.trim();
+            const level = document.getElementById('uf-level').value;
+            const order = parseInt(document.getElementById('uf-order').value) || 1;
+            const passmark = parseInt(document.getElementById('uf-passmark').value) || 80;
+            const released = document.getElementById('uf-released').checked;
+
+            if (!name || !level) { toast('Name and level are required'); return; }
+
+            const data = { name, level, order, passmark, released, updatedAt: serverTimestamp() };
+
+            try {
+                if (editingUnitId) {
+                    await updateDoc(doc(db, 'units', editingUnitId), data);
+                    toast(`✓ "${name}" updated`);
+                } else {
+                    data.wordIds = [];
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'units'), data);
+                    toast(`✓ "${name}" created`);
+                }
+                document.getElementById('unitModal').classList.remove('open');
+                await loadUnits();
+            } catch (e) {
+                toast('Error saving unit — see console');
+                console.error(e);
+            }
+        });
+
+        /* Delete unit */
+        window.deleteUnit = function (id, name) {
+            openConfirm(
+                `Delete "${name}"?`,
+                'This will remove the unit and unassign all its words. Words themselves are not deleted.',
+                async () => {
+                    const unit = allUnits.find(u => u.id === id);
+                    /* Unassign unitId from all words in this unit */
+                    for (const wordId of (unit?.wordIds || [])) {
+                        try { await updateDoc(doc(db, 'words', wordId), { unitId: null }); } catch { }
+                    }
+                    await deleteDoc(doc(db, 'units', id));
+                    sessionStorage.removeItem('akaltye_words_cache');
+                    toast(`"${name}" deleted`);
+                    await loadUnits();
+                }
+            );
+        };
 
         /* ══════════════════════════════════════════════════════════
            CONFIRM DIALOG
