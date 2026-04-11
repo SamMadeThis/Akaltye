@@ -1,13 +1,8 @@
 /* =============================================================
    auth.js — Authentication helpers for ALKATYE
 
-   WHAT: Google sign-in, sign-out, and a shared auth state
-         observer that other pages can import and use.
-   HOW:  ES module. Exports signIn(), signOut(), and
-         onUserReady(callback) which fires once auth state
-         is known (either logged in or not).
-   WHY:  Centralising auth logic means every page gets
-         consistent behaviour without duplicating code.
+   Google Sign-in/sign-out sits here to centralise authentication logic.
+
    ============================================================= */
 
 import { auth, db }           from "./firebase-config.js";
@@ -26,13 +21,9 @@ const provider = new GoogleAuthProvider();
 
 /* =============================================================
    SIGN IN — Google popup
-   - WHAT: Opens Google sign-in popup, creates Firestore user
-           doc if this is their first sign-in
-   - HOW:  signInWithPopup → check if user doc exists →
-           create if not → redirect to setup if new user,
-           index if returning
-   - WHY:  Popup works well on desktop and mobile; the
-           first-visit check means setup.html only shows once
+    
+   Creating firestore user on first sign-in. 
+
    ============================================================= */
 export async function signIn() {
   try {
@@ -52,7 +43,7 @@ export async function signIn() {
         createdAt:   serverTimestamp(),
         setupDone:   false
       });
-      // Send to setup
+      // Send to setup - @Todo I need to double check this block as the setup is showing up on every signin
       window.location.href = 'setup.html';
     } else if (!userSnap.data().setupDone) {
       // Has account but never finished setup
@@ -70,10 +61,8 @@ export async function signIn() {
 
 /* =============================================================
    SIGN OUT
-   - WHAT: Signs the user out of Firebase Auth
-   - HOW:  Calls firebaseSignOut, clears local auth cache,
-           redirects to index
-   - WHY:  Clean sign-out prevents stale auth state
+   
+   Clean the sign-out prevents stale authentication state
    ============================================================= */
 export async function signOut() {
   try {
@@ -88,12 +77,10 @@ export async function signOut() {
 
 /* =============================================================
    ON USER READY
-   - WHAT: Fires callback once auth state is known
-   - HOW:  Wraps onAuthStateChanged in a one-time observer;
-           callback receives the user object (or null if
-           not signed in)
-   - WHY:  Pages need to know auth state before rendering
-           user-specific content; this avoids race conditions
+  
+   Pages need to know authentication state before rendering user-specific 
+   content; this avoids race conditions
+
    ============================================================= */
 export function onUserReady(callback) {
   const unsubscribe = onAuthStateChanged(auth, user => {
@@ -105,9 +92,9 @@ export function onUserReady(callback) {
 
 /* =============================================================
    GET CURRENT USER
-   - WHAT: Returns the currently signed-in user synchronously
-   - WHY:  Convenience helper so pages don't need to import
-           auth directly just to get the current user
+   
+   Convenience helper so pages don't need to import authentication
+    directly just to get the current user
    ============================================================= */
 export function getCurrentUser() {
   return auth.currentUser;

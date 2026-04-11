@@ -165,6 +165,9 @@ export const BADGE_DEFINITIONS = [
     name: 'First practice',
     desc: 'Completed a quiz',
     check: ({ quizCount }) => quizCount >= 1,
+    // @Todo the total number on the badge shown on the profile 
+    // is the total quiz count, its confusing I need to change 
+    // this perhaps just make this a notification but part of a milestone badges 
   },
   {
     id: 'quiz_10',
@@ -276,6 +279,11 @@ export function getNextBadgeProgress() {
   if (!unearned.length) return null;
 
   // Build progress for each unearned badge based on its category/id
+  // @Todo I need to go over what milestones should be displayed
+  // Badges are small rewards to represent a single action or achievement
+  // Milestones are significant high-level checkpoints to represent major progress or a collection of achievements
+
+  //Progress Map should show Milestones only
   const progressMap = {
     words_10:        { current: seenCount, target: 10 },
     words_25:        { current: seenCount, target: 25 },
