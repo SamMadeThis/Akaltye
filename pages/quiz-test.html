@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<!--
+  quiz-test.html — New quiz experience for AKALTYE
+  Design: Option B — card layout, numbered answers, check button,
+          bottom feedback bar, streak badge, correct answer on wrong.
+  This page is a standalone test. Once approved it will replace
+  the quiz screen in practice.html.
+-->
+<html lang="en">
+
+<head>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-17ZB632V40');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>AKALTYE — Quiz (test)</title>
+    <style>
+        /* ── Quiz page layout ── */
+        .quiz-page {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            height: calc(100vh - 64px);
+            /* full viewport minus nav */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Scrollable content area — sits above the fixed action bar */
+        .quiz-scroll {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding-bottom: var(--space-4);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Action area — always pinned to bottom */
+        .quiz-action {
+            flex-shrink: 0;
+            border-top: 0.5px solid var(--clr-surface-a10);
+        }
+
+        /* ── Top bar ── */
+        .qp-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-4) var(--space-3);
+            flex-shrink: 0;
+        }
+
+        .qp-back {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: color var(--transition-fast);
+        }
+
+        .qp-back:hover {
+            color: var(--clr-ochre);
+        }
+
+        .qp-mode-lbl {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--clr-surface-a40);
+        }
+
+        /* ── Progress bar ── */
+        .qp-prog-wrap {
+            padding: 0 var(--space-4) var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-shrink: 0;
+        }
+
+        .qp-prog-track {
+            flex: 1;
+            height: 3px;
+            background: var(--clr-surface-a10);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .qp-prog-fill {
+            height: 100%;
+            background: var(--clr-primary-a0);
+            border-radius: 99px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .qp-prog-lbl {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            white-space: nowrap;
+        }
+
+        /* ── Streak badge ── */
+        .qp-streak {
+            display: none;
+            align-items: center;
+            gap: var(--space-2);
+            align-self: flex-start;
+            margin: 0 var(--space-4) var(--space-3);
+            background: rgba(184, 115, 51, 0.1);
+            border: 0.5px solid var(--clr-ochre);
+            border-radius: var(--radius-pill);
+            padding: var(--space-1) var(--space-3);
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-ochre);
+            letter-spacing: 0.06em;
+            animation: fadeUp 0.3s ease both;
+        }
+
+        .qp-streak.visible {
+            display: flex;
+        }
+
+        /* ── Question card ── */
+        .qp-q-card {
+            margin: 0 var(--space-4) var(--space-4);
+            background: var(--clr-surface-tonal-a0);
+            border: 0.5px solid var(--clr-surface-a10);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .qp-type-pill {
+            display: inline-flex;
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--clr-surface-a40);
+            border: 0.5px solid var(--clr-surface-a20);
+            border-radius: var(--radius-pill);
+            padding: 3px 10px;
+            align-self: flex-start;
+        }
+
+        .qp-q-main {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--clr-light);
+            letter-spacing: -0.3px;
+            line-height: 1.25;
+        }
+
+        .qp-q-sub {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-ochre);
+            opacity: 0.85;
+            letter-spacing: 0.04em;
+        }
+
+        .qp-q-instruction {
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            color: var(--clr-surface-a50);
+            line-height: 1.5;
+        }
+
+        /* ── Answer list ── */
+        .qp-ans-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            padding: 0 var(--space-4);
+            flex: 1;
+        }
+
+        .qp-ans {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            border: 0.5px solid var(--clr-surface-a20);
+            border-radius: var(--radius-sm);
+            padding: var(--space-4) var(--space-4);
+            cursor: pointer;
+            transition: border-color var(--transition-fast), background var(--transition-fast);
+            user-select: none;
+        }
+
+        .qp-ans:hover:not(.disabled) {
+            border-color: var(--clr-ochre);
+            background: rgba(184, 115, 51, 0.06);
+        }
+
+        .qp-ans.selected {
+            border-color: var(--clr-primary-a0);
+            background: rgba(201, 175, 194, 0.08);
+        }
+
+        .qp-ans.correct {
+            border-color: var(--clr-success-a0);
+            background: rgba(34, 148, 110, 0.12);
+        }
+
+        .qp-ans.incorrect {
+            border-color: var(--clr-danger-a0);
+            background: rgba(156, 33, 33, 0.12);
+        }
+
+        .qp-ans.disabled {
+            cursor: not-allowed;
+        }
+
+        .qp-ans-num {
+            width: 22px;
+            height: 22px;
+            border-radius: var(--radius-sm);
+            border: 0.5px solid var(--clr-surface-a20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-surface-a40);
+            flex-shrink: 0;
+            transition: border-color var(--transition-fast), color var(--transition-fast);
+        }
+
+        .qp-ans.selected .qp-ans-num {
+            border-color: var(--clr-primary-a0);
+            color: var(--clr-primary-a0);
+        }
+
+        .qp-ans.correct .qp-ans-num {
+            border-color: var(--clr-success-a0);
+            color: var(--clr-success-a10);
+        }
+
+        .qp-ans.incorrect .qp-ans-num {
+            border-color: var(--clr-danger-a0);
+            color: var(--clr-danger-a10);
+        }
+
+        .qp-ans-text {
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            color: var(--clr-light);
+            line-height: 1.3;
+            flex: 1;
+            transition: color var(--transition-fast);
+        }
+
+        .qp-ans.correct .qp-ans-text {
+            color: var(--clr-success-a10);
+        }
+
+        .qp-ans.incorrect .qp-ans-text {
+            color: var(--clr-danger-a10);
+        }
+
+        /* ── Gap input ── */
+        .qp-gap-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            padding: 0 var(--space-4);
+        }
+
+        /* ── Match game ── */
+        .qp-match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2);
+            padding: 0 var(--space-4);
+        }
+
+        .qp-match-item {
+            border: 0.5px solid var(--clr-surface-a20);
+            border-radius: var(--radius-sm);
+            padding: var(--space-3) var(--space-3);
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            color: var(--clr-surface-a60);
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition-fast);
+            user-select: none;
+            line-height: 1.3;
+        }
+
+        .qp-match-item:hover:not(.matched):not(.disabled) {
+            border-color: var(--clr-ochre);
+            color: var(--clr-ochre);
+        }
+
+        .qp-match-item.selected {
+            border-color: var(--clr-primary-a0);
+            color: var(--clr-primary-a0);
+            background: rgba(201, 175, 194, 0.08);
+        }
+
+        .qp-match-item.matched {
+            border-color: var(--clr-success-a0);
+            color: var(--clr-success-a10);
+            background: rgba(34, 148, 110, 0.1);
+            cursor: default;
+        }
+
+        .qp-match-item.wrong-flash {
+            border-color: var(--clr-danger-a0);
+            background: rgba(156, 33, 33, 0.1);
+        }
+
+        /* ── Check button ── */
+        .qp-check-wrap {
+            padding: var(--space-4);
+        }
+
+        .qp-check {
+            width: 100%;
+            padding: var(--space-4);
+            background: none;
+            border: 0.5px solid var(--clr-surface-a20);
+            border-radius: var(--radius-md);
+            color: var(--clr-surface-a40);
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            cursor: not-allowed;
+            transition: all var(--transition-fast);
+        }
+
+        .qp-check.ready {
+            background: var(--clr-ochre);
+            border-color: var(--clr-ochre);
+            color: #1a0a00;
+            cursor: pointer;
+        }
+
+        .qp-check.ready:hover {
+            background: #c97d38;
+        }
+
+        .qp-check.ready:active {
+            transform: scale(0.98);
+        }
+
+        /* ── Bottom feedback bar ── */
+        .qp-feedback-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            animation: slideUp 0.22s cubic-bezier(0.35, 0, 0.25, 1) both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .qp-feedback-bar.correct-bar {
+            display: flex;
+            background: rgba(34, 148, 110, 0.1);
+        }
+
+        .qp-feedback-bar.incorrect-bar {
+            display: flex;
+            background: rgba(156, 33, 33, 0.1);
+        }
+
+        .qp-feedback-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .qp-feedback-title {
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 600;
+        }
+
+        .correct-bar .qp-feedback-title {
+            color: var(--clr-success-a10);
+        }
+
+        .incorrect-bar .qp-feedback-title {
+            color: var(--clr-danger-a10);
+        }
+
+        .qp-feedback-answer {
+            font-family: var(--font-display);
+            font-size: var(--text-md);
+            font-weight: 600;
+            color: var(--clr-light);
+        }
+
+        .qp-feedback-phonetic {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            color: var(--clr-ochre);
+            opacity: 0.85;
+        }
+
+        .qp-continue {
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            border: none;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .correct-bar .qp-continue {
+            background: var(--clr-success-a0);
+            color: #04342c;
+        }
+
+        .correct-bar .qp-continue:hover {
+            background: #1a7a59;
+        }
+
+        .incorrect-bar .qp-continue {
+            background: var(--clr-danger-a0);
+            color: #fcebeb;
+        }
+
+        .incorrect-bar .qp-continue:hover {
+            background: #7a1a1a;
+        }
+
+        /* ── Score screen ── */
+        .qp-score {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-6);
+            padding: var(--space-8) var(--space-4);
+            text-align: center;
+        }
+
+        .qp-score.active {
+            display: flex;
+        }
+
+        .qp-score-num {
+            font-family: var(--font-display);
+            font-size: var(--text-3xl);
+            font-weight: 600;
+            color: var(--clr-light);
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .qp-score-num span {
+            color: var(--clr-primary-a0);
+        }
+
+        .qp-score-bar-track {
+            width: 100%;
+            height: 3px;
+            background: var(--clr-surface-a10);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .qp-score-bar-fill {
+            height: 100%;
+            background: var(--clr-primary-a0);
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .qp-score-quip {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: var(--text-base);
+            color: var(--clr-primary-a40);
+        }
+
+        .qp-score-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header></header>
+
+    <div class="page-content"
+        style="align-items:flex-start;justify-content:flex-start;padding:0;margin:0;max-width:100%;">
+        <div class="quiz-page" id="quizPage">
+
+            <!-- Scrollable content area -->
+            <div class="quiz-scroll">
+
+                <!-- Top bar -->
+                <div class="qp-topbar">
+                    <button class="qp-back" id="qpBack">← back</button>
+                    <span class="qp-mode-lbl" id="qpModeLbl">—</span>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="qp-prog-wrap">
+                    <div class="qp-prog-track">
+                        <div class="qp-prog-fill" id="qpProgFill" style="width:0%"></div>
+                    </div>
+                    <span class="qp-prog-lbl" id="qpProgLbl">1 / —</span>
+                </div>
+
+                <!-- Streak badge -->
+                <div class="qp-streak" id="qpStreak">✦ <span id="qpStreakNum">3</span> in a row</div>
+
+                <!-- Question card -->
+                <div class="qp-q-card" id="qpQCard">
+                    <span class="qp-type-pill" id="qpTypePill">—</span>
+                    <div class="qp-q-instruction" id="qpInstruction"></div>
+                    <div class="qp-q-main" id="qpMain">—</div>
+                    <div class="qp-q-sub" id="qpSub"></div>
+                </div>
+
+                <!-- Answer area -->
+                <div class="qp-ans-list" id="qpAnsList"></div>
+                <div class="qp-gap-wrap" id="qpGapWrap" style="display:none">
+                    <input class="gap-input" id="qpGapInput" type="text" placeholder="Type the Arrernte word…"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="qp-match-grid" id="qpMatchGrid" style="display:none"></div>
+
+                <!-- Score screen (inside scroll area) -->
+                <div class="qp-score" id="qpScore">
+                    <div class="qp-score-num" id="qpScoreNum">0 <span>/ 0</span></div>
+                    <div
+                        style="font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--clr-surface-a40);">
+                        correct answers</div>
+                    <div class="qp-score-bar-track" style="width:100%">
+                        <div class="qp-score-bar-fill" id="qpScoreBar" style="width:0%"></div>
+                    </div>
+                    <div class="qp-score-quip" id="qpScoreQuip"></div>
+                    <div class="qp-score-actions">
+                        <button class="btn-primary" id="qpPlayAgain">Play again</button>
+                        <a href="practice.html" class="btn-ghost" style="text-align:center;padding:var(--space-3);">Back
+                            to practice</a>
+                    </div>
+                </div>
+
+            </div><!-- /quiz-scroll -->
+
+            <!-- Pinned action bar — always at the bottom -->
+            <div class="quiz-action" id="quizAction">
+                <div class="qp-check-wrap" id="qpCheckWrap">
+                    <button class="qp-check" id="qpCheck">Check answer</button>
+                </div>
+                <div class="qp-feedback-bar" id="qpFeedback">
+                    <div class="qp-feedback-content">
+                        <div class="qp-feedback-title" id="qpFeedbackTitle"></div>
+                        <div class="qp-feedback-answer" id="qpFeedbackAnswer"></div>
+                        <div class="qp-feedback-phonetic" id="qpFeedbackPhonetic"></div>
+                    </div>
+                    <button class="qp-continue" id="qpContinue">Continue →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { getWords } from '../js/words-service.js';
+        import { auth } from '../js/firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+        import { pullFromFirestore, syncQuizLog } from '../js/sync.js';
+        import { updateStreak } from '../js/badges.js';
+
+        let currentUid = null;
+        onAuthStateChanged(auth, user => {
+            currentUid = user ? user.uid : null;
+            if (currentUid) pullFromFirestore(currentUid);
+        });
+
+        /* ── Helpers ── */
+        const $ = id => document.getElementById(id);
+        const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
+        const firstDef = w => { const d = Array.isArray(w.definition) ? w.definition : [w.definition]; return d[0] || ''; };
+        const allDefs = w => Array.isArray(w.definition) ? w.definition : [w.definition];
+
+        function toast(msg) {
+            const t = $('toast'); t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1800);
+        }
+
+        /* ── State ── */
+        let WORDS = [];
+        let questions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let matchState = null;
+        let answered = false;
+        let quizMode = '';
+        let selectedAns = null;
+
+        const MODE_NAMES = {
+            guess: 'Guess the Word', meaning: 'Meaning Match',
+            gap: 'Fill the Gap', match: 'Match Synonym', shuffle: 'Game Shuffle'
+        };
+        const TYPE_LABELS = { guess: 'guess the word', meaning: 'meaning match', gap: 'fill the gap', match: 'match synonym' };
+
+        /* ── Read URL params ── */
+        const params = new URLSearchParams(window.location.search);
+        quizMode = params.get('mode') || 'shuffle';
+
+        /* ── Question builders ── */
+        function buildMC(word, type, pool) {
+            const dist = shuffle(pool.filter(w => w.word !== word.word)).slice(0, 3);
+            if (type === 'meaning') {
+                const correct = firstDef(word), wrongs = dist.map(w => firstDef(w));
+                return {
+                    type: 'meaning', word, instruction: 'What does this word mean?',
+                    main: word.word, sub: word.phonetic ? `/${word.phonetic}/` : '',
+                    correct, options: shuffle([correct, ...wrongs])
+                };
+            } else {
+                const correct = word.word, wrongs = dist.map(w => w.word);
+                return {
+                    type: 'guess', word, instruction: 'Which Arrernte word means…',
+                    main: `"${firstDef(word)}"`, sub: '',
+                    correct, options: shuffle([correct, ...wrongs])
+                };
+            }
+        }
+
+        function buildGap(word, pool) {
+            const sentence = word.examples && word.examples[0];
+            if (sentence) {
+                const re = new RegExp(word.word, 'gi');
+                const blanked = re.test(sentence) ? sentence.replace(re, '______') : sentence + ' (______)'
+                return {
+                    type: 'gap', word, instruction: 'Fill in the missing Arrernte word.',
+                    main: blanked, sub: word.phonetic ? `Hint: /${word.phonetic}/` : '', correct: word.word
+                };
+            }
+            return buildMC(word, 'meaning', pool);
+        }
+
+        function buildMatchBlock(batch) {
+            return { type: 'match', pairs: batch.map(w => ({ word: w.word, def: firstDef(w), phonetic: w.phonetic || '' })) };
+        }
+
+        function buildQuestions(pool, mode) {
+            const words = shuffle(pool);
+            if (mode === 'match') {
+                const rounds = [];
+                for (let i = 0; i < words.length; i += 4) { const b = words.slice(i, i + 4); if (b.length >= 2) rounds.push(buildMatchBlock(b)); }
+                return rounds.slice(0, 3);
+            }
+            return words.slice(0, 10).map((w, i) => {
+                let t = mode;
+                if (mode === 'shuffle') { const cycle = ['guess', 'meaning', 'gap', 'meaning', 'guess']; t = cycle[i % cycle.length]; }
+                return t === 'gap' ? buildGap(w, pool) : buildMC(w, t, pool);
+            });
+        }
+
+        /* ── Render ── */
+        function renderQuestion() {
+            answered = false;
+            selectedAns = null;
+            matchState = null;
+
+            const q = questions[currentIdx];
+            const total = questions.length;
+
+            $('qpProgFill').style.width = (currentIdx / total * 100) + '%';
+            $('qpProgLbl').textContent = `${currentIdx + 1} / ${total}`;
+            $('qpModeLbl').textContent = MODE_NAMES[quizMode] || quizMode;
+            $('qpTypePill').textContent = TYPE_LABELS[q.type] || q.type;
+
+            /* streak badge */
+            if (streak >= 3) {
+                $('qpStreak').classList.add('visible');
+                $('qpStreakNum').textContent = streak;
+            } else {
+                $('qpStreak').classList.remove('visible');
+            }
+
+            /* reset feedback and check button */
+            const fb = $('qpFeedback');
+            fb.className = 'qp-feedback-bar';
+            $('qpCheckWrap').style.display = 'block';
+            $('qpCheck').className = 'qp-check';
+            $('qpCheck').disabled = false;
+
+            /* hide answer areas */
+            $('qpAnsList').style.display = 'flex';
+            $('qpGapWrap').style.display = 'none';
+            $('qpMatchGrid').style.display = 'none';
+            $('qpAnsList').innerHTML = '';
+
+            if (q.type === 'match') renderMatch(q);
+            else if (q.type === 'gap') renderGap(q);
+            else renderMC(q);
+        }
+
+        function renderMC(q) {
+            $('qpInstruction').textContent = q.instruction;
+            $('qpMain').textContent = q.main;
+            $('qpSub').textContent = q.sub || '';
+            $('qpQCard').style.display = 'flex';
+
+            q.options.forEach((opt, i) => {
+                const el = document.createElement('div');
+                el.className = 'qp-ans';
+                el.innerHTML = `<div class="qp-ans-num">${i + 1}</div><div class="qp-ans-text">${opt}</div>`;
+                el.dataset.value = opt;
+                el.addEventListener('click', () => selectMC(el, opt, q));
+                $('qpAnsList').appendChild(el);
+            });
+        }
+
+        function selectMC(el, value, q) {
+            if (answered) return;
+            document.querySelectorAll('.qp-ans').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedAns = { el, value, q };
+            $('qpCheck').className = 'qp-check ready';
+        }
+
+        function checkMC() {
+            if (!selectedAns) return;
+            const { el, value, q } = selectedAns;
+            answered = true;
+            const correct = value === q.correct;
+
+            document.querySelectorAll('.qp-ans').forEach(a => {
+                a.classList.add('disabled');
+                if (a.dataset.value === q.correct) a.classList.add('correct');
+            });
+            if (!correct) el.classList.add('incorrect');
+
+            showFeedback(correct, q.word);
+            if (correct) score++;
+        }
+
+        function renderGap(q) {
+            $('qpInstruction').textContent = q.instruction;
+            $('qpMain').textContent = q.main;
+            $('qpSub').textContent = q.sub || '';
+            $('qpQCard').style.display = 'flex';
+            $('qpAnsList').style.display = 'none';
+            $('qpGapWrap').style.display = 'flex';
+            $('qpGapInput').value = '';
+            $('qpGapInput').disabled = false;
+            $('qpGapInput').className = 'gap-input';
+            setTimeout(() => $('qpGapInput').focus(), 50);
+            $('qpGapInput').oninput = () => {
+                $('qpCheck').className = $('qpGapInput').value.trim() ? 'qp-check ready' : 'qp-check';
+            };
+        }
+
+        function checkGap() {
+            const q = questions[currentIdx];
+            const val = $('qpGapInput').value.trim();
+            const correct = val.toLowerCase() === q.correct.toLowerCase();
+            answered = true;
+            $('qpGapInput').className = `gap-input ${correct ? 'correct' : 'incorrect'}`;
+            $('qpGapInput').disabled = true;
+            showFeedback(correct, q.word);
+            if (correct) score++;
+        }
+
+        function renderMatch(q) {
+            $('qpInstruction').textContent = 'Match each word to its meaning.';
+            $('qpMain').textContent = '';
+            $('qpSub').textContent = '';
+            $('qpQCard').style.display = 'flex';
+            $('qpAnsList').style.display = 'none';
+            $('qpMatchGrid').style.display = 'grid';
+            $('qpMatchGrid').innerHTML = '';
+
+            matchState = { pairs: q.pairs, selLeft: null, selRight: null, matched: new Set(), score: 0 };
+
+            const lefts = shuffle(q.pairs.map(p => p.word));
+            const rights = shuffle(q.pairs.map(p => p.def));
+
+            [...lefts, ...rights].forEach((text, i) => {
+                const isLeft = i < lefts.length;
+                const el = document.createElement('div');
+                el.className = 'qp-match-item';
+                el.textContent = text;
+                el.dataset.side = isLeft ? 'left' : 'right';
+                if (isLeft) el.dataset.word = text; else el.dataset.def = text;
+                el.addEventListener('click', () => handleMatch(el));
+                $('qpMatchGrid').appendChild(el);
+            });
+        }
+
+        function handleMatch(el) {
+            if (el.classList.contains('matched') || answered) return;
+            const side = el.dataset.side;
+            if (side === 'left') {
+                document.querySelectorAll('.qp-match-item[data-side="left"]').forEach(x => { if (!x.classList.contains('matched')) x.classList.remove('selected'); });
+                el.classList.add('selected'); matchState.selLeft = el;
+            } else {
+                document.querySelectorAll('.qp-match-item[data-side="right"]').forEach(x => { if (!x.classList.contains('matched')) x.classList.remove('selected'); });
+                el.classList.add('selected'); matchState.selRight = el;
+            }
+            if (matchState.selLeft && matchState.selRight) {
+                const word = matchState.selLeft.dataset.word;
+                const def = matchState.selRight.dataset.def;
+                const pair = matchState.pairs.find(p => p.word === word);
+                const ok = pair && pair.def === def;
+                if (ok) {
+                    matchState.selLeft.classList.replace('selected', 'matched');
+                    matchState.selRight.classList.replace('selected', 'matched');
+                    matchState.matched.add(word);
+                    matchState.score++;
+                    score++;
+                    if (matchState.matched.size === matchState.pairs.length) {
+                        setTimeout(() => { answered = true; showFeedback(true, null, true); }, 300);
+                    }
+                } else {
+                    [matchState.selLeft, matchState.selRight].forEach(x => {
+                        x.classList.remove('selected');
+                        x.classList.add('wrong-flash');
+                        setTimeout(() => x.classList.remove('wrong-flash'), 500);
+                    });
+                }
+                matchState.selLeft = matchState.selRight = null;
+            }
+        }
+
+        function checkMatch() {
+            if (matchState && matchState.matched.size === matchState.pairs.length) {
+                answered = true;
+                showFeedback(true, null, true);
+            } else {
+                toast('Match all pairs first');
+            }
+        }
+
+        /* ── Feedback bar ── */
+        function showFeedback(correct, word, isMatch = false) {
+            $('qpCheckWrap').style.display = 'none';
+            const fb = $('qpFeedback');
+
+            if (correct) {
+                streak++;
+                fb.className = 'qp-feedback-bar correct-bar';
+                $('qpFeedbackTitle').textContent = isMatch ? 'All matched! Mwarre!' : 'Mwarre! Correct.';
+                $('qpFeedbackAnswer').textContent = '';
+                $('qpFeedbackPhonetic').textContent = '';
+            } else {
+                streak = 0;
+                $('qpStreak').classList.remove('visible');
+                fb.className = 'qp-feedback-bar incorrect-bar';
+                $('qpFeedbackTitle').textContent = 'Not quite —';
+                if (word) {
+                    $('qpFeedbackAnswer').textContent = questions[currentIdx].correct || word.word;
+                    $('qpFeedbackPhonetic').textContent = word.phonetic ? `/${word.phonetic}/` : '';
+                }
+            }
+
+            if (streak >= 3) {
+                $('qpStreak').classList.add('visible');
+                $('qpStreakNum').textContent = streak;
+            }
+        }
+
+        /* ── Check button handler ── */
+        $('qpCheck').addEventListener('click', () => {
+            if (answered) return;
+            const q = questions[currentIdx];
+            if (q.type === 'gap') checkGap();
+            else if (q.type === 'match') checkMatch();
+            else if (selectedAns) checkMC();
+        });
+
+        /* ── Gap enter key ── */
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !answered) {
+                const q = questions[currentIdx];
+                if (q && q.type === 'gap') checkGap();
+            }
+        });
+
+        /* ── Continue ── */
+        $('qpContinue').addEventListener('click', () => {
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                renderQuestion();
+            } else {
+                showScore();
+            }
+        });
+
+        /* ── Score screen ── */
+        function showScore() {
+            $('qpCheckWrap').style.display = 'none';
+            $('qpFeedback').className = 'qp-feedback-bar';
+            $('quizAction').style.display = 'none';
+            $('qpStreak').classList.remove('visible');
+
+            const total = questions.length;
+            const pct = Math.round(score / total * 100);
+
+            $('qpScoreNum').innerHTML = `${score} <span>/ ${total}</span>`;
+            setTimeout(() => { $('qpScoreBar').style.width = pct + '%'; }, 50);
+
+            const quips = [[100, 'Perfect! Mwarre anthurre!'], [80, "Really solid — you're getting it!"], [60, 'Good effort, keep practising.'], [40, "A few more sessions and you'll nail it."], [0, 'Just getting started — keep going!']];
+            $('qpScoreQuip').textContent = (quips.find(([t]) => pct >= t) || quips.at(-1))[1];
+            $('qpScore').classList.add('active');
+
+            /* save to quiz log */
+            const log = JSON.parse(localStorage.getItem('lexicon_quiz_log') || '[]');
+            const now = new Date();
+            log.unshift({
+                mode: MODE_NAMES[quizMode] || quizMode, score, total, pct,
+                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: now.toLocaleDateString([], { day: 'numeric', month: 'short' }),
+                iso: now.toISOString()
+            });
+            if (currentUid) syncQuizLog(currentUid, log.slice(0, 50));
+            else localStorage.setItem('lexicon_quiz_log', JSON.stringify(log.slice(0, 50)));
+
+            updateStreak();
+        }
+
+        /* ── Play again ── */
+        $('qpPlayAgain').addEventListener('click', () => {
+            currentIdx = 0; score = 0; streak = 0;
+            questions = buildQuestions(WORDS.slice(), quizMode);
+            $('qpScore').classList.remove('active');
+            $('qpQCard').style.display = 'flex';
+            $('quizAction').style.display = 'block';
+            renderQuestion();
+        });
+
+        /* ── Back button ── */
+        $('qpBack').addEventListener('click', () => { window.location.href = 'practice.html'; });
+
+        /* ── Init ── */
+        (async () => {
+            WORDS = await getWords();
+            if (!WORDS.length) { toast('Could not load words'); return; }
+            questions = buildQuestions(WORDS.slice(), quizMode);
+            renderQuestion();
+        })();
+    </script>
+
+    <script type="module" src="/js/nav.js"></script>
+</body>
+
+</html>
