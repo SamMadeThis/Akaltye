@@ -33,7 +33,7 @@ document.querySelector('header').innerHTML = `
     <nav class="nav">
       <ul class="nav__menu">
         <li class="nav__item"><a href="/pages/explore.html"   class="nav__link">Explore</a></li>
-        <li class="nav__item"><a href="/pages/practice.html"  class="nav__link">Practice</a></li>
+        <li class="nav__item"><a href="/pages/learn.html"  class="nav__link">Learn</a></li>
         <li class="nav__item"><a href="/pages/profile.html"   class="nav__link">Profile</a></li>
         <li class="nav__item"><a href="/pages/resources.html" class="nav__link">Resources</a></li>
       </ul>
