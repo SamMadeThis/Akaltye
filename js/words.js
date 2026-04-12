@@ -22,7 +22,7 @@
 // ═══════════════════════════════════════════════════
 
 import { getWords }                                        from './words-service.js';
-import { auth }                                           from './firebase-config.js';
+import { auth }                                            from './firebase-config.js';
 import { onAuthStateChanged }                             from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
 import { pullFromFirestore, syncSeen, syncFavourites, syncBookmarks } from './sync.js';
 
@@ -310,7 +310,7 @@ function applyWord(el, w) {
 
   // Prev / Next button state
   document.getElementById('prevBtn').disabled = current === 0;
-  document.getElementById('nextBtn').disabled = current === words.length - 1;
+  document.getElementById('nextBtn').disabled = !_unitId && current === words.length - 1;
 
   // Fav button — lives outside the card, sync manually
   const favBtn  = document.getElementById('favBtn');
@@ -394,8 +394,74 @@ function burstParticles(btn) {
 //  ACTIONS
 // ═══════════════════════════════════════════════════
 
-function navigate(dir) {
+/* Unit ID — set in init if ?unit= param present, used by navigate() */
+let _unitId   = null;
+let _unitName = '';
+
+function showUnitCompletePrompt() {
+  /* Remove any existing prompt */
+  document.getElementById('unitCompletePrompt')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'unitCompletePrompt';
+  overlay.style.cssText = `
+    position: fixed; inset: 0;
+    background: rgba(12,10,10,0.88);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 1.5rem;
+    animation: fadeIn 0.3s ease;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      background: #1e1b1b;
+      border: 0.5px solid #312e2e;
+      border-radius: 18px;
+      padding: 2rem 1.75rem;
+      max-width: 360px; width: 100%;
+      text-align: center;
+      display: flex; flex-direction: column; gap: 1rem;
+    ">
+      <div style="font-family:'Lora',serif;font-size:2.4rem;font-weight:600;color:#c9afc2;letter-spacing:-1px;line-height:1;">
+        ✦
+      </div>
+      <div style="font-family:'Lora',serif;font-size:1.25rem;font-weight:500;color:#fff;">
+        Words complete
+      </div>
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:#474444;line-height:1.7;">
+        You've been through all ${words.length} words in <em style="color:#c9afc2;">${_unitName}</em>.<br>
+        Ready to test yourself?
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:0.5rem;">
+        <button onclick="goToReviewTest()" style="
+          background:#B87333; border:none; border-radius:10px;
+          padding:14px; width:100%; cursor:pointer;
+          font-family:'Vollkorn',serif; font-size:1rem; color:#1a0a00;
+          transition:background 0.15s ease;
+        ">Take the review test →</button>
+        <button onclick="document.getElementById('unitCompletePrompt').remove()" style="
+          background:none; border:0.5px solid #312e2e; border-radius:10px;
+          padding:12px; width:100%; cursor:pointer;
+          font-family:'Roboto Mono',monospace; font-size:11px; color:#474444;
+        ">Go back to words</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+window.goToReviewTest = function() {
+  window.location.href = `quiz-test.html?mode=shuffle&unit=${_unitId}&unitName=${encodeURIComponent(_unitName)}&review=1`;
+};
   if (autoSeenTimer) clearTimeout(autoSeenTimer);
+
+  /* ── Unit completion: forward past last card ── */
+  if (dir > 0 && current === words.length - 1 && _unitId) {
+    showUnitCompletePrompt();
+    return;
+  }
+
   current = Math.max(0, Math.min(words.length - 1, current + dir));
   renderCard(dir > 0 ? 'next' : 'prev');
 }
@@ -510,11 +576,43 @@ function applyFilter(group, tag, pos) {
 
 (async () => {
   /* Load words from Firestore (cached after first load) */
-  WORDS = await getWords();
-  words = shuffle(WORDS);
-  if (!WORDS.length) {
+  const allWords = await getWords();
+  if (!allWords.length) {
     console.error('words.js: no words loaded — check Firestore connection');
     return;
+  }
+
+  // Read URL params
+  const params     = new URLSearchParams(window.location.search);
+  const startGroup = params.get('group') || null;
+  const startTag   = params.get('tag')   || null;
+  const startPos   = params.get('pos')   || null;
+  const startWord  = params.get('word')  || null;
+  const unitId     = params.get('unit')  || null;
+
+  /* ── If ?unit= is present, filter to unit words only ── */
+  if (unitId) {
+    const unitWords = allWords.filter(w => w.unitId === unitId);
+    if (unitWords.length) {
+      WORDS     = unitWords;
+      _unitId   = unitId;
+      /* Use the unit name from URL param if provided, else generic */
+      _unitName = params.get('unitName') ? decodeURIComponent(params.get('unitName')) : 'this unit';
+      /* Update heading */
+      const headingEl = document.querySelector('h2');
+      if (headingEl) headingEl.textContent = _unitName !== 'this unit' ? _unitName : 'Unit';
+      /* Show words in consistent order for learning */
+      words   = WORDS;
+      current = 0;
+      renderCard(null);
+    } else {
+      /* Unit has no words assigned yet — fall back to all */
+      WORDS = allWords;
+      applyFilter(startGroup, startTag, startPos);
+    }
+  } else {
+    WORDS = allWords;
+    applyFilter(startGroup, startTag, startPos);
   }
 
   document.getElementById('prevBtn').addEventListener('click', () => navigate(-1));
@@ -527,15 +625,6 @@ function applyFilter(group, tag, pos) {
     if (e.key === 'ArrowRight') navigate(1);
     if (e.key === 'ArrowLeft')  navigate(-1);
   });
-
-  // Read URL params and apply filter on load
-  const params     = new URLSearchParams(window.location.search);
-  const startGroup = params.get('group') || null;
-  const startTag   = params.get('tag')   || null;
-  const startPos   = params.get('pos')   || null;
-  const startWord  = params.get('word')  || null;
-
-  applyFilter(startGroup, startTag, startPos);
 
   // If a specific word was requested via ?word=Kwatye, jump to it
   if (startWord) {

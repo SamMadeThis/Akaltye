@@ -1489,7 +1489,7 @@
                 }
                 document.getElementById('wordModal').classList.remove('open');
                 /* Clear sessionStorage cache so words-service fetches fresh */
-                sessionStorage.removeItem('akaltye_words_cache');
+                sessionStorage.removeItem('akaltye_words_cache_v2'); sessionStorage.removeItem('akaltye_words_cache');
                 await loadWords();
             } catch (e) {
                 toast('Error saving word — see console');
@@ -1504,7 +1504,7 @@
                 'This word will be permanently removed from the lexicon. This cannot be undone.',
                 async () => {
                     await deleteDoc(doc(db, 'words', id));
-                    sessionStorage.removeItem('akaltye_words_cache');
+                    sessionStorage.removeItem('akaltye_words_cache_v2'); sessionStorage.removeItem('akaltye_words_cache');
                     toast(`"${word}" deleted`);
                     await loadWords();
                 }
@@ -1834,7 +1834,7 @@
             await updateDoc(doc(db, 'units', unitId), { wordIds, updatedAt: serverTimestamp() });
             /* Also tag the word with unitId */
             await updateDoc(doc(db, 'words', wordId), { unitId, updatedAt: serverTimestamp() });
-            sessionStorage.removeItem('akaltye_words_cache');
+            sessionStorage.removeItem('akaltye_words_cache_v2'); sessionStorage.removeItem('akaltye_words_cache');
             toast('✓ Word added to unit');
             await loadUnits();
             /* Re-open the body and clear search */
@@ -1855,7 +1855,7 @@
             const wordIds = (unit.wordIds || []).filter(id => id !== wordId);
             await updateDoc(doc(db, 'units', unitId), { wordIds, updatedAt: serverTimestamp() });
             await updateDoc(doc(db, 'words', wordId), { unitId: null, updatedAt: serverTimestamp() });
-            sessionStorage.removeItem('akaltye_words_cache');
+            sessionStorage.removeItem('akaltye_words_cache_v2'); sessionStorage.removeItem('akaltye_words_cache');
             toast('Word removed from unit');
             await loadUnits();
             setTimeout(() => {
@@ -1948,7 +1948,7 @@
                         try { await updateDoc(doc(db, 'words', wordId), { unitId: null }); } catch { }
                     }
                     await deleteDoc(doc(db, 'units', id));
-                    sessionStorage.removeItem('akaltye_words_cache');
+                    sessionStorage.removeItem('akaltye_words_cache_v2'); sessionStorage.removeItem('akaltye_words_cache');
                     toast(`"${name}" deleted`);
                     await loadUnits();
                 }

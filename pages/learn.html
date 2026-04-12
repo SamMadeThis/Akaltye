@@ -960,7 +960,7 @@
             if (!learnDone) {
                 ctaText = 'Start learning words';
                 ctaSub = `${words.length} words · tap through each one`;
-                ctaUrl = `words.html?unit=${u.id}`;
+                ctaUrl = `words.html?unit=${u.id}&unitName=${encodeURIComponent(u.name)}`;
             } else if (!reviewDone) {
                 ctaText = 'Take the review test';
                 ctaSub = `${words.length} questions · see what you got wrong`;

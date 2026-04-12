@@ -30,7 +30,7 @@ import {
   collection, getDocs, query, where
 } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 
-const CACHE_KEY = 'akaltye_words_cache';
+const CACHE_KEY = 'akaltye_words_cache_v2'; // v2: includes unitId field
 
 let _memoryCache = null; // in-memory for the current page load
 
@@ -96,5 +96,8 @@ export async function getWords() {
    ============================================================= */
 export function clearWordsCache() {
   _memoryCache = null;
-  try { sessionStorage.removeItem(CACHE_KEY); } catch {}
+  try {
+    sessionStorage.removeItem(CACHE_KEY);
+    sessionStorage.removeItem('akaltye_words_cache'); // clear old key too
+  } catch {}
 }
