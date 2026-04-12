@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-17ZB632V40');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review your quiz results">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>AKALTYE — Your Scorecard</title>
+</head>
+
+<body>
+    <header></header>
+
+    <div class="page-content" style="align-items:flex-start;justify-content:flex-start;padding:0;">
+        <div class="scorecard-page">
+
+            <!-- Header -->
+            <div class="scorecard-header">
+                <div class="score-badge" id="scoreBadge">
+                    <span class="score-num" id="scorePercent">—</span>
+                </div>
+
+                <h1 class="scorecard-title">Check out your scorecard!</h1>
+                <p class="scorecard-subtitle" id="scoreSubtitle">Click the tiles below to reveal the solutions</p>
+
+                <button class="reveal-toggle" id="revealToggle">Reveal all</button>
+            </div>
+
+            <!-- Stats -->
+            <div class="score-stats" id="scoreStats"></div>
+
+            <!-- Questions grid -->
+            <div class="questions-grid" id="questionsGrid"></div>
+
+            <!-- Actions -->
+            <div class="scorecard-actions">
+                <a href="#" class="scorecard-btn secondary" id="btnReviewLesson">Review lesson</a>
+                <a href="learn.html" class="scorecard-btn primary">Back to learn</a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
+    <script type="module" src="/js/nav.js"></script>
+    <script type="module" src="../js/scorecard.js"></script>
+</body>
+
+</html>

@@ -6,6 +6,7 @@
   Two screens: #screenUnits (list) and #screenUnit (detail).
   Search bar at top searches full lexicon.
   Practice is auto-filtered to current unit words — no options.
+  UPDATED: Added scorecard review functionality
 -->
 <html lang="en">
 
@@ -29,6 +30,9 @@
     <link rel="stylesheet" href="../css/styles.css">
     <title>AKALTYE — Learn</title>
     <style>
+        /* NOTE: All learn page styles are inline here for now.
+           Consider moving to styles.css for consistency. */
+
         /* ── Page layout ── */
         .learn-page {
             width: 100%;
@@ -691,6 +695,12 @@
                     </div>
                 </div>
 
+                <!-- Scorecard review section (appears after tests completed) -->
+                <div id="unitScorecardWrap" style="display:none;">
+                    <div class="section-lbl" style="margin-bottom:var(--space-3);">Review your results</div>
+                    <div id="scorecardsList"></div>
+                </div>
+
             </div><!-- /screenUnit -->
 
         </div>
@@ -795,7 +805,6 @@
             searchResults.classList.remove('open');
             const w = WORDS.find(w => w.id === id);
             if (!w) return;
-            /* For now show a toast — word detail page can be built next */
             showToast(`${w.word} — ${firstDef(w)}`);
         };
 
@@ -977,19 +986,76 @@
 
             $('unitCtaText').textContent = ctaText;
             $('unitCtaSub').textContent = ctaSub;
-            $('unitMainCta').onclick = () => { window.location.href = ctaUrl; };
+
+            const storeUnit = () => {
+                try {
+                    sessionStorage.setItem('akaltye_active_unit', JSON.stringify({
+                        id: u.id,
+                        name: u.name,
+                        wordIds: wordIds,
+                    }));
+                } catch (e) { }
+            };
+
+            $('unitMainCta').onclick = () => { storeUnit(); window.location.href = ctaUrl; };
 
             /* Practice games — only shown when user has started the unit */
             const practiceWrap = $('unitPracticeWrap');
             if (learnDone && words.length >= 4) {
                 practiceWrap.style.display = 'block';
-                const url = mode => `quiz-test.html?mode=${mode}&unit=${u.id}`;
-                $('modeGuess').onclick = () => window.location.href = url('guess');
-                $('modeMeaning').onclick = () => window.location.href = url('meaning');
-                $('modeGap').onclick = () => window.location.href = url('gap');
-                $('modeShuffle').onclick = () => window.location.href = url('shuffle');
+                const url = mode => `quiz-test.html?mode=${mode}&unit=${u.id}&unitName=${encodeURIComponent(u.name)}`;
+                const go = mode => { storeUnit(); window.location.href = url(mode); };
+                $('modeGuess').onclick = () => go('guess');
+                $('modeMeaning').onclick = () => go('meaning');
+                $('modeGap').onclick = () => go('gap');
+                $('modeShuffle').onclick = () => go('shuffle');
             } else {
                 practiceWrap.style.display = 'none';
+            }
+
+            /* Scorecard review section */
+            const scorecardWrap = $('unitScorecardWrap');
+            const scorecardsList = $('scorecardsList');
+
+            if (progress.reviewDone || progress.passed) {
+                let scHTML = '';
+
+                if (progress.reviewDone && progress.reviewQuestions) {
+                    const reviewPct = Math.round((progress.reviewScore / progress.reviewTotal) * 100);
+                    scHTML += `
+                        <div class="mode-item" onclick="viewScorecard('${u.id}', 'review')">
+                            <div class="mode-item-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                            <div style="flex:1;">
+                                <div class="mode-item-name">Review test scorecard</div>
+                                <div class="mode-item-desc">Score: ${progress.reviewScore}/${progress.reviewTotal} (${reviewPct}%)</div>
+                            </div>
+                            <span class="mode-item-arr">→</span>
+                        </div>
+                    `;
+                }
+
+                if (progress.passed && progress.finalQuestions) {
+                    const finalPct = Math.round((progress.finalScore / progress.finalTotal) * 100);
+                    scHTML += `
+                        <div class="mode-item" onclick="viewScorecard('${u.id}', 'final')" style="${progress.reviewDone ? 'margin-top:0;' : ''}">
+                            <div class="mode-item-icon"><i class="fa-solid fa-trophy"></i></div>
+                            <div style="flex:1;">
+                                <div class="mode-item-name">Final test scorecard</div>
+                                <div class="mode-item-desc">Score: ${progress.finalScore}/${progress.finalTotal} (${finalPct}%) — Passed!</div>
+                            </div>
+                            <span class="mode-item-arr">→</span>
+                        </div>
+                    `;
+                }
+
+                if (scHTML) {
+                    scorecardsList.innerHTML = scHTML;
+                    scorecardWrap.style.display = 'block';
+                } else {
+                    scorecardWrap.style.display = 'none';
+                }
+            } else {
+                scorecardWrap.style.display = 'none';
             }
         }
 
@@ -997,6 +1063,49 @@
             currentUnit = null;
             showScreen('screenUnits');
         });
+
+        /* ══════════════════════════════════════════
+           SCORECARD REVIEW
+           ══════════════════════════════════════════ */
+        window.viewScorecard = function (unitId, testType) {
+            const progress = getUnitProgress(unitId);
+            const u = UNITS.find(unit => unit.id === unitId);
+            if (!u) return;
+
+            let questions, score, total;
+
+            if (testType === 'review') {
+                if (!progress.reviewQuestions) {
+                    showToast('No review results saved');
+                    return;
+                }
+                questions = progress.reviewQuestions;
+                score = progress.reviewScore;
+                total = progress.reviewTotal;
+            } else if (testType === 'final') {
+                if (!progress.finalQuestions) {
+                    showToast('No final test results saved');
+                    return;
+                }
+                questions = progress.finalQuestions;
+                score = progress.finalScore;
+                total = progress.finalTotal;
+            }
+
+            const results = {
+                questions: questions,
+                score: score,
+                total: total,
+                testType: testType,
+                unitId: unitId,
+                unitName: u.name,
+                passmark: u.passmark || 80,
+                timestamp: Date.now()
+            };
+
+            sessionStorage.setItem('akaltye_quiz_results', JSON.stringify(results));
+            window.location.href = 'scorecard.html';
+        };
 
         /* ══════════════════════════════════════════
            TOAST
@@ -1018,7 +1127,7 @@
             try {
                 const snap = await getDocs(query(collection(db, 'units'), orderBy('order')));
                 UNITS = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-                    .filter(u => u.released); /* only show released units to users */
+                    .filter(u => u.released);
             } catch (e) {
                 console.warn('learn: could not load units', e);
                 UNITS = [];

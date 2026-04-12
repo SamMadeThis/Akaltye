@@ -454,6 +454,8 @@ function showUnitCompletePrompt() {
 window.goToReviewTest = function() {
   window.location.href = `quiz-test.html?mode=shuffle&unit=${_unitId}&unitName=${encodeURIComponent(_unitName)}&review=1`;
 };
+
+function navigate(dir) {
   if (autoSeenTimer) clearTimeout(autoSeenTimer);
 
   /* ── Unit completion: forward past last card ── */
@@ -592,21 +594,36 @@ function applyFilter(group, tag, pos) {
 
   /* ── If ?unit= is present, filter to unit words only ── */
   if (unitId) {
-    const unitWords = allWords.filter(w => w.unitId === unitId);
+    /* Read unit data stored in sessionStorage by learn.html */
+    let unitWordIds = null;
+    let unitDisplayName = params.get('unitName') ? decodeURIComponent(params.get('unitName')) : 'Unit';
+    try {
+      const stored = sessionStorage.getItem('akaltye_active_unit');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.id === unitId) {
+          unitWordIds     = parsed.wordIds;
+          unitDisplayName = parsed.name || unitDisplayName;
+        }
+      }
+    } catch(e) {}
+
+    /* Filter allWords to this unit's wordIds */
+    const wordIdSet  = new Set(unitWordIds || []);
+    const unitWords  = unitWordIds
+      ? allWords.filter(w => wordIdSet.has(w.id))
+      : allWords.filter(w => w.unitId === unitId); /* fallback if sessionStorage not set */
+
     if (unitWords.length) {
       WORDS     = unitWords;
       _unitId   = unitId;
-      /* Use the unit name from URL param if provided, else generic */
-      _unitName = params.get('unitName') ? decodeURIComponent(params.get('unitName')) : 'this unit';
-      /* Update heading */
+      _unitName = unitDisplayName;
       const headingEl = document.querySelector('h2');
-      if (headingEl) headingEl.textContent = _unitName !== 'this unit' ? _unitName : 'Unit';
-      /* Show words in consistent order for learning */
+      if (headingEl) headingEl.textContent = unitDisplayName;
       words   = WORDS;
       current = 0;
       renderCard(null);
     } else {
-      /* Unit has no words assigned yet — fall back to all */
       WORDS = allWords;
       applyFilter(startGroup, startTag, startPos);
     }

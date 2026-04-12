@@ -32,28 +32,33 @@
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
-            height: calc(100vh - 64px);
-            /* full viewport minus nav */
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        /* Scrollable content area — sits above the fixed action bar */
+        /* Scrollable content area */
         .quiz-scroll {
             flex: 1;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 0;
             padding-bottom: var(--space-4);
-            -webkit-overflow-scrolling: touch;
         }
 
-        /* Action area — always pinned to bottom */
+        /* Action area — full viewport width, content centred inside */
         .quiz-action {
             flex-shrink: 0;
             border-top: 0.5px solid var(--clr-surface-a10);
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Inner wrapper — centres check/feedback content to match quiz width */
+        .quiz-action-inner {
+            max-width: 480px;
+            margin: 0 auto;
         }
 
         /* ── Top bar ── */
@@ -378,10 +383,15 @@
             animation: slideUp 0.22s cubic-bezier(0.35, 0, 0.25, 1) both;
         }
 
+        .qp-feedback-bar {
+            display: none;
+            animation: slideUp 0.22s cubic-bezier(0.35, 0, 0.25, 1) both;
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(16px);
+                transform: translateY(8px);
             }
 
             to {
@@ -391,13 +401,24 @@
         }
 
         .qp-feedback-bar.correct-bar {
-            display: flex;
-            background: rgba(34, 148, 110, 0.1);
+            display: block;
+            background: rgba(34, 148, 110, 0.12);
         }
 
         .qp-feedback-bar.incorrect-bar {
+            display: block;
+            background: rgba(156, 33, 33, 0.12);
+        }
+
+        /* Inner row — centred, matches quiz width */
+        .qp-feedback-inner {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: var(--space-4);
             display: flex;
-            background: rgba(156, 33, 33, 0.1);
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
         }
 
         .qp-feedback-content {
@@ -436,10 +457,9 @@
 
         .qp-continue {
             padding: var(--space-3) var(--space-5);
-            border-radius: var(--radius-md);
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.08em;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: var(--text-base);
             cursor: pointer;
             border: none;
             flex-shrink: 0;
@@ -577,10 +597,15 @@
                         <div class="qp-score-bar-fill" id="qpScoreBar" style="width:0%"></div>
                     </div>
                     <div class="qp-score-quip" id="qpScoreQuip"></div>
+                    <!--this is the score button and scorecard at the end of the quiz-->
                     <div class="qp-score-actions">
+                        <button class="btn-primary" onclick="window.location.href='scorecard.html'"
+                            style="width:100%;margin-bottom:var(--space-3);">
+                            View Scorecard
+                        </button>
                         <button class="btn-primary" id="qpPlayAgain">Play again</button>
-                        <a href="practice.html" class="btn-ghost" style="text-align:center;padding:var(--space-3);">Back
-                            to practice</a>
+                        <a href="learn.html" class="btn-ghost" style="text-align:center;padding:var(--space-3);">Back
+                            to learn</a>
                     </div>
                 </div>
 
@@ -589,15 +614,19 @@
             <!-- Pinned action bar — always at the bottom -->
             <div class="quiz-action" id="quizAction">
                 <div class="qp-check-wrap" id="qpCheckWrap">
-                    <button class="qp-check" id="qpCheck">Check answer</button>
+                    <div class="quiz-action-inner">
+                        <button class="qp-check" id="qpCheck">Check answer</button>
+                    </div>
                 </div>
                 <div class="qp-feedback-bar" id="qpFeedback">
-                    <div class="qp-feedback-content">
-                        <div class="qp-feedback-title" id="qpFeedbackTitle"></div>
-                        <div class="qp-feedback-answer" id="qpFeedbackAnswer"></div>
-                        <div class="qp-feedback-phonetic" id="qpFeedbackPhonetic"></div>
+                    <div class="qp-feedback-inner">
+                        <div class="qp-feedback-content">
+                            <div class="qp-feedback-title" id="qpFeedbackTitle"></div>
+                            <div class="qp-feedback-answer" id="qpFeedbackAnswer"></div>
+                            <div class="qp-feedback-phonetic" id="qpFeedbackPhonetic"></div>
+                        </div>
+                        <button class="qp-continue" id="qpContinue">Continue →</button>
                     </div>
-                    <button class="qp-continue" id="qpContinue">Continue →</button>
                 </div>
             </div>
 
@@ -774,6 +803,10 @@
             answered = true;
             const correct = value === q.correct;
 
+            // Track answer
+            q.userAnswer = value;
+            q.isCorrect = correct;
+
             document.querySelectorAll('.qp-ans').forEach(a => {
                 a.classList.add('disabled');
                 if (a.dataset.value === q.correct) a.classList.add('correct');
@@ -805,6 +838,11 @@
             const val = $('qpGapInput').value.trim();
             const correct = val.toLowerCase() === q.correct.toLowerCase();
             answered = true;
+
+            // Track answer
+            q.userAnswer = val;
+            q.isCorrect = correct;
+
             $('qpGapInput').className = `gap-input ${correct ? 'correct' : 'incorrect'}`;
             $('qpGapInput').disabled = true;
             showFeedback(correct, q.word);
@@ -858,7 +896,13 @@
                     matchState.matched.add(word);
                     matchState.score++;
                     score++;
+
+                    // Track match question score
+                    const q = questions[currentIdx];
+                    q.score = matchState.score;
+
                     if (matchState.matched.size === matchState.pairs.length) {
+                        q.matched = `${matchState.score}/${matchState.pairs.length}`;
                         setTimeout(() => { answered = true; showFeedback(true, null, true); }, 300);
                     }
                 } else {
@@ -935,7 +979,82 @@
                 showScore();
             }
         });
+        /* ── Save quiz results for scorecard and unit progress ── */
+        function saveQuizResults() {
+            try {
+                const unitData = JSON.parse(sessionStorage.getItem('akaltye_active_unit') || '{}');
+                const isFinal = params.get('final') === '1';
+                const isReview = params.get('review') === '1';
+                const testType = isFinal ? 'final' : (isReview ? 'review' : 'practice');
 
+                // Build questions with results
+                const questionsWithResults = questions.map(q => {
+                    let questionText = q.main || q.instruction || 'Question';
+                    let userAnswer = q.userAnswer || '';
+                    let correctAnswer = q.correct || '';
+                    let isCorrect = q.isCorrect || false;
+
+                    if (q.type === 'match') {
+                        questionText = 'Match words to meanings';
+                        userAnswer = q.matched || `${q.score || 0} matched`;
+                        correctAnswer = `${q.pairs.length} pairs`;
+                        isCorrect = q.score === q.pairs.length;
+                    }
+
+                    return {
+                        type: q.type || 'guess',
+                        question: questionText,
+                        userAnswer: userAnswer,
+                        correctAnswer: correctAnswer,
+                        correct: isCorrect
+                    };
+                });
+
+                const total = questions.length;
+                const correctCount = score;
+
+                // Save to localStorage for unit progress
+                if (unitData.id) {
+                    const progress = JSON.parse(localStorage.getItem(`akaltye_unit_${unitData.id}`) || '{}');
+
+                    if (testType === 'review') {
+                        progress.reviewDone = true;
+                        progress.reviewScore = correctCount;
+                        progress.reviewTotal = total;
+                        progress.reviewQuestions = questionsWithResults;
+                        progress.reviewTimestamp = Date.now();
+                    } else if (testType === 'final') {
+                        const passed = (correctCount / total * 100) >= 80;
+                        progress.passed = passed;
+                        progress.finalScore = correctCount;
+                        progress.finalTotal = total;
+                        progress.finalQuestions = questionsWithResults;
+                        progress.finalTimestamp = Date.now();
+                    }
+
+                    localStorage.setItem(`akaltye_unit_${unitData.id}`, JSON.stringify(progress));
+                    console.log('✅ Unit progress saved:', progress);
+                }
+
+                // Save to sessionStorage for scorecard
+                const scorecardResults = {
+                    questions: questionsWithResults,
+                    score: correctCount,
+                    total: total,
+                    testType: testType,
+                    unitId: unitData.id,
+                    unitName: unitData.name,
+                    passmark: 80,
+                    timestamp: Date.now()
+                };
+
+                sessionStorage.setItem('akaltye_quiz_results', JSON.stringify(scorecardResults));
+                console.log('✅ Scorecard results saved:', scorecardResults);
+
+            } catch (error) {
+                console.error('❌ Error saving quiz results:', error);
+            }
+        }
         /* ── Score screen ── */
         function showScore() {
             $('qpCheckWrap').style.display = 'none';
@@ -966,6 +1085,9 @@
             else localStorage.setItem('lexicon_quiz_log', JSON.stringify(log.slice(0, 50)));
 
             updateStreak();
+
+            // Save quiz results for scorecard and unit progress
+            saveQuizResults();
         }
 
         /* ── Play again ── */
@@ -980,8 +1102,9 @@
 
         /* ── Back button ── */
         $('qpBack').addEventListener('click', () => {
-            window.location.href = unitId ? 'learn.html' : 'practice.html';
+            window.location.href = 'learn.html';
         });
+
 
         /* ── Init ── */
         (async () => {
@@ -990,7 +1113,20 @@
 
             /* ── Filter to unit if ?unit= param present ── */
             if (unitId) {
-                const unitWords = allWords.filter(w => w.unitId === unitId);
+                let unitWordIds = null;
+                try {
+                    const stored = sessionStorage.getItem('akaltye_active_unit');
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (parsed.id === unitId) unitWordIds = parsed.wordIds;
+                    }
+                } catch (e) { }
+
+                const wordIdSet = new Set(unitWordIds || []);
+                const unitWords = unitWordIds
+                    ? allWords.filter(w => wordIdSet.has(w.id))
+                    : allWords.filter(w => w.unitId === unitId);
+
                 WORDS = unitWords.length ? unitWords : allWords;
                 if (unitName) $('qpModeLbl').textContent = unitName;
             } else {
