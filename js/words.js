@@ -473,6 +473,9 @@ function navigate(dir) {
     showUnitCompletePrompt();
     return;
   }
+
+  current = Math.max(0, Math.min(words.length - 1, current + dir));
+  renderCard(dir > 0 ? 'next' : 'prev');
 }
 
 function toggleFavourite() {
