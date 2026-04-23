@@ -966,7 +966,8 @@
 
             /* CTA */
             let ctaText, ctaSub, ctaUrl;
-            if (!learnDone) {
+            // FIX: If reviewDone is true, skip the learn step (they clearly got through somehow)
+            if (!learnDone && !reviewDone) {
                 ctaText = 'Start learning words';
                 ctaSub = `${words.length} words · tap through each one`;
                 ctaUrl = `words.html?unit=${u.id}&unitName=${encodeURIComponent(u.name)}`;

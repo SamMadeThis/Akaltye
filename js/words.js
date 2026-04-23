@@ -460,12 +460,19 @@ function navigate(dir) {
 
   /* ── Unit completion: forward past last card ── */
   if (dir > 0 && current === words.length - 1 && _unitId) {
+    // CRITICAL FIX: Mark unit as complete before showing prompt
+    try {
+      const progress = JSON.parse(localStorage.getItem(`akaltye_unit_${_unitId}`) || '{}');
+      progress.learnDone = true;
+      localStorage.setItem(`akaltye_unit_${_unitId}`, JSON.stringify(progress));
+      console.log('✅ Unit learn step marked complete:', progress);
+    } catch (e) {
+      console.error('Failed to save unit progress:', e);
+    }
+    
     showUnitCompletePrompt();
     return;
   }
-
-  current = Math.max(0, Math.min(words.length - 1, current + dir));
-  renderCard(dir > 0 ? 'next' : 'prev');
 }
 
 function toggleFavourite() {
