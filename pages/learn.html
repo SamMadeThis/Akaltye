@@ -947,22 +947,36 @@
             const reviewDone = progress.reviewDone || false;
             const passed = progress.passed || false;
 
+            const learnUrl = `words.html?unit=${u.id}&unitName=${encodeURIComponent(u.name)}`;
+            const reviewUrl = `quiz-test.html?mode=shuffle&unit=${u.id}&unitName=${encodeURIComponent(u.name)}&review=1`;
+            const finalUrl = `quiz-test.html?mode=shuffle&unit=${u.id}&unitName=${encodeURIComponent(u.name)}&final=1`;
+
+            const storeUnit = () => {
+                try {
+                    sessionStorage.setItem('akaltye_active_unit', JSON.stringify({
+                        id: u.id,
+                        name: u.name,
+                        wordIds: wordIds,
+                    }));
+                } catch (e) { }
+            };
+
             $('unitSteps').innerHTML = `
-        <div class="step-row">
-          <div class="step-num ${learnDone ? 'done' : 'now'}">${learnDone ? '✓' : '1'}</div>
-          <div class="step-name ${learnDone ? 'done' : ''}">Learn words</div>
-          <div class="step-state ${learnDone ? 'done' : 'now'}">${learnDone ? 'done' : 'start here'}</div>
-        </div>
-        <div class="step-row">
-          <div class="step-num ${reviewDone ? 'done' : learnDone ? 'now' : 'todo'}">${reviewDone ? '✓' : '2'}</div>
-          <div class="step-name ${reviewDone ? 'done' : ''}">Review test</div>
-          <div class="step-state ${reviewDone ? 'done' : learnDone ? 'now' : ''}">${reviewDone ? 'done' : learnDone ? 'ready' : 'locked'}</div>
-        </div>
-        <div class="step-row">
-          <div class="step-num ${passed ? 'done' : reviewDone ? 'now' : 'todo'}">${passed ? '✓' : '3'}</div>
-          <div class="step-name ${passed ? 'done' : ''}">Final test</div>
-          <div class="step-state ${passed ? 'done' : reviewDone ? 'now' : ''}">${passed ? 'passed' : reviewDone ? 'ready' : 'locked'}</div>
-        </div>`;
+<div class="step-row" style="cursor:pointer;" onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${learnUrl}'">
+  <div class="step-num ${learnDone ? 'done' : 'now'}">${learnDone ? '✓' : '1'}</div>
+  <div class="step-name ${learnDone ? 'done' : ''}">Learn words</div>
+  <div class="step-state ${learnDone ? 'done' : 'now'}">${learnDone ? (passed ? 'retake →' : 'done') : 'start here'}</div>
+</div>
+<div class="step-row" style="cursor:${learnDone ? 'pointer' : 'not-allowed'};opacity:${learnDone ? 1 : 0.5}" ${learnDone ? `onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${reviewUrl}'"` : ''}>
+  <div class="step-num ${reviewDone ? 'done' : learnDone ? 'now' : 'todo'}">${reviewDone ? '✓' : '2'}</div>
+  <div class="step-name ${reviewDone ? 'done' : ''}">Review test</div>
+  <div class="step-state ${reviewDone ? 'done' : learnDone ? 'now' : ''}">${reviewDone ? (passed ? 'retake →' : 'done') : learnDone ? 'ready' : 'locked'}</div>
+</div>
+<div class="step-row" style="cursor:${reviewDone ? 'pointer' : 'not-allowed'};opacity:${reviewDone ? 1 : 0.5}" ${reviewDone ? `onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${finalUrl}'"` : ''}>
+  <div class="step-num ${passed ? 'done' : reviewDone ? 'now' : 'todo'}">${passed ? '✓' : '3'}</div>
+  <div class="step-name ${passed ? 'done' : ''}">Final test</div>
+  <div class="step-state ${passed ? 'done' : reviewDone ? 'now' : ''}">${passed ? 'retake →' : reviewDone ? 'ready' : 'locked'}</div>
+</div>`;
 
             /* CTA */
             let ctaText, ctaSub, ctaUrl;
