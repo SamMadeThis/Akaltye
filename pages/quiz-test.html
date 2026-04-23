@@ -979,13 +979,26 @@
                 showScore();
             }
         });
+
         /* ── Save quiz results for scorecard and unit progress ── */
         function saveQuizResults() {
             try {
-                const unitData = JSON.parse(sessionStorage.getItem('akaltye_active_unit') || '{}');
+                // Get unit data from sessionStorage OR fall back to URL params
+                let unitData = JSON.parse(sessionStorage.getItem('akaltye_active_unit') || '{}');
+
+                // CRITICAL FIX: Use URL params if sessionStorage is empty
+                if (!unitData.id && unitId) {
+                    unitData = {
+                        id: unitId,
+                        name: unitName || 'Unit'
+                    };
+                }
+
                 const isFinal = params.get('final') === '1';
                 const isReview = params.get('review') === '1';
                 const testType = isFinal ? 'final' : (isReview ? 'review' : 'practice');
+
+
 
                 // Build questions with results
                 const questionsWithResults = questions.map(q => {
