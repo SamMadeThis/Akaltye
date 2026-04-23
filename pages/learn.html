@@ -1002,15 +1002,7 @@
             $('unitCtaText').textContent = ctaText;
             $('unitCtaSub').textContent = ctaSub;
 
-            const storeUnit = () => {
-                try {
-                    sessionStorage.setItem('akaltye_active_unit', JSON.stringify({
-                        id: u.id,
-                        name: u.name,
-                        wordIds: wordIds,
-                    }));
-                } catch (e) { }
-            };
+
 
             $('unitMainCta').onclick = () => { storeUnit(); window.location.href = ctaUrl; };
 
