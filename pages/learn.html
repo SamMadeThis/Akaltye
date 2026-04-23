@@ -962,17 +962,17 @@
             };
 
             $('unitSteps').innerHTML = `
-<div class="step-row" style="cursor:pointer;" onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${learnUrl}'">
+<div class="step-row" style="cursor:pointer;" onclick="goToStep('${u.id}', 'learn')">
   <div class="step-num ${learnDone ? 'done' : 'now'}">${learnDone ? '✓' : '1'}</div>
   <div class="step-name ${learnDone ? 'done' : ''}">Learn words</div>
   <div class="step-state ${learnDone ? 'done' : 'now'}">${learnDone ? (passed ? 'retake →' : 'done') : 'start here'}</div>
 </div>
-<div class="step-row" style="cursor:${learnDone ? 'pointer' : 'not-allowed'};opacity:${learnDone ? 1 : 0.5}" ${learnDone ? `onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${reviewUrl}'"` : ''}>
+<div class="step-row" style="cursor:${learnDone ? 'pointer' : 'not-allowed'};opacity:${learnDone ? 1 : 0.5}" ${learnDone ? `onclick="goToStep('${u.id}', 'review')"` : ''}>
   <div class="step-num ${reviewDone ? 'done' : learnDone ? 'now' : 'todo'}">${reviewDone ? '✓' : '2'}</div>
   <div class="step-name ${reviewDone ? 'done' : ''}">Review test</div>
   <div class="step-state ${reviewDone ? 'done' : learnDone ? 'now' : ''}">${reviewDone ? (passed ? 'retake →' : 'done') : learnDone ? 'ready' : 'locked'}</div>
 </div>
-<div class="step-row" style="cursor:${reviewDone ? 'pointer' : 'not-allowed'};opacity:${reviewDone ? 1 : 0.5}" ${reviewDone ? `onclick="sessionStorage.setItem('akaltye_active_unit', JSON.stringify({id:'${u.id}',name:'${u.name.replace(/'/g, "\\'")}',wordIds:${JSON.stringify(wordIds)}})); window.location.href='${finalUrl}'"` : ''}>
+<div class="step-row" style="cursor:${reviewDone ? 'pointer' : 'not-allowed'};opacity:${reviewDone ? 1 : 0.5}" ${reviewDone ? `onclick="goToStep('${u.id}', 'final')"` : ''}>
   <div class="step-num ${passed ? 'done' : reviewDone ? 'now' : 'todo'}">${passed ? '✓' : '3'}</div>
   <div class="step-name ${passed ? 'done' : ''}">Final test</div>
   <div class="step-state ${passed ? 'done' : reviewDone ? 'now' : ''}">${passed ? 'retake →' : reviewDone ? 'ready' : 'locked'}</div>
@@ -1112,6 +1112,38 @@
 
             sessionStorage.setItem('akaltye_quiz_results', JSON.stringify(results));
             window.location.href = 'scorecard.html';
+        };
+
+        /* ══════════════════════════════════════════
+       GO TO STEP - Navigate to unit steps
+       ══════════════════════════════════════════ */
+        window.goToStep = function (unitId, step) {
+            const u = UNITS.find(unit => unit.id === unitId);
+            if (!u) return;
+
+            const wordIds = u.wordIds || [];
+
+            // Store unit data
+            try {
+                sessionStorage.setItem('akaltye_active_unit', JSON.stringify({
+                    id: u.id,
+                    name: u.name,
+                    wordIds: wordIds,
+                }));
+            } catch (e) {
+                console.error('Failed to store unit data:', e);
+            }
+
+            // Navigate to the appropriate page
+            const urls = {
+                learn: `words.html?unit=${u.id}&unitName=${encodeURIComponent(u.name)}`,
+                review: `quiz-test.html?mode=shuffle&unit=${u.id}&unitName=${encodeURIComponent(u.name)}&review=1`,
+                final: `quiz-test.html?mode=shuffle&unit=${u.id}&unitName=${encodeURIComponent(u.name)}&final=1`
+            };
+
+            if (urls[step]) {
+                window.location.href = urls[step];
+            }
         };
 
         /* ══════════════════════════════════════════
