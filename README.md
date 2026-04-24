@@ -65,7 +65,7 @@ Akaltye aims to support:
 
 - 🔭 Currently working on **Akaltye**
 - 🌱 Currently learning **Firebase**
-- 📫 Reach me at **SamMadeThisGit@outlook.com**
+- 📫 Reach me at **akaltye.dev@gmail.com**
 
 <p align="left">
 <a href="https://github.com/SamMadeThis" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg" alt="SamMadeThis" height="30" width="40" /></a>
