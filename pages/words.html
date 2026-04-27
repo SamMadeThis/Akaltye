@@ -2,23 +2,77 @@
 <html lang="en">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-17ZB632V40');
+    </script>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Words — AKALTYE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
+    <title>AKALTYE</title>
+
+    <style>
+        .btn-icon {
+            flex: 0 0 auto;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* ── Slide-and-replace viewport ──────────────────────
+           Clips both card slots so only the one at left:0
+           is visible. The two .card elements slide inside it.
+           min-height matches the card's own min-height so
+           the container never collapses during the slide.
+        ──────────────────────────────────────────────────── */
+        .card-viewport {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+            /* match .card min-height so viewport never collapses */
+            min-height: 280px;
+            margin-bottom: var(--space-4);
+        }
+
+        /* Cards are now absolutely positioned inside the viewport */
+        .card {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            /* left is controlled by JS — active card sits at 0%,
+               inactive card is parked off-screen at ±100% */
+            margin-bottom: 0;
+            /* viewport provides the spacing now */
+        }
+
+        /* Remove the old fade-out class — slide handles transitions */
+        .card.fade-out {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
 </head>
 
 <body>
 
     <header>
         <nav>
-            <a href="/" class="logo">AKAL<span>TYE</span></a>
-
             <input type="checkbox" class="menu-toggle" id="menuToggle">
             <label for="menuToggle" class="menu-icon">
                 <span></span>
@@ -26,85 +80,99 @@
 
             <div class="auth-btn" id="authButton"></div>
 
+            <a href="/" class="logo">akal<span>tye</span></a>
+
             <div class="menu-drawer">
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="explore.html">Explore</a></li>
                     <li><a href="learn.html">Learn</a></li>
-                    <li><a href="practice.html">Practice</a></li>
-                    <li><a href="saved.html">Saved</a></li>
                     <li><a href="profile.html">Profile</a></li>
                 </ul>
             </div>
         </nav>
     </header>
 
-    <div class="page">
-        <div class="container">
+    <div class="page-content">
+        <div class="app">
 
-            <!-- Progress bar -->
-            <div class="progress">
-                <div class="progress__track">
-                    <div class="progress__bar" id="progressBar" style="width: 0%"></div>
+            <h2>Lexicon</h2>
+            <span id="headerMeta"></span>
+
+            <div class="progress-row">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <span class="progress__label" id="progressLabel">0/10</span>
+                <div class="progress-label" id="progressLabel">— / —</div>
             </div>
 
-            <!-- Word card -->
-            <div class="card" id="wordCard">
-                <header>
-                    <div>
-                        <h2 class="word">Akaltye</h2>
-                        <p class="phonetic">/ə-ɡəl-tʲɛ/</p>
+            <!-- Slide viewport — two card slots live inside -->
+            <div class="card-viewport">
+                <!-- Slot A — starts as the active card (left: 0) -->
+                <div class="card" id="wordCardA" style="left: 0%">
+                    <div class="word" id="wordText">—</div>
+                    <div class="phonetic" id="phonetic"></div>
+                    <div class="definition" id="definition">—</div>
+                    <div class="examples" id="examples"></div>
+                    <div class="notes" id="notes" style="display:none"></div>
+                    <div class="tags-and-pos">
+                        <div class="tags" id="tagsContainer"></div>
+                        <a href="#" class="pos-badge" id="posbadge">—</a>
                     </div>
-                    <div style="display: flex; gap: var(--space-2);">
-                        <button class="btn btn--icon btn--fav" id="favBtn">
-                            <span>❤️</span>
-                        </button>
-                        <span class="badge badge--pos">noun</span>
-                    </div>
-                </header>
-
-                <p class="def">
-                    <span class="def-line"><strong class="def-num">1.</strong> Language, tongue, speech</span>
-                    <span class="def-line"><strong class="def-num">2.</strong> The Arrernte language specifically</span>
-                </p>
-
-                <div class="examples">
-                    <p class="example">We're learning akaltye at school.</p>
-                    <p class="example">My grandmother speaks akaltye fluently.</p>
                 </div>
 
-                <p class="notes">
-                    This word refers both to language in general and specifically to the Arrernte language. Context
-                    determines which meaning applies.
-                </p>
-
-                <footer>
-                    <span class="badge badge--tag">language</span>
-                    <span class="badge badge--tag">culture</span>
-                    <span class="badge badge--seen">Seen 3 times</span>
-                </footer>
+                <!-- Slot B — parked off-screen to the right initially -->
+                <div class="card" id="wordCardB" style="left: 100%">
+                    <!-- content injected by JS before each slide -->
+                </div>
             </div>
 
-            <!-- Controls -->
-            <div
-                style="display: flex; gap: var(--space-2); align-items: center; justify-content: center; margin-bottom: var(--space-8);">
-                <button class="btn" id="prevBtn" style="flex: 1;">← Previous</button>
-                <button class="btn btn--icon" id="shuffleBtn">🔀</button>
-                <button class="btn btn--earth" id="nextBtn" style="flex: 1;">Next →</button>
-            </div>
+            <div class="controls">
+                <button class="btn" id="prevBtn">← prev</button>
 
-            <!-- Mark as seen -->
-            <button class="btn" id="seenBtn"
-                style="width: 100%; border-color: var(--clr-primary-a0); color: var(--clr-primary-a0); font-weight: 500;">
-                Mark as studied
-            </button>
+                <button class="btn btn-fav btn-icon" id="favBtn" title="Favourite">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+
+                <button class="btn btn-bookmark btn-icon" id="bookmarkBtn" title="Bookmark">
+                    <i class="fa-solid fa-bookmark"></i>
+                </button>
+
+                <button class="btn" id="nextBtn">next →</button>
+            </div>
 
         </div>
 
-    </div>
+        <div class="toast" id="toast"></div>
 
+        <!-- Replace the pronunciation section in words.html with this: -->
+
+        <div class="pronunciation-section">
+            <h2>Pronunciation Tips</h2>
+            <ul class="pronunciation-tips">
+                <li>All words end in 'e' (often silent)</li>
+                <li>No difference between p/b, t/d, k/g</li>
+                <li>'w' after consonants = round your lips</li>
+                <li>Stress usually on first vowel after consonant</li>
+                <li>For words with 'rr': Roll or tap your tongue</li>
+                <li>For words with 'kng': Blend k+ng in one sound (like a half-sneeze)</li>
+                <li>For words with 'lh', 'nh', 'th': Tongue touches back of front teeth</li>
+                <li>For words with 'w' (rounded): Round your lips like saying "window"</li>
+                <li>For words starting with 'a': This 'a' might be silent - both ways are correct</li>
+                <li>For words ending in 'e': Usually silent, especially before vowels</li>
+            </ul>
+            <p>See IAD information on spelling and pronunciation for examples:
+                <a href="https://iadpd.com.au/ecarrernte-spelling-and-pronunciation/" target="_blank" rel="noopener">
+                    Eastern and Central Arrernte spelling and pronunciation
+                </a>
+            </p>
+        </div>
+
+        <!-- Developer Note - Separate Section -->
+        <div class="developer-note">
+            <p>Note from the developer: Audio will be added later in the year.</p>
+        </div>
+    </div>
     <footer class="site-footer">
         <p>
             © 2026 · Made with ❤️ by
@@ -115,9 +183,8 @@
             <a href="mailto:SamMadeThisGit@outlook.com">Contact</a>
         </p>
     </footer>
-
     <script type="module" src="/js/nav.js"></script>
-    <script type="module" src="/js/home.js"></script>
+    <script type="module" src="../js/words.js"></script>
 
 </body>
 

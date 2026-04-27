@@ -482,10 +482,10 @@ nav {
 }
 
 .card .phonetic {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-surface-a20);
-  margin-top: var(--space-1);
+  color: #2a2a2a !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+  font-size: 13px;
 }
 
 .card .def {
@@ -520,13 +520,12 @@ nav {
 }
 
 .card .notes {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--clr-surface-a20);
-  border-left: 3px solid var(--clr-ochre);
-  padding-left: var(--space-3);
-  line-height: 1.6;
-  letter-spacing: 0.02em;
+  color: #2a2a2a !important;
+  font-weight: 500 !important;
+  font-size: 13px;
+  padding-left: 12px;
+  border-left: 3px solid #e0e0e0;
+
 }
 
 .card footer {
@@ -2164,4 +2163,557 @@ a.badge:hover {
   .search-wrapper.has-icon .search-input {
     padding-left: calc(var(--space-4) + 28px);
   }
+}
+
+/* =============================================================
+   EXPLORE PAGE SEARCH BAR — Add this to your styles.css
+   ============================================================= */
+
+/* Search bar container */
+.explore-search {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto var(--space-8);
+  padding: 0 var(--space-4);
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--clr-surface-tonal-a0);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-md);
+  color: var(--clr-light);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-5);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.search-input::placeholder {
+  color: var(--clr-surface-a40);
+  font-family: var(--font-body);
+}
+
+.search-input:focus {
+  border-color: var(--clr-primary-a0);
+  background: var(--clr-surface-tonal-a10);
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+}
+
+/* Search icon */
+.search-icon {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-surface-a40);
+  font-size: var(--text-base);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.search-input:focus~.search-icon {
+  color: var(--clr-primary-a0);
+}
+
+/* Clear button */
+.search-clear {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--clr-surface-a40);
+  font-size: var(--text-base);
+  padding: var(--space-2);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.search-clear:hover {
+  color: var(--clr-primary-a0);
+  background: rgba(255, 87, 34, 0.1);
+}
+
+/* Search with icon spacing */
+.search-wrapper.has-icon .search-input {
+  padding-left: calc(var(--space-5) + 32px);
+}
+
+/* Results counter */
+.search-results-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a40);
+  margin-top: var(--space-3);
+  text-align: center;
+}
+
+.search-results-count strong {
+  color: var(--clr-primary-a0);
+}
+
+/* Empty state */
+.search-empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.search-empty-icon {
+  font-size: 3rem;
+  color: var(--clr-surface-a30);
+  margin-bottom: var(--space-4);
+}
+
+.search-empty-icon i {
+  font-size: inherit;
+  color: inherit;
+}
+
+.search-empty p {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--clr-surface-a40);
+  margin-bottom: var(--space-2);
+}
+
+.search-empty span {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--clr-surface-a30);
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .explore-search {
+    margin-bottom: var(--space-6);
+  }
+
+  .search-input {
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-5) var(--space-3) var(--space-4);
+  }
+
+  .search-wrapper.has-icon .search-input {
+    padding-left: calc(var(--space-4) + 28px);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   words.html
+   ════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════
+   UPDATED STYLES - Replace previous CSS
+   ════════════════════════════════════════════════════ */
+
+/* ── Button Controls - Full Width Layout ────────── */
+.controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: var(--space-4);
+  width: 100%;
+  max-width: 640px;
+  /* Match card max-width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Prev/next buttons flex to fill space */
+.controls .btn:not(.btn-icon) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Icon buttons stay fixed size */
+.controls .btn-icon {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+}
+
+/* ── Better Text Contrast ────────── */
+
+/* Word title - brand ochre for emphasis */
+.card .word {
+  color: var(--clr-brand-ochre, #B87333);
+}
+
+/* Phonetic - slightly lighter but still readable */
+.card .phonetic {
+  color: #4a4a4a;
+  opacity: 1;
+}
+
+/* Definition - dark and readable */
+.card .definition {
+  color: #2a2a2a;
+}
+
+.card .def-line {
+  color: #2a2a2a;
+}
+
+/* Definition numbers */
+.card .def-num {
+  color: #666;
+}
+
+/* Examples - readable grey */
+.card .example {
+  color: #3a3a3a;
+}
+
+/* Notes */
+.card .notes {
+  color: #3a3a3a;
+}
+
+/* ── POS Badge - Pill Outline Style ────────── */
+.pos-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.pos-badge:hover {
+  border-color: var(--clr-brand-ochre, #B87333);
+  color: var(--clr-brand-ochre, #B87333);
+}
+
+/* ── Seen Badge ────────── */
+.seen-badge {
+  color: #888;
+  font-size: 12px;
+}
+
+/* ── Tags - Pill Outline Style ────────── */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-3);
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 14px;
+  border: 1px solid #d0d0d0;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  background: transparent;
+}
+
+.tag:hover {
+  border-color: var(--clr-brand-primary, #c9afc2);
+  color: var(--clr-brand-primary, #c9afc2);
+  background: rgba(201, 175, 194, 0.05);
+}
+
+/* ════════════════════════════════════════════════════
+   UNIFIED COLOR SYSTEM - Consistent across explore + words
+   ════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════
+   SAGE GREEN - All Parts of Speech (FILLED)
+   ══════════════════════════════════════════════════ */
+
+/* POS Badge on Word Cards - Filled style */
+.pos-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1a1a1a;
+  background: #87A878;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  margin: 0;
+}
+
+.pos-badge:hover {
+  background: #6E8B5F;
+}
+
+/* POS Filter Buttons on Explore Page */
+.filter-btn.pos-filter,
+button[data-filter-type="pos"] {
+  border-color: #87A878;
+  color: #87A878;
+  background: rgba(135, 168, 120, 0.08);
+}
+
+.filter-btn.pos-filter:hover,
+button[data-filter-type="pos"]:hover {
+  background: rgba(135, 168, 120, 0.18);
+  border-color: #6E8B5F;
+}
+
+.filter-btn.pos-filter.active,
+button[data-filter-type="pos"].active {
+  background: #87A878;
+  color: #1a1a1a;
+  border-color: #87A878;
+}
+
+
+/* ══════════════════════════════════════════════════
+   BLUE - All Levels
+   ══════════════════════════════════════════════════ */
+
+/* Level Filter Buttons on Explore Page */
+.filter-btn.level-filter,
+button[data-filter-type="level"] {
+  border-color: #4A90A4;
+  color: #4A90A4;
+  background: rgba(74, 144, 164, 0.08);
+}
+
+.filter-btn.level-filter:hover,
+button[data-filter-type="level"]:hover {
+  background: rgba(74, 144, 164, 0.18);
+  border-color: #3A7A8A;
+}
+
+.filter-btn.level-filter.active,
+button[data-filter-type="level"].active {
+  background: #4A90A4;
+  color: #1a1a1a;
+  border-color: #4A90A4;
+}
+
+/* Level Badge on Word Cards (if you add it later) */
+.level-badge {
+  border: 1.5px solid #4A90A4;
+  color: #4A90A4;
+  background: rgba(74, 144, 164, 0.08);
+}
+
+.level-badge:hover {
+  background: rgba(74, 144, 164, 0.18);
+  border-color: #3A7A8A;
+}
+
+
+/* ══════════════════════════════════════════════════
+   WHITE & BLACK - All Lexicon Categories
+   ══════════════════════════════════════════════════ */
+
+/* Container for tags + POS badge on same line */
+.tags-and-pos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-3);
+}
+
+/* Tags - Filled style for better readability */
+.tag {
+  display: inline-block;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  background: #3a3a3a;
+  font-weight: 500;
+}
+
+.tag:hover {
+  background: #4a4a4a;
+}
+
+/* Lexicon Category Tiles/Buttons */
+.tile,
+.filter-btn.lexicon-filter,
+button[data-filter-type="lexicon"] {
+  background: var(--clr-surface, #1a1a1a);
+  border: 1px solid var(--clr-surface-a20, #2a2a2a);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.tile:hover,
+.filter-btn.lexicon-filter:hover,
+button[data-filter-type="lexicon"]:hover {
+  border-color: var(--clr-surface-a30, #3a3a3a);
+  background: var(--clr-surface-a10, #1e1e1e);
+}
+
+.tile__content {
+  color: #ffffff;
+}
+
+.tile__label {
+  color: #e0e0e0;
+}
+
+.tile__count {
+  color: #888;
+}
+
+/* Active state for lexicon filters */
+.filter-btn.lexicon-filter.active,
+button[data-filter-type="lexicon"].active {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: #ffffff;
+}
+
+
+/* ══════════════════════════════════════════════════
+   Generic Filter Button Base Style
+   ══════════════════════════════════════════════════ */
+
+.filter-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 1.5px solid;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* ════════════════════════════════════════════════════
+   PRONUNCIATION TIPS STYLING
+   Add to your styles.css
+   ════════════════════════════════════════════════════ */
+
+/* Pronunciation Tips Container */
+.pronunciation-section {
+  max-width: 640px;
+  margin: var(--space-8) auto var(--space-6);
+  padding: var(--space-5);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--clr-surface-a20);
+  border-radius: var(--radius-lg);
+}
+
+.pronunciation-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #c9afc2;
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: -0.02em;
+}
+
+.pronunciation-tips {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.pronunciation-tips li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d0d0d0;
+  padding-left: 24px;
+  position: relative;
+}
+
+.pronunciation-tips li::before {
+  content: '•';
+  position: absolute;
+  left: 8px;
+  color: #87A878;
+  font-size: 18px;
+}
+
+/* Link to IAD resources */
+.pronunciation-section p {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--clr-surface-a20);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #888;
+}
+
+.pronunciation-section a {
+  color: #87A878;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.pronunciation-section a:hover {
+  color: #6E8B5F;
+  text-decoration: underline;
+}
+
+/* Developer Note - Separate Section */
+.developer-note {
+  max-width: 640px;
+  margin: var(--space-6) auto;
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--clr-surface-a10);
+  border-radius: var(--radius-md);
+  border-left: 3px solid #B87333;
+}
+
+.developer-note p {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.developer-note p::before {
+  content: '💡 ';
+  margin-right: 6px;
 }

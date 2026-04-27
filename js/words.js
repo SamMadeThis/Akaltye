@@ -19,6 +19,7 @@
 //    [2] Clickable tags — tag chips link to words.html?tag=X
 //    [3] Clickable POS badge — links to words.html?pos=X
 //    [4] 105% inStart gap — small visual gap between cards as they slide
+//    [5] Removed wrapper div around word/phonetic for correct styling
 // ═══════════════════════════════════════════════════
 
 import { getWords }                                        from './words-service.js';
@@ -281,21 +282,17 @@ function applyWord(el, w) {
   const favCls = isFav ? 'btn btn-fav btn-icon active' : 'btn btn-fav btn-icon';
   const bmCls  = isBm  ? 'btn btn-bookmark btn-icon active' : 'btn btn-bookmark btn-icon';
 
+  // Fixed HTML structure - tags and POS on same line, filled backgrounds
   el.innerHTML = `
-    <div class="card-top">
-      <!-- [CHANGE 3] POS badge is now an <a> link → words.html?pos=X
-           Clicking it reloads the word browser filtered to that part of speech. -->
-      <a href="words.html?pos=${encodeURIComponent(w.pos || '')}" class="pos-badge">${w.pos || ''}</a>
-      ${seenHtml}
-    </div>
-    <div>
-      <div class="word">${w.word}</div>
-      <div class="phonetic">${w.phonetic || ''}</div>
-    </div>
+    <div class="word">${w.word}</div>
+    <div class="phonetic">${w.phonetic || ''}</div>
     <div class="definition">${defHtml}</div>
     ${exHtml}
     ${notesHtml}
-    <div class="tags">${tagsHtml}</div>
+    <div class="tags-and-pos">
+      ${tagsHtml}
+      <a href="words.html?pos=${encodeURIComponent(w.pos || '')}" class="pos-badge">${w.pos || ''}</a>
+    </div>
   `;
 
   // Progress bar — lives outside the card so updated here directly
