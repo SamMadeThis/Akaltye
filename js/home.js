@@ -55,7 +55,27 @@ async function loadUserDashboard(user) {
   const favCountEl = document.getElementById('favCount');
   if (favCountEl) favCountEl.textContent = favCount;
   
-  // Calculate streak (you can implement this based on your logic)
+  // Calculate and update progress bar
+  const milestone = 500; // Next milestone
+  const remaining = milestone - totalSeen;
+  const progressPercent = Math.min((totalSeen / milestone) * 100, 100);
+  
+  const progressFillEl = document.querySelector('.progress-fill');
+  if (progressFillEl) {
+    progressFillEl.style.width = progressPercent + '%';
+  }
+  
+  const wordsProgressEl = document.getElementById('wordsProgress');
+  if (wordsProgressEl && remaining > 0) {
+    wordsProgressEl.textContent = `${remaining} more to reach ${milestone}`;
+  } else if (wordsProgressEl) {
+    wordsProgressEl.textContent = `Milestone reached! 🎉`;
+  }
+  
+  // Calculate streak
+  const currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
   const streakEl = document.getElementById('currentStreak');
-  if (streakEl) streakEl.textContent = '0 days'; // Replace with actual streak calculation
+  if (streakEl) {
+    streakEl.textContent = currentStreak > 0 ? `${currentStreak} days` : '0 days';
+  }
 }

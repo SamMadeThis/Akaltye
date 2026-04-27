@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AKALTYE - Learn Arrernte Language</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@400;500;600&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
   <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
 </head>
 
@@ -40,13 +43,13 @@
              ═══════════════════════════════════════════════ -->
     <div class="track-journey-section" style="display: none;">
       <div class="container">
-        <h1>Learn <span style="color: var(--clr-brand-ochre);">Arrernte</span> Language</h1>
+        <h1>Learn <span style="color: var(--clr-brand);">Arrernte</span> Language</h1>
         <p style="font-size: 1.1rem; color: #d0d0d0; margin-bottom: var(--space-8);">
           This is a place to learn at your own pace, word by word.
         </p>
 
         <div
-          style="max-width: 500px; margin: 0 auto; padding: var(--space-6); background: rgba(255,255,255,0.02); border: 2px solid var(--clr-brand-ochre); border-radius: var(--radius-lg);">
+          style="max-width: 500px; margin: 0 auto; padding: var(--space-6); background: rgba(255,255,255,0.02); border: 2px solid var(--clr-brand); border-radius: var(--radius-lg);">
           <h2 style="margin-top: 0;">Track your journey</h2>
           <p style="color: #b0b0b0; margin-bottom: var(--space-5);">
             Sign in to save words, track progress, and earn achievements
@@ -78,8 +81,12 @@
         </div>
 
         <p style="margin-top: var(--space-8); text-align: center; color: #888; font-size: 14px;">
-          This web app is a learning tool created with resources already publicly <br>
-          available online. Always seek out speakers and elders to deepen your understanding.
+          This web app is a learning tool, created with resources that are available to the public online. <br>
+          This learning tool that was designed for people who wish to learn Eastern and Centeral Arrernte
+          language on a mobile device with gamification elements.<br>
+          This tool is not intended to replace face to face learning and it is always advisable to seek <br>
+          out
+          speakers and elders to deepen your understanding.
         </p>
       </div>
     </div>
@@ -87,50 +94,88 @@
     <!-- ═══════════════════════════════════════════════
              SIGNED IN CONTENT - Show only when signed in
              ═══════════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════════
+       DASHBOARD HTML STRUCTURE (Signed In)
+       Copy this structure into your index.html
+       ═══════════════════════════════════════════════ -->
+
     <div class="dashboard-content" style="display: none;">
       <div class="container">
-        <h1>Welcome back, <span id="userName" style="color: var(--clr-brand-ochre);">User</span>!</h1>
+        <h1>Welcome back, <span id="userName">User</span>!</h1>
+        <p>Keep up your learning streak</p>
 
-        <!-- Stats Grid -->
-        <div
-          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+        <!-- Stats Grid with Progress Bars -->
+        <div class="stats-grid">
+
+          <!-- Words Studied Card -->
           <div class="stat-card">
-            <h3>Words Studied</h3>
-            <p id="wordsStudied">0</p>
+            <div>
+              <h3>Words Studied</h3>
+              <p id="wordsStudied">0</p>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 54%"></div>
+            </div>
+            <p id="wordsProgress">230 more to reach 500</p>
           </div>
+
+          <!-- Current Streak Card -->
           <div class="stat-card">
-            <h3>Current Streak</h3>
-            <p id="currentStreak">0 days</p>
+            <div>
+              <h3>Current Streak</h3>
+              <p id="currentStreak">0 days</p>
+            </div>
+            <p class="body-text">Come back tomorrow to keep it going!</p>
           </div>
+
+          <!-- Favorites Card -->
           <div class="stat-card">
-            <h3>Favorites</h3>
-            <p id="favCount">0</p>
+            <div>
+              <h3>Favorites</h3>
+              <p id="favCount">0</p>
+            </div>
+            <p>View your saved words</p>
           </div>
+
         </div>
 
         <!-- Quick Actions -->
         <h2>Quick Actions</h2>
-        <div
-          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
+        <div class="actions-grid">
+
           <a href="pages/words.html" class="action-card">
-            <i class="fa-solid fa-book"></i>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
             <h3>Continue Learning</h3>
             <p>Browse word cards</p>
           </a>
+
           <a href="pages/learn.html" class="action-card">
-            <i class="fa-solid fa-graduation-cap"></i>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
             <h3>Start a Unit</h3>
             <p>Structured lessons</p>
           </a>
+
           <a href="pages/explore.html" class="action-card">
-            <i class="fa-solid fa-compass"></i>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8"></polygon>
+            </svg>
             <h3>Explore</h3>
             <p>Find words by topic</p>
           </a>
+
         </div>
       </div>
     </div>
-
   </div>
 
   <footer class="site-footer">
