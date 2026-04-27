@@ -2,29 +2,14 @@
 <html lang="en">
 
 <head>
-  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-17ZB632V40');
-  </script>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="Learn Arrernte — a living language of the Alice Springs region. Study words, practise phrases, and connect with Country.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
-    rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <title>AKALTYE - Learn Arrernte Language</title>
   <link rel="stylesheet" href="css/styles.css">
-  <title>AKALTYE — Arrernte Language</title>
+  <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="page-home">
+<body>
 
   <header>
     <nav>
@@ -48,106 +33,105 @@
     </nav>
   </header>
 
-  <main class="hero">
+  <div class="page">
 
-    <!-- Headline -->
-    <section class="headline">
-      <h1>Learn <em>Arrernte</em> Language</h1>
-      <p>This is a place to learn at your own pace, word by word.</p>
-    </section>
+    <!-- ═══════════════════════════════════════════════
+             SIGNED OUT CONTENT - Show only when NOT signed in
+             ═══════════════════════════════════════════════ -->
+    <div class="track-journey-section" style="display: none;">
+      <div class="container">
+        <h1>Learn <span style="color: var(--clr-brand-ochre);">Arrernte</span> Language</h1>
+        <p style="font-size: 1.1rem; color: #d0d0d0; margin-bottom: var(--space-8);">
+          This is a place to learn at your own pace, word by word.
+        </p>
 
-    <!-- SIGN-IN SECTION - MOVED BEFORE WOTD -->
+        <div
+          style="max-width: 500px; margin: 0 auto; padding: var(--space-6); background: rgba(255,255,255,0.02); border: 2px solid var(--clr-brand-ochre); border-radius: var(--radius-lg);">
+          <h2 style="margin-top: 0;">Track your journey</h2>
+          <p style="color: #b0b0b0; margin-bottom: var(--space-5);">
+            Sign in to save words, track progress, and earn achievements
+          </p>
 
-    <!-- Progress stats (shown when signed in) - COMPACT VERSION -->
-    <section class="progress-compact" id="progressCompact" style="display:none;">
-      <div class="welcome-back">
-        <div class="welcome-text">
-          <strong>Welcome back, <span id="userName" style="color: var(--clr-brand);">Learner</span>!</strong>
-          <p>Continue your learning journey</p>
+          <ul style="list-style: none; padding: 0; margin-bottom: var(--space-5);">
+            <li style="padding: 8px 0; color: #d0d0d0;">
+              <i class="fa-solid fa-check" style="color: var(--clr-brand-ochre); margin-right: 10px;"></i>
+              Save favorite words
+            </li>
+            <li style="padding: 8px 0; color: #d0d0d0;">
+              <i class="fa-solid fa-check" style="color: var(--clr-brand-ochre); margin-right: 10px;"></i>
+              Track quiz scores & streaks
+            </li>
+            <li style="padding: 8px 0; color: #d0d0d0;">
+              <i class="fa-solid fa-check" style="color: var(--clr-brand-ochre); margin-right: 10px;"></i>
+              Earn achievement badges
+            </li>
+          </ul>
+
+          <a href="pages/signin.html" class="btn btn-primary"
+            style="display: block; text-align: center; padding: 16px; background: var(--clr-brand-ochre); color: #1a0a00; text-decoration: none; border-radius: 10px; font-weight: 500;">
+            Sign in to start learning →
+          </a>
+
+          <p style="text-align: center; margin-top: var(--space-3); font-size: 12px; color: #888;">
+            Free to use · No credit card required
+          </p>
         </div>
-        <div class="streak-counter">
-          <div class="streak-flame">🔥</div>
-          <div class="streak-number" id="streakNumber">0</div>
-          <div class="streak-label">day streak</div>
+
+        <p style="margin-top: var(--space-8); text-align: center; color: #888; font-size: 14px;">
+          This web app is a learning tool created with resources already publicly <br>
+          available online. Always seek out speakers and elders to deepen your understanding.
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+             SIGNED IN CONTENT - Show only when signed in
+             ═══════════════════════════════════════════════ -->
+    <div class="dashboard-content" style="display: none;">
+      <div class="container">
+        <h1>Welcome back, <span id="userName" style="color: var(--clr-brand-ochre);">User</span>!</h1>
+
+        <!-- Stats Grid -->
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+          <div class="stat-card">
+            <h3>Words Studied</h3>
+            <p id="wordsStudied">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Current Streak</h3>
+            <p id="currentStreak">0 days</p>
+          </div>
+          <div class="stat-card">
+            <h3>Favorites</h3>
+            <p id="favCount">0</p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <h2>Quick Actions</h2>
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
+          <a href="pages/words.html" class="action-card">
+            <i class="fa-solid fa-book"></i>
+            <h3>Continue Learning</h3>
+            <p>Browse word cards</p>
+          </a>
+          <a href="pages/learn.html" class="action-card">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <h3>Start a Unit</h3>
+            <p>Structured lessons</p>
+          </a>
+          <a href="pages/explore.html" class="action-card">
+            <i class="fa-solid fa-compass"></i>
+            <h3>Explore</h3>
+            <p>Find words by topic</p>
+          </a>
         </div>
       </div>
-      <div class="stats-quick">
-        <div>
-          <strong id="quickSeen">0</strong>
-          <span>studied</span>
-        </div>
-        <div>
-          <strong id="quickQuizzes">0</strong>
-          <span>quizzes</span>
-        </div>
-      </div>
-    </section>
+    </div>
 
-    <!-- Sign-in prompt (shown when signed out) - PROMINENT VERSION -->
-    <aside class="signin-prompt signin-prompt--prominent" id="signinPrompt" style="display:none;">
-      <div class="signin-content">
-        <strong>Track your journey</strong>
-        <p>Sign in to save words, track progress, and earn achievements</p>
-
-        <ul class="signin-benefits">
-          <li>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
-              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-            <span>Save favorite words</span>
-          </li>
-          <li>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
-              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-            <span>Track quiz scores & streaks</span>
-          </li>
-          <li>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
-              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-            <span>Earn achievement badges</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="signin-actions">
-        <a href="pages/login.html" class="btn btn--brand">Sign in to start learning →</a>
-        <p class="signin-note">Free to use · No credit card required</p>
-      </div>
-    </aside>
-
-    <!-- Word of the day - NOW AFTER SIGN-IN SECTION - HIDDEN UNTIL SIGNED IN -->
-    <article class="wotd" id="wotdCard" style="display:none;">
-      <header>
-        <span>Word of the day</span>
-        <span id="wotdPhonetic"></span>
-      </header>
-      <h2 id="wotdWord">—</h2>
-      <p class="def" id="wotdDef">—</p>
-      <p class="example" id="wotdExample"></p>
-    </article>
-
-    <!-- CTAs - HIDDEN UNTIL SIGNED IN -->
-    <nav class="cta" id="ctaSection" style="display:none;">
-      <a href="pages/learn.html" class="btn btn--primary" style="padding: 16px var(--space-6);">
-        Start with beginner words →
-      </a>
-      <a href="pages/explore.html" class="btn btn--ghost">
-        Explore all words
-      </a>
-    </nav>
-
-    <footer
-      style="font-family: var(--font-mono); font-size: var(--text-xs); color: var(--clr-surface-a30); letter-spacing: 0.05em; line-height: 1.8; animation: fadeUp 0.55s ease 0.32s both; padding-bottom: var(--space-3);">
-      This web app is a learning tool created with resources already publicly available online.<br>
-      Always seek out speakers and elders to deepen your understanding.
-    </footer>
-
-  </main>
+  </div>
 
   <footer class="site-footer">
     <p>
@@ -160,8 +144,9 @@
     </p>
   </footer>
 
-  <script type="module" src="/js/nav.js"></script>
-  <script type="module" src="/js/home.js"></script>
+  <!-- Load navigation and home scripts -->
+  <script type="module" src="js/nav.js"></script>
+  <script type="module" src="js/home.js"></script>
 
 </body>
 
