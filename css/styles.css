@@ -904,6 +904,12 @@ nav {
   margin-bottom: 8px;
 }
 
+.stat-card.streak-card .stat-card>div:first-child::after {
+  content: '🔥';
+  font-size: 2rem;
+  margin-left: 8px;
+}
+
 /* Progress bar fill */
 .stat-card .progress-fill {
   height: 100%;
