@@ -87,13 +87,13 @@
     <!-- ═══════════════════════════════════════════════
              SIGNED IN CONTENT - Show only when signed in
              ═══════════════════════════════════════════════ -->
+
     <div class="dashboard-content" style="display: none;">
       <div class="container">
-        <h1>Welcome back, <span id="userName" style="color: var(--clr-brand-ochre);">User</span>!</h1>
+        <h1>Welcome back, <span id="userName">User</span>!</h1>
 
-        <!-- Stats Grid -->
-        <div
-          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+        <!-- Stats Grid with proper classes -->
+        <div class="stats-grid">
           <div class="stat-card">
             <h3>Words Studied</h3>
             <p id="wordsStudied">0</p>
@@ -110,8 +110,7 @@
 
         <!-- Quick Actions -->
         <h2>Quick Actions</h2>
-        <div
-          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
+        <div class="actions-grid">
           <a href="pages/words.html" class="action-card">
             <i class="fa-solid fa-book"></i>
             <h3>Continue Learning</h3>

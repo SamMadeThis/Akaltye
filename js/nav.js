@@ -1,5 +1,39 @@
-// nav.js - Fixed version with manual toggle
-// The label's default behavior is being blocked, so we manually toggle
+
+// ═══════════════════════════════════════════════════
+//  nav.js - Navigation with auth button state
+// ═══════════════════════════════════════════════════
+
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
+import { signOut } from './auth.js';
+
+const authButton = document.getElementById('authButton');
+
+// Update auth button based on user state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in - show sign out button
+    authButton.innerHTML = `
+      <button class="btn-sign-out" id="signOutBtn">
+        Sign out
+      </button>
+    `;
+    
+    // Add sign out handler
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      await signOut();
+    });
+    
+  } else {
+    // User is signed out - show sign in button
+    authButton.innerHTML = `
+      <a href="pages/signin.html" class="btn-sign-in">
+        Sign in
+      </a>
+    `;
+  }
+});
+
 
 // Manually toggle checkbox when hamburger is clicked
 function setupMenuToggle() {
