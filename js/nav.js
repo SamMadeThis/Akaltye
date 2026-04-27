@@ -2,6 +2,9 @@
 // ═══════════════════════════════════════════════════
 //  nav.js - Navigation with auth button state
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  nav.js - Navigation with auth button state
+// ═══════════════════════════════════════════════════
 
 import { auth } from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
@@ -27,13 +30,12 @@ onAuthStateChanged(auth, (user) => {
   } else {
     // User is signed out - show sign in button
     authButton.innerHTML = `
-      <a href="pages/signin.html" class="btn-sign-in">
+      <a href="pages/login.html" class="btn-sign-in">
         Sign in
       </a>
     `;
   }
 });
-
 
 // Manually toggle checkbox when hamburger is clicked
 function setupMenuToggle() {
