@@ -103,7 +103,7 @@
         <!-- Stats Grid with Progress Bars -->
         <div class="stats-grid">
 
-          <!-- Units Progress Card -->
+          <!-- Units Progress Card 
           <div class="stat-card">
             <div>
               <h3>UNITS PROGRESS</h3>
@@ -113,7 +113,7 @@
               <div class="progress-fill" id="unitsProgressBar" style="width: 0%"></div>
             </div>
             <p id="unitsProgressText">Complete units to advance</p>
-          </div>
+          </div>-->
 
           <!-- Current Streak Card -->
           <div class="stat-card">
@@ -185,10 +185,59 @@
     </p>
   </footer>
 
+
   <!-- Load navigation and home scripts -->
   <script type="module" src="js/nav.js"></script>
   <script type="module" src="js/home.js"></script>
 
+
+  <script>
+    // Simple streak tracking with localStorage
+    function updateStreak() {
+      const today = new Date().toDateString();
+      const lastVisit = localStorage.getItem('lastVisitDate');
+      let streak = parseInt(localStorage.getItem('currentStreak')) || 0;
+
+      if (!lastVisit) {
+        // First time user - start at day 1
+        streak = 1;
+      } else if (lastVisit !== today) {
+        // Check if they visited yesterday
+        const lastVisitDate = new Date(lastVisit);
+        const todayDate = new Date(today);
+        const diffTime = todayDate - lastVisitDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          // Visited yesterday - increment streak
+          streak++;
+        } else if (diffDays > 1) {
+          // Missed days - reset to 1
+          streak = 1;
+        }
+        // If diffDays === 0, same day - keep current streak
+      }
+
+      // Save to localStorage
+      localStorage.setItem('lastVisitDate', today);
+      localStorage.setItem('currentStreak', streak);
+
+      // Update the display
+      document.getElementById('currentStreak').textContent = `${streak} day${streak !== 1 ? 's' : ''}`;
+
+      // Add fire emoji
+      const streakElement = document.getElementById('currentStreak');
+      if (!streakElement.querySelector('.fire-emoji')) {
+        streakElement.innerHTML += ' <span class="fire-emoji">🔥</span>';
+      }
+    }
+
+    // Call it when page loads
+    updateStreak();
+
+
+
+  </script>
 </body>
 
 </html>
