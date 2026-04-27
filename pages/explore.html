@@ -2,678 +2,182 @@
 <html lang="en">
 
 <head>
-    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-17ZB632V40"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-17ZB632V40');
-    </script>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore Arrernte words by category, level, or search.">
+    <title>Explore — AKALTYE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <script src="https://kit.fontawesome.com/7c89d7deb7.js" crossorigin="anonymous"></script>
-    <title>AKALTYE — Explore</title>
-
-    <style>
-        /* ── Page layout ── */
-        .explore-wrap {
-            width: 100%;
-            max-width: 560px;
-            margin: 0 auto;
-            padding: var(--space-5) var(--space-4) var(--space-8);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-6);
-        }
-
-        .explore-page-title {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a20);
-            text-align: center;
-        }
-
-        /* ── Search ── */
-        .explore-search-wrap {
-            position: relative;
-        }
-
-        .explore-search {
-            width: 100%;
-            background: none;
-            border: none;
-            border-bottom: 0.5px solid var(--clr-surface-a20);
-            border-radius: 0;
-            color: var(--clr-light);
-            font-family: var(--font-display);
-            font-size: var(--text-lg);
-            font-weight: 400;
-            padding: var(--space-2) var(--space-6) var(--space-2) 0;
-            outline: none;
-            transition: border-color var(--transition-fast);
-            letter-spacing: -0.3px;
-        }
-
-        .explore-search::placeholder {
-            color: var(--clr-surface-a20);
-            font-style: italic;
-        }
-
-        .explore-search:focus {
-            border-color: var(--clr-primary-a0);
-        }
-
-        .explore-search-icon {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--clr-surface-a30);
-            font-size: var(--text-base);
-            pointer-events: none;
-        }
-
-        /* ── Search results ── */
-        .explore-results {
-            display: none;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        .explore-results.active {
-            display: flex;
-        }
-
-        .explore-result-count {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a40);
-            margin-bottom: var(--space-3);
-        }
-
-        .explore-result-item {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: var(--space-4);
-            padding: var(--space-3) 0;
-            border-bottom: 0.5px solid var(--clr-surface-a10);
-            text-decoration: none;
-            transition: opacity var(--transition-fast);
-        }
-
-        .explore-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .explore-result-item:hover {
-            opacity: 1;
-        }
-
-        .explore-result-item:hover .explore-result-word {
-            color: var(--clr-ochre);
-        }
-
-        .explore-result-item:hover .explore-result-arrow {
-            color: var(--clr-ochre);
-        }
-
-        .explore-result-left {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .explore-search::-webkit-search-cancel-button {
-            display: none;
-        }
-
-        .explore-search::-webkit-search-decoration {
-            display: none;
-        }
-
-        .explore-result-word {
-            font-family: var(--font-display);
-            font-size: var(--text-lg);
-            font-weight: 600;
-            color: var(--clr-light);
-            letter-spacing: -0.3px;
-        }
-
-        .explore-result-word mark {
-            background: none;
-            color: var(--clr-primary-a0);
-        }
-
-        .explore-result-phonetic {
-            font-family: var(--font-mono);
-            font-size: var(--text-sm);
-            color: var(--clr-ochre);
-            opacity: 0.8;
-        }
-
-        .explore-result-def {
-            font-family: var(--font-body);
-            font-size: var(--text-base);
-            color: var(--clr-surface-a50);
-            line-height: 1.5;
-            max-width: 260px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .explore-result-def mark {
-            background: none;
-            color: var(--clr-primary-a0);
-        }
-
-        .explore-result-arrow {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a30);
-            flex-shrink: 0;
-        }
-
-        .explore-no-results {
-            font-family: var(--font-mono);
-            font-size: var(--text-sm);
-            color: var(--clr-surface-a40);
-            text-align: center;
-            padding: var(--space-6) 0;
-            font-style: italic;
-        }
-
-        /* ── Section label ── */
-        .explore-section-label {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a40);
-            margin-bottom: var(--space-3);
-        }
-
-        /* ── Quick access — 2×2 minimal tiles ── */
-        .explore-quick {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--space-2);
-        }
-
-        .explore-quick-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            padding: var(--space-3) var(--space-4);
-            border: 0.5px solid var(--clr-surface-a10);
-            border-radius: var(--radius-sm);
-            text-decoration: none;
-            cursor: pointer;
-            transition: border-color var(--transition-fast), background var(--transition-fast);
-        }
-
-        .explore-quick-item:hover {
-            border-color: var(--clr-ochre);
-            background: rgba(184, 115, 51, 0.08);
-        }
-
-        .explore-quick-item:hover i {
-            color: var(--clr-ochre);
-        }
-
-        .explore-quick-item:hover .explore-quick-label {
-            color: var(--clr-ochre);
-        }
-
-        .explore-quick-item i {
-            font-size: 14px;
-            color: var(--clr-surface-a40);
-            width: 16px;
-            text-align: center;
-        }
-
-        .explore-quick-label {
-            font-family: var(--font-body);
-            font-size: var(--text-base);
-            color: var(--clr-surface-a60);
-        }
-
-        /* ── Category list — editorial rows ── */
-        .explore-cat-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        .explore-cat-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: var(--space-3) 0;
-            border-bottom: 0.5px solid var(--clr-surface-a10);
-            text-decoration: none;
-            cursor: pointer;
-            transition: opacity var(--transition-fast);
-        }
-
-        .explore-cat-item:last-child {
-            border-bottom: none;
-        }
-
-        .explore-cat-item:hover {
-            opacity: 1;
-        }
-
-        .explore-cat-item:hover .explore-cat-name {
-            color: var(--clr-ochre);
-        }
-
-        .explore-cat-item:hover i {
-            color: var(--clr-ochre);
-        }
-
-        .explore-cat-item:hover .explore-cat-arrow {
-            color: var(--clr-ochre);
-        }
-
-        .explore-cat-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-4);
-        }
-
-        .explore-cat-left i {
-            font-size: 15px;
-            color: var(--clr-surface-a40);
-            width: 18px;
-            text-align: center;
-        }
-
-        .explore-cat-name {
-            font-family: var(--font-display);
-            font-size: var(--text-md);
-            font-weight: 500;
-            color: var(--clr-light);
-            letter-spacing: -0.2px;
-        }
-
-        .explore-cat-right {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-        }
-
-        .explore-cat-count {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a30);
-            letter-spacing: 0.04em;
-        }
-
-        .explore-cat-arrow {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            color: var(--clr-surface-a30);
-        }
-
-        /* ── Level & POS — pill chips ── */
-        .explore-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-2);
-        }
-
-        .explore-chip {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--clr-surface-a50);
-            border: 0.5px solid var(--clr-surface-a20);
-            border-radius: var(--radius-pill);
-            padding: 5px 14px;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            text-decoration: none;
-        }
-
-        .explore-chip:hover {
-            border-color: var(--clr-ochre);
-            color: var(--clr-ochre);
-            background: rgba(184, 115, 51, 0.08);
-        }
-
-        /* Hide browse sections when search is active */
-        .explore-browse {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-6);
-        }
-
-        .explore-browse.hidden {
-            display: none;
-        }
-    </style>
 </head>
 
 <body>
 
-    <header></header>
+    <header>
+        <nav>
+            <input type="checkbox" class="menu-toggle" id="menuToggle">
+            <label for="menuToggle" class="menu-icon">
+                <span></span>
+            </label>
 
-    <div class="page-content"
-        style="align-items:flex-start; justify-content:flex-start; padding-top: var(--space-3); padding-bottom: 0;">
-        <div class="explore-wrap">
+            <div class="auth-btn" id="authButton"></div>
 
-            <div class="explore-page-title">Explore</div>
+            <a href="/" class="logo">akal<span>tye</span></a>
 
-            <!-- ── Search ── -->
-            <div class="explore-search-wrap">
-                <input class="explore-search" id="exploreSearch" type="search" placeholder="Search words or meanings…"
-                    autocomplete="off" autocorrect="off" spellcheck="false">
-                <i class="fa-regular fa-magnifying-glass explore-search-icon"></i>
+            <div class="menu-drawer">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="learn.html">Learn</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="page">
+        <div class="container">
+
+            <h1 style="margin-bottom: var(--space-6);">Explore</h1>
+
+            <!--explore search bar-->
+
+
+            <div class="explore-search">
+                <div class="search-wrapper has-icon">
+                    <input type="text" class="search-input" id="exploreSearch"
+                        placeholder="Search words, categories, examples..." autocomplete="off">
+                    <i class="search-icon">🔍</i>
+                    <button class="search-clear" id="searchClear" aria-label="Clear search">
+                        ✕
+                    </button>
+                </div>
+                <div class="search-results-count" id="searchCount" style="display: none;">
+                    Found <strong id="resultCount">0</strong> results
+                </div>
             </div>
 
-            <!-- ── Search results — shown when typing ── -->
-            <div class="explore-results" id="exploreResults">
-                <div class="explore-result-count" id="exploreResultCount"></div>
-                <div id="exploreResultList"></div>
+            <!-- Search results container (hidden by default) -->
+            <div class="list" id="searchResults" style="display: none;"></div>
+
+            <!-- Your existing "Your Collections" section goes here -->
+
+
+            <!-- User's collections -->
+            <h2
+                style="font-family: var(--font-display); font-size: var(--text-base); font-weight: 400; color: var(--clr-surface-a40); letter-spacing: 0.03em; margin-bottom: var(--space-4);">
+                Your Collections
+            </h2>
+
+            <div class="tiles">
+                <a href="saved.html" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-heart"></i>
+                        <span class="tile__label">Favourites</span>
+                        <span class="tile__count" id="favCount">0</span>
+                    </div>
+                </a>
+
+                <a href="history.html" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span class="tile__label">History</span>
+                        <span class="tile__count" id="historyCount">0</span>
+                    </div>
+                </a>
             </div>
 
-            <!-- ── Browse sections — hidden when searching ── -->
-            <div class="explore-browse" id="exploreBrowse">
+            <!-- Browse by category -->
+            <h2
+                style="font-family: var(--font-display); font-size: var(--text-base); font-weight: 400; color: var(--clr-surface-a40); letter-spacing: 0.03em; margin: var(--space-8) 0 var(--space-4);">
+                Browse by Category
+            </h2>
 
-                <!-- Quick access -->
-                <div>
-                    <div class="explore-section-label">Quick access</div>
-                    <div class="explore-quick">
-                        <a href="saved.html" class="explore-quick-item">
-                            <i class="fa-regular fa-heart"></i>
-                            <span class="explore-quick-label">Favourites</span>
-                        </a>
-                        <a href="saved.html" class="explore-quick-item">
-                            <i class="fa-solid fa-bookmark"></i>
-                            <span class="explore-quick-label">Bookmarks</span>
-                        </a>
-                        <a href="words.html" class="explore-quick-item">
-                            <i class="fa-regular fa-message"></i>
-                            <span class="explore-quick-label">All words</span>
-                        </a>
-                        <a href="history.html" class="explore-quick-item">
-                            <i class="fa-regular fa-clock"></i>
-                            <span class="explore-quick-label">History</span>
-                        </a>
+            <div class="tiles">
+                <a href="words.html?tag=animals" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-crow"></i>
+                        <span class="tile__label">Animals</span>
+                        <span class="tile__count">42</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Lexicon categories -->
-                <div>
-                    <div class="explore-section-label">Lexicon</div>
-                    <div class="explore-cat-list">
-                        <div class="explore-cat-item" data-group="people">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-people-line"></i>
-                                <span class="explore-cat-name">People</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="people"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="country">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-leaf"></i>
-                                <span class="explore-cat-name">Country</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="country"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="emotions">
-                            <div class="explore-cat-left">
-                                <i class="fa-regular fa-face-grin-beam"></i>
-                                <span class="explore-cat-name">Emotions</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="emotions"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="body">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-child-reaching"></i>
-                                <span class="explore-cat-name">Body</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="body"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="language">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-language"></i>
-                                <span class="explore-cat-name">Language</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="language"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="daily life">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-sun"></i>
-                                <span class="explore-cat-name">Daily life</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="daily life"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="culture">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-fire"></i>
-                                <span class="explore-cat-name">Culture</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="culture"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="cheeky">
-                            <div class="explore-cat-left">
-                                <i class="fa-regular fa-face-grin-squint-tears"></i>
-                                <span class="explore-cat-name">Cheeky</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="cheeky"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
-                        <div class="explore-cat-item" data-group="rude">
-                            <div class="explore-cat-left">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                                <span class="explore-cat-name">Rude words</span>
-                            </div>
-                            <div class="explore-cat-right">
-                                <span class="explore-cat-count" data-count-group="rude"></span>
-                                <span class="explore-cat-arrow">→</span>
-                            </div>
-                        </div>
+                <a href="words.html?tag=family" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span class="tile__label">Family</span>
+                        <span class="tile__count">28</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Level -->
-                <div>
-                    <div class="explore-section-label">Level</div>
-                    <div class="explore-chips">
-                        <span class="explore-chip" data-tag="beginner">Beginner</span>
-                        <span class="explore-chip" data-tag="intermediate">Intermediate</span>
-                        <span class="explore-chip" data-tag="advanced">Advanced</span>
+                <a href="words.html?tag=country" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-mountain-sun"></i>
+                        <span class="tile__label">Country</span>
+                        <span class="tile__count">56</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Parts of speech -->
-                <div>
-                    <div class="explore-section-label">Parts of speech</div>
-                    <div class="explore-chips">
-                        <span class="explore-chip" data-pos="noun">Noun</span>
-                        <span class="explore-chip" data-pos="verb">Verb</span>
-                        <span class="explore-chip" data-pos="adjective">Adjective</span>
-                        <span class="explore-chip" data-pos="interjection">Interjection</span>
-                        <span class="explore-chip" data-pos="pronoun">Pronoun</span>
-                        <span class="explore-chip" data-pos="adverb">Adverb</span>
+                <a href="words.html?tag=food" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-apple-whole"></i>
+                        <span class="tile__label">Food</span>
+                        <span class="tile__count">34</span>
                     </div>
-                </div>
+                </a>
 
+                <a href="words.html?tag=weather" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-cloud-moon-rain"></i>
+                        <span class="tile__label">Weather</span>
+                        <span class="tile__count">18</span>
+                    </div>
+                </a>
+
+                <a href="words.html?tag=time" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-clock"></i>
+                        <span class="tile__label">Time</span>
+                        <span class="tile__count">22</span>
+                    </div>
+                </a>
+
+                <a href="words.html?tag=actions" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-person-running"></i>
+                        <span class="tile__label">Actions</span>
+                        <span class="tile__count">45</span>
+                    </div>
+                </a>
+
+                <a href="words.html?tag=places" class="tile">
+                    <div class="tile__content">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span class="tile__label">Places</span>
+                        <span class="tile__count">31</span>
+                    </div>
+                </a>
             </div>
+
         </div>
     </div>
 
-    <script type="module">
-        import { getWords } from '../js/words-service.js';
-
-        /* Load words then wire up counts and search */
-        const WORDS = await getWords();
-
-        /* ── Word counts per group ── */
-        document.querySelectorAll('[data-count-group]').forEach(el => {
-            const group = el.dataset.countGroup;
-            const count = WORDS.filter(w =>
-                Array.isArray(w.groups) && w.groups.includes(group)
-            ).length;
-            el.textContent = count > 0 ? `${count} words` : '';
-        });
-
-        /* ── Category navigation ── */
-        document.querySelectorAll('.explore-cat-item').forEach(item => {
-            item.addEventListener('click', () => {
-                location.href = `words.html?group=${encodeURIComponent(item.dataset.group)}`;
-            });
-        });
-
-        /* ── Level chip navigation ── */
-        document.querySelectorAll('.explore-chip[data-tag]').forEach(chip => {
-            chip.addEventListener('click', () => {
-                location.href = `words.html?tag=${encodeURIComponent(chip.dataset.tag)}`;
-            });
-        });
-
-        /* ── POS chip navigation ── */
-        document.querySelectorAll('.explore-chip[data-pos]').forEach(chip => {
-            chip.addEventListener('click', () => {
-                location.href = `words.html?pos=${encodeURIComponent(chip.dataset.pos)}`;
-            });
-        });
-
-        /* ── Live search ────────────────────────────────────────────
-           Searches against:
-             1. English definition (primary)
-             2. Arrernte word
-             3. Phonetic transcription
-             4. Tags
-           Shows results after 2+ characters, hides browse sections.
-           Highlights the matching portion of the word and definition.
-        ── */
-        const input = document.getElementById('exploreSearch');
-        const results = document.getElementById('exploreResults');
-        const resultList = document.getElementById('exploreResultList');
-        const resultCount = document.getElementById('exploreResultCount');
-        const browse = document.getElementById('exploreBrowse');
-
-        function highlight(text, query) {
-            if (!query) return text;
-            const safe = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`(${safe})`, 'gi');
-            return String(text).replace(regex, '<mark>$1</mark>');
-        }
-
-        function getAllDefs(w) {
-            return Array.isArray(w.definition) ? w.definition : [w.definition];
-        }
-
-        function doSearch(raw) {
-            const q = raw.trim();
-
-            if (q.length < 2) {
-                results.classList.remove('active');
-                browse.classList.remove('hidden');
-                return;
-            }
-
-            browse.classList.add('hidden');
-            results.classList.add('active');
-
-            const ql = q.toLowerCase();
-
-            const matched = WORDS.filter(w => {
-                const defs = getAllDefs(w).join(' ').toLowerCase();
-                const word = (w.word || '').toLowerCase();
-                const phon = (w.phonetic || '').toLowerCase();
-                const tags = (w.tags || []).join(' ').toLowerCase();
-                return defs.includes(ql) || word.includes(ql) || phon.includes(ql) || tags.includes(ql);
-            });
-
-            /* Sort — definition matches first, then word matches */
-            matched.sort((a, b) => {
-                const aDefMatch = getAllDefs(a).join(' ').toLowerCase().includes(ql);
-                const bDefMatch = getAllDefs(b).join(' ').toLowerCase().includes(ql);
-                if (aDefMatch && !bDefMatch) return -1;
-                if (!aDefMatch && bDefMatch) return 1;
-                return 0;
-            });
-
-            const total = matched.length;
-            resultCount.textContent = total === 0
-                ? ''
-                : `${total} result${total !== 1 ? 's' : ''}`;
-
-            if (total === 0) {
-                resultList.innerHTML = `<div class="explore-no-results">No words found for "${q}"</div>`;
-                return;
-            }
-
-            resultList.innerHTML = matched.slice(0, 30).map(w => {
-                const defs = getAllDefs(w);
-                const matchedDef = defs.find(d => d.toLowerCase().includes(ql)) || defs[0];
-                const href = `words.html?word=${encodeURIComponent(w.word)}`;
-                return `
-          <a href="${href}" class="explore-result-item">
-            <div class="explore-result-left">
-              <span class="explore-result-word">${highlight(w.word, q)}</span>
-              ${w.phonetic ? `<span class="explore-result-phonetic">/${w.phonetic}/</span>` : ''}
-              <span class="explore-result-def">${highlight(matchedDef, q)}</span>
-            </div>
-            <span class="explore-result-arrow">→</span>
-          </a>`;
-            }).join('');
-        }
-
-        input.addEventListener('input', e => doSearch(e.target.value));
-
-        /* Clear search on escape */
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                input.value = '';
-                doSearch('');
-                input.blur();
-            }
-        });
-    </script>
+    <footer class="site-footer">
+        <p>
+            © 2026 · Made with ❤️ by
+            <a href="https://github.com/SamMadeThis">SamMadeThis</a>
+            ·
+            <a href="https://github.com/SamMadeThis/Akaltye">GitHub</a>
+            ·
+            <a href="mailto:SamMadeThisGit@outlook.com">Contact</a>
+        </p>
+    </footer>
 
     <script type="module" src="/js/nav.js"></script>
+    <script type="module" src="/js/explore.js"></script>
 
 </body>
 

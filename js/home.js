@@ -1,153 +1,171 @@
-/* =============================================================
-   home.js — Logic for index.html (home page)
+// home.js - Updated for prominent sign-in gate
+// Matches user's current design, just with sign-in section moved up
 
-   Word of the day, scroll reveal, progress stats, sign-in prompt visibility, number scramble hover.
-   
-   ============================================================= */
+// Word of the day data
+const wordOfTheDay = {
+  word: "Akaltye",
+  phonetic: "/ə-ɡəl-tʲɛ/",
+  definition: "Language, tongue, speech. The Arrernte language specifically.",
+  example: "We're learning akaltye at school."
+};
 
-import { auth }             from './firebase-config.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js';
-import { pullFromFirestore }  from './sync.js';
+// Update word of the day display
+function updateWordOfTheDay() {
+  const wotdCard = document.getElementById('wotdCard');
+  const wordEl = document.getElementById('wotdWord');
+  const phoneticEl = document.getElementById('wotdPhonetic');
+  const defEl = document.getElementById('wotdDef');
+  const exampleEl = document.getElementById('wotdExample');
 
-/* ── Word of the day ────────────────────────────────────────── 
-@todo add this section to the admin page so I dont have to hard code this window later.
-*/
-const WORDS = [
-  { word: 'Werte',    phonetic: 'wer-da',     definition: "Greeting — Hello, what's up?",        example: 'Werte? Inwenheke-ame unte atyenge antangkelhene.' },
-  { word: 'Mwerre',   phonetic: 'mwa-rra',    definition: 'Good, right, proper. Healthy, well.',  example: 'Unte mwerre? — Are you good?' },
-  { word: 'Kwatye',   phonetic: 'kwa-dja',    definition: 'Water, rain.',                          example: 'Kwatye arrangkwe — there is no water.' },
-  { word: 'Apmere',   phonetic: 'ap-mara',    definition: 'Country, land, home, place.',           example: 'Apmere — the land that holds everything.' },
-  { word: 'Mparntwe', phonetic: "m'barn-twa", definition: 'Alice Springs — the town area.',        example: 'Mparntwe is Arrernte Country.' },
-  { word: 'Urreke',   phonetic: 'oo-ree-ga',  definition: 'Goodbye, farewell.',                    example: 'Urreke! Nhenhe apetyeke — Goodbye! See you later.' },
-  { word: 'Inwenhe',  phonetic: 'in-wan-ha',  definition: 'What — used to ask about something.',   example: 'Inwenhe nhenhe? — What is this?' },
-  { word: 'Ye',       phonetic: 'ya',          definition: 'Yes, yeah.',                            example: 'Ye, ayenge mwerre — Yes, I am good.' },
-];
+  if (!wotdCard || !wordEl || !phoneticEl || !defEl || !exampleEl) return;
 
-const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-const wotd = WORDS[dayOfYear % WORDS.length];
+  // Set the word data
+  wordEl.textContent = wordOfTheDay.word;
+  phoneticEl.textContent = wordOfTheDay.phonetic;
+  defEl.textContent = wordOfTheDay.definition;
+  exampleEl.textContent = wordOfTheDay.example;
 
-document.getElementById('wotdWord').textContent     = wotd.word;
-document.getElementById('wotdPhonetic').textContent = wotd.phonetic ? `/${wotd.phonetic}/` : '';
-document.getElementById('wotdDef').textContent      = wotd.definition;
-document.getElementById('wotdExample').textContent  = wotd.example || '';
-if (!wotd.example) document.getElementById('wotdExample').style.display = 'none';
+  // Trigger animation on scroll
+  observeWOTD();
+}
 
+// Animate WOTD on scroll
+function observeWOTD() {
+  const wotdCard = document.getElementById('wotdCard');
+  if (!wotdCard) return;
 
-/* ── Scroll reveal on WOTD card ─────────────────────────────── */
-const card = document.getElementById('wotdCard');
-const observer = new IntersectionObserver(
-  (entries, obs) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        setTimeout(() => card.classList.add('is-visible'), 180);
-        obs.disconnect();
+        wotdCard.classList.add('is-visible');
+        observer.unobserve(entry.target);
       }
     });
-  },
-  { threshold: 0.15 }
-);
-observer.observe(card);
+  }, {
+    threshold: 0.2
+  });
 
-
-/* ── Progress stats ─────────────────────────────────────────── */
-function renderProgress() {
-  const seen    = JSON.parse(localStorage.getItem('lexicon_seen')       || '{}');
-  const quizzes = JSON.parse(localStorage.getItem('lexicon_quiz_log')   || '[]');
-  const favs    = JSON.parse(localStorage.getItem('lexicon_favourites') || '[]');
-  const seenCount = Object.keys(seen).length;
-
-  if (seenCount === 0) return;
-
-  const seenVal = String(seenCount);
-  const quizVal = String(quizzes.length);
-  const favVal  = String(Array.isArray(favs) ? favs.length : 0);
-
-  const seenEl = document.getElementById('progressSeen');
-  const quizEl = document.getElementById('progressQuizzes');
-  const favEl  = document.getElementById('progressFavs');
-
-  seenEl.textContent = seenVal; seenEl.dataset.real = seenVal;
-  quizEl.textContent = quizVal; quizEl.dataset.real = quizVal;
-  favEl.textContent  = favVal;  favEl.dataset.real  = favVal;
-
-  document.getElementById('homeProgress').classList.add('visible');
-
-  // Inject corner bracket spans — CSS ::before/::after only covers two corners
-  const statsEl = document.querySelector('.home-progress-stats');
-  if (statsEl && !statsEl.querySelector('.corner-tr')) {
-    const tr = document.createElement('span'); tr.className = 'corner-tr';
-    const bl = document.createElement('span'); bl.className = 'corner-bl';
-    statsEl.appendChild(tr);
-    statsEl.appendChild(bl);
-  }
+  observer.observe(wotdCard);
 }
 
-renderProgress();
+// Update auth sections based on sign-in status
+function updateAuthSections() {
+  const signinPrompt = document.getElementById('signinPrompt');
+  const progressCompact = document.getElementById('progressCompact');
+  const wotdCard = document.getElementById('wotdCard');
+  const ctaSection = document.getElementById('ctaSection');
+  
+  if (!signinPrompt || !progressCompact) return;
 
+  const isSignedIn = checkAuthStatus();
 
-/* ── Auth state ─────────────────────────────────────────────────
-  There are two different states: 
-   -  If user is signed out this will show pulsing save card and hide stats. This is to prompt the user to sign in. 
-   -  If the user is signed in it will hide the save card and show stats with real data.
-── */
-const signinPrompt = document.getElementById('homeSigninPrompt');
-const homeProgress = document.getElementById('homeProgress');
-
-onAuthStateChanged(auth, user => {
-  if (user) {
+  if (isSignedIn) {
+    // Show compact welcome/progress section
     signinPrompt.style.display = 'none';
-    pullFromFirestore(user.uid).then(renderProgress);
-    renderProgress();
-  } else {
-    signinPrompt.style.display = 'flex';
-    homeProgress.classList.remove('visible');
-  }
-});
+    progressCompact.style.display = 'block';
+    
+    // Show gated content (WOTD + CTAs - only visible when signed in)
+    if (wotdCard) wotdCard.style.display = 'block';
+    if (ctaSection) ctaSection.style.display = 'flex';
 
+    // Update streak
+    updateStreak();
 
-/* ── Number scramble hover ─────────────────────────────────────
-  Hover animation over the stats - number scrambles and then shows the actual numbers 
-  This only shows if the user is signed in (state is determined in Auth state above)
-
-*/
- 
-function scrambleNumber(stat) {
-  const numEl   = stat.querySelector('.home-progress-stat-num');
-  const realVal = numEl.dataset.real;
-  if (!realVal || numEl._scrambling) return;
-
-  numEl._scrambling = true;
-  numEl.classList.add('scrambling');
-  numEl.classList.remove('settled');
-
-  const digits = '0123456789';
-  const frames = 14;
-  const delay  = 35;
-  let   count  = 0;
-
-  const tick = setInterval(() => {
-    numEl.textContent = Array.from(
-      { length: realVal.length },
-      () => digits[Math.floor(Math.random() * 10)]
-    ).join('');
-
-    count++;
-    if (count >= frames) {
-      clearInterval(tick);
-      numEl.textContent = realVal;
-      numEl.classList.remove('scrambling');
-      numEl.classList.add('settled');
-      numEl._scrambling = false;
+    // Get user data
+    const user = getCurrentUser();
+    const stats = getUserStats();
+    
+    // Update welcome message
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) {
+      userNameEl.textContent = user.name || 'Learner';
     }
-  }, delay);
+
+    // Update streak display
+    const streakEl = document.getElementById('streakNumber');
+    if (streakEl) {
+      streakEl.textContent = stats.streak || 0;
+    }
+
+    // Update quick stats
+    const seenEl = document.getElementById('quickSeen');
+    const quizzesEl = document.getElementById('quickQuizzes');
+    
+    if (seenEl) seenEl.textContent = stats.seen;
+    if (quizzesEl) quizzesEl.textContent = stats.quizzes || 0;
+
+  } else {
+    // Show prominent sign-in prompt
+    signinPrompt.style.display = 'flex';
+    progressCompact.style.display = 'none';
+    
+    // Hide gated content (WOTD + CTAs)
+    if (wotdCard) wotdCard.style.display = 'none';
+    if (ctaSection) ctaSection.style.display = 'none';
+  }
 }
 
-function resetNumber(stat) {
-  const numEl = stat.querySelector('.home-progress-stat-num');
-  if (numEl) numEl.classList.remove('scrambling', 'settled');
+// Streak tracking function
+function updateStreak() {
+  const today = new Date().toDateString();
+  const lastVisit = localStorage.getItem('lastVisit');
+  const currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
+  
+  // If already visited today, don't update
+  if (lastVisit === today) return;
+  
+  // Check if yesterday
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toDateString();
+  
+  if (lastVisit === yesterdayStr) {
+    // Consecutive day - increment streak
+    localStorage.setItem('currentStreak', (currentStreak + 1).toString());
+  } else if (!lastVisit) {
+    // First visit ever
+    localStorage.setItem('currentStreak', '1');
+  } else {
+    // Streak broken - reset to 1
+    localStorage.setItem('currentStreak', '1');
+  }
+  
+  // Update last visit
+  localStorage.setItem('lastVisit', today);
 }
 
-document.querySelectorAll('.home-progress-stat').forEach(stat => {
-  stat.addEventListener('mouseenter', () => scrambleNumber(stat));
-  stat.addEventListener('mouseleave', () => resetNumber(stat));
-});
+// Helper functions
+function checkAuthStatus() {
+  return localStorage.getItem('isSignedIn') === 'true';
+}
+
+function getCurrentUser() {
+  return {
+    name: localStorage.getItem('userName') || 'Learner'
+  };
+}
+
+function getUserStats() {
+  return {
+    seen: parseInt(localStorage.getItem('wordsStudied') || '0'),
+    quizzes: parseInt(localStorage.getItem('quizzesTaken') || '0'),
+    favourites: parseInt(localStorage.getItem('favouritesCount') || '0'),
+    streak: parseInt(localStorage.getItem('currentStreak') || '0')
+  };
+}
+
+// Initialize home page
+function initHome() {
+  updateWordOfTheDay();
+  updateAuthSections();
+}
+
+// Run on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHome);
+} else {
+  initHome();
+}
+
+// Export for use in other files if needed
+export { updateWordOfTheDay, updateAuthSections, checkAuthStatus };

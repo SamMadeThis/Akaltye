@@ -589,7 +589,27 @@
 </head>
 
 <body>
-    <header></header>
+    <header>
+        <nav>
+            <input type="checkbox" class="menu-toggle" id="menuToggle">
+            <label for="menuToggle" class="menu-icon">
+                <span></span>
+            </label>
+
+            <div class="auth-btn" id="authButton"></div>
+
+            <a href="/" class="logo">akal<span>tye</span></a>
+
+            <div class="menu-drawer">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="learn.html">Learn</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
 
     <div class="page-content" style="align-items:flex-start;justify-content:flex-start;padding:0;">
         <div class="learn-page">
@@ -715,8 +735,18 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
 
+    <div class="toast" id="toast"></div>
+    <footer class="site-footer">
+        <p>
+            © 2026 · Made with ❤️ by
+            <a href="https://github.com/SamMadeThis">SamMadeThis</a>
+            ·
+            <a href="https://github.com/SamMadeThis/Akaltye">GitHub</a>
+            ·
+            <a href="mailto:SamMadeThisGit@outlook.com">Contact</a>
+        </p>
+    </footer>
     <script type="module">
         import { getWords } from '../js/words-service.js';
         import { db } from '../js/firebase-config.js';

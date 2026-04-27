@@ -19,6 +19,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
         rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="../css/styles.css">
     <title>AKALTYE — Profile</title>
     <script>
@@ -36,7 +37,27 @@
 
 <body>
 
-    <header></header>
+    <header>
+        <nav>
+            <input type="checkbox" class="menu-toggle" id="menuToggle">
+            <label for="menuToggle" class="menu-icon">
+                <span></span>
+            </label>
+
+            <div class="auth-btn" id="authButton"></div>
+
+            <a href="../index.html" class="logo">akal<span>tye</span></a>
+
+            <div class="menu-drawer">
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="learn.html">Learn</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
 
     <div class="page-content">
         <div class="ring-tip" id="ringTip"></div>
@@ -114,6 +135,17 @@
 
         </div>
     </div>
+    <footer class="site-footer">
+        <p>
+            © 2026 · Made with ❤️ by
+            <a href="https://github.com/SamMadeThis">SamMadeThis</a>
+            ·
+            <a href="https://github.com/SamMadeThis/Akaltye">GitHub</a>
+            ·
+            <a href="mailto:SamMadeThisGit@outlook.com">Contact</a>
+        </p>
+    </footer>
+
 
     <script type="module">
         import { auth } from '../js/firebase-config.js';
@@ -366,7 +398,7 @@
         });
     </script>
 
-    <script type="module" src="/js/nav.js"></script>
+    <script type="module" src="../js/nav.js"></script>
 
 </body>
 

@@ -19,112 +19,147 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@300&family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap"
     rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="css/styles.css">
   <title>AKALTYE — Arrernte Language</title>
 </head>
 
 <body class="page-home">
 
-  <header></header>
+  <header>
+    <nav>
+      <input type="checkbox" class="menu-toggle" id="menuToggle">
+      <label for="menuToggle" class="menu-icon">
+        <span></span>
+      </label>
 
-  <div class="home-hero">
+      <div class="auth-btn" id="authButton"></div>
 
-    <div class="home-country">
-      <div class="home-country-line"></div>
-      <span class="home-country-label">Arrernte Country · Mparntwe</span>
-    </div>
+      <a href="/" class="logo">akal<span>tye</span></a>
 
-    <!-- I dont know if I like this heading..... -->
-    <div class="home-headline">
-      <h1 class="home-title">
-        Learn the language<br>of <em>this Country.</em>
-      </h1>
-      <p class="home-subtitle">
-        Arrernte is a living language spoken in Central Australia.
-        This is a place to learn at your own pace, word by word.
-      </p>
-    </div>
-
-    <!-- Word of the day -->
-    <!-- @TODO I would like to experiment with some kind of hover or scroll animation here.-->
-    <div class="home-word-card" id="wotdCard">
-      <div class="home-word-card-top">
-        <div class="home-word-card-label">Word of the day</div>
-        <div class="home-word-card-phonetic" id="wotdPhonetic"></div>
+      <div class="menu-drawer">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="pages/explore.html">Explore</a></li>
+          <li><a href="pages/learn.html">Learn</a></li>
+          <li><a href="pages/profile.html">Profile</a></li>
+        </ul>
       </div>
-      <div class="home-word-card-word" id="wotdWord">—</div>
-      <div class="home-word-card-rule"></div>
-      <div class="home-word-card-def" id="wotdDef">—</div>
-      <div class="home-word-card-example" id="wotdExample"></div>
-    </div>
+    </nav>
+  </header>
 
-    <!-- Progress stats — shown when signed in with data 
-    State is determined in home.js 
-    - if user is signed in it will show stats 
-    - if not signed it will show sign in card 
-    -->
-    <div class="home-progress" id="homeProgress">
-      <div class="home-progress-label">Your progress</div>
-      <div class="home-progress-stats">
-        <a href="pages/words.html?tag=all" class="home-progress-stat">
-          <span class="home-progress-stat-num" id="progressSeen">0</span>
-          <span class="home-progress-stat-label">studied</span>
-        </a>
-        <a href="pages/practice.html" class="home-progress-stat">
-          <span class="home-progress-stat-num" id="progressQuizzes">0</span>
-          <span class="home-progress-stat-label">quizzes</span>
-        </a>
-        <a href="pages/saved.html" class="home-progress-stat">
-          <span class="home-progress-stat-num" id="progressFavs">0</span>
-          <span class="home-progress-stat-label">favourited</span>
-        </a>
+  <main class="hero">
+
+    <!-- Headline -->
+    <section class="headline">
+      <h1>Learn <em>Arrernte</em> Language</h1>
+      <p>This is a place to learn at your own pace, word by word.</p>
+    </section>
+
+    <!-- SIGN-IN SECTION - MOVED BEFORE WOTD -->
+
+    <!-- Progress stats (shown when signed in) - COMPACT VERSION -->
+    <section class="progress-compact" id="progressCompact" style="display:none;">
+      <div class="welcome-back">
+        <div class="welcome-text">
+          <strong>Welcome back, <span id="userName" style="color: var(--clr-brand);">Learner</span>!</strong>
+          <p>Continue your learning journey</p>
+        </div>
+        <div class="streak-counter">
+          <div class="streak-flame">🔥</div>
+          <div class="streak-number" id="streakNumber">0</div>
+          <div class="streak-label">day streak</div>
+        </div>
       </div>
-    </div>
-
-    <!-- Save card — shown when signed out, sits in the stats position.
-         Pulses its border to ochre twice on load to draw attention,
-         then settles. Replaced by real stats once signed in. -->
-    <div class="home-signin-prompt" id="homeSigninPrompt" style="display:none;">
-      <div class="home-signin-prompt-text">
-        <span class="home-signin-prompt-title">Save your progress</span>
-        <span class="home-signin-prompt-sub">Sign in to track words, streaks and quizzes.</span>
+      <div class="stats-quick">
+        <div>
+          <strong id="quickSeen">0</strong>
+          <span>studied</span>
+        </div>
+        <div>
+          <strong id="quickQuizzes">0</strong>
+          <span>quizzes</span>
+        </div>
       </div>
-      <a href="pages/login.html" class="home-signin-prompt-btn">Sign in →</a>
-    </div>
+    </section>
 
-    <!-- CTAs -->
-    <div class="home-actions">
-      <a href="pages/learn.html" class="home-btn-primary">
+    <!-- Sign-in prompt (shown when signed out) - PROMINENT VERSION -->
+    <aside class="signin-prompt signin-prompt--prominent" id="signinPrompt" style="display:none;">
+      <div class="signin-content">
+        <strong>Track your journey</strong>
+        <p>Sign in to save words, track progress, and earn achievements</p>
+
+        <ul class="signin-benefits">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
+              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>Save favorite words</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
+              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>Track quiz scores & streaks</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="8" fill="var(--clr-brand)" opacity="0.1" />
+              <path d="M5 8L7 10L11 6" stroke="var(--clr-brand)" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>Earn achievement badges</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="signin-actions">
+        <a href="pages/login.html" class="btn btn--brand">Sign in to start learning →</a>
+        <p class="signin-note">Free to use · No credit card required</p>
+      </div>
+    </aside>
+
+    <!-- Word of the day - NOW AFTER SIGN-IN SECTION - HIDDEN UNTIL SIGNED IN -->
+    <article class="wotd" id="wotdCard" style="display:none;">
+      <header>
+        <span>Word of the day</span>
+        <span id="wotdPhonetic"></span>
+      </header>
+      <h2 id="wotdWord">—</h2>
+      <p class="def" id="wotdDef">—</p>
+      <p class="example" id="wotdExample"></p>
+    </article>
+
+    <!-- CTAs - HIDDEN UNTIL SIGNED IN -->
+    <nav class="cta" id="ctaSection" style="display:none;">
+      <a href="pages/learn.html" class="btn btn--primary" style="padding: 16px var(--space-6);">
         Start with beginner words →
       </a>
-      <a href="pages/explore.html" class="home-btn-secondary">
+      <a href="pages/explore.html" class="btn btn--ghost">
         Explore all words
       </a>
-    </div>
+    </nav>
 
-    <p class="home-footer-note">
-      Arrernte is spoken by the Arrernte people of Central Australia.<br>
-      This app is a learning tool. Always seek out speakers and elders to deepen your understanding.
+    <footer
+      style="font-family: var(--font-mono); font-size: var(--text-xs); color: var(--clr-surface-a30); letter-spacing: 0.05em; line-height: 1.8; animation: fadeUp 0.55s ease 0.32s both; padding-bottom: var(--space-3);">
+      This web app is a learning tool created with resources already publicly available online.<br>
+      Always seek out speakers and elders to deepen your understanding.
+    </footer>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      © 2026 · Made with ❤️ by
+      <a href="https://github.com/SamMadeThis">SamMadeThis</a>
+      ·
+      <a href="https://github.com/SamMadeThis/Akaltye">GitHub</a>
+      ·
+      <a href="mailto:SamMadeThisGit@outlook.com">Contact</a>
     </p>
-
-  </div>
-
-  <footer>
-    <div class="site-footer">
-      <p class="site-footer-text">
-        © 2026 · Made with ❤️ by
-        <a href="https://github.com/SamMadeThis" class="site-footer-link">SamMadeThis</a>
-        &nbsp;·&nbsp;
-        <a href="https://github.com/SamMadeThis/Akaltye" class="site-footer-link">GitHub</a>
-        &nbsp;·&nbsp;
-        <a href="mailto:SamMadeThisGit@outlook.com" class="site-footer-link">Contact</a>
-      </p>
-    </div>
   </footer>
-  <!--Javascript files
-      - Nav.js is the navigation bar JS
-      - Home.js is the javascript for index.html (word of the day and authentication) 
-      -->
+
   <script type="module" src="/js/nav.js"></script>
   <script type="module" src="/js/home.js"></script>
 
