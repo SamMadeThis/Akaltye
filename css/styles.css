@@ -12,6 +12,26 @@
    7. Animations
    ============================================================= */
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 /* =============================================================
    1. DESIGN TOKENS
    ============================================================= */
@@ -227,15 +247,21 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  overflow: visible;
+  /* Add this */
 }
 
 nav {
-  position: relative;
+  position: sticky;
+  top: 0;
   display: flex;
   align-items: center;
   width: 100%;
   padding: var(--space-4) var(--space-6);
   gap: var(--space-3);
+  background-color: var(--clr-dark);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .menu-icon {
@@ -290,7 +316,7 @@ nav {
 }
 
 .btn-sign-out {
-  background: transparent !important;
+  background: var(--clr-brand) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
   color: #d0d0d0 !important;
 }
